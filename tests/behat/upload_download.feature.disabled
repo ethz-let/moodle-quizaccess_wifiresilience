@@ -1,0 +1,101 @@
+@quizaccess @quizaccess_wifiresilience
+Feature: Download responses, encrypted, on the client-side, and re-upload.
+  In order to attempt quizzes with dodgy wifi that dies and never comes back
+  As a student or invigilator
+  I need to be able to download my responses on the client-side, and later upload them to the quiz.
+
+# This feature is not currently working in any browser, even though it used to work.
+# At some point it should be fixed, and renamed back to .feature.
+#
+# In Chrome, the 'I simulate losing the network by changing the submit URL' step
+# fails silently, so then the test crashes out at 'I follow the emergency download link'
+# since that link does not exist.
+#
+# In PhantomJS, it crashes at the 'I follow the emergency download link' step, with
+# and error saying that the link is not visible, when it can be clearly seen in
+# the screen grab.
+#
+# I can't get Firefox to work right now.
+
+  Background:
+    Given the following "courses" exist:
+      | fullname | shortname | format |
+      | Course 1 | C1        | topics |
+    And the following "users" exist:
+      | username | firstname |
+      | student  | Study     |
+    And the following "course enrolments" exist:
+      | user    | course | role    |
+      | student | C1     | student |
+    And the following "question categories" exist:
+      | contextlevel | reference | name           |
+      | Course       | C1        | Test questions |
+    And the following "questions" exist:
+      | questioncategory | qtype     | name       | questiontext |
+      | Test questions   | truefalse | Question A | Answer me A  |
+      | Test questions   | truefalse | Question B | Answer me B  |
+    And the following "questions" exist:
+      | questioncategory | qtype     | name       | questiontext | template         |
+      | Test questions   | essay     | Question C | Answer me C  | editorfilepicker |
+    And the following "activities" exist:
+      | activity   | name                | course | idnumber | questionsperpage | wifiresilience_enabled |
+      | quiz       | Quiz fault-tolerant | C1     | quiz1    | 1                | 1                   |
+    And quiz "Quiz fault-tolerant" contains the following questions:
+      | Question A | 1 |
+      | Question B | 1 |
+      | Question C | 1 |
+    And the quiz auto-save period is set to "2"
+    And I log in as "student"
+    And I follow "Course 1"
+    And I follow "Quiz fault-tolerant"
+    And I press "Attempt quiz now"
+    When I simulate losing the network by changing the submit URL
+    And I click on "True" "radio" in the "#q1" "css_element"
+    And I click on "False" "radio" in the "#q2" "css_element"
+    And I set the field with xpath "//*[@class='editor_atto_content']" to "Answer to the third question"
+    And I wait "2" seconds
+
+  @javascript
+  Scenario: Download the responses so far, then re-upload them without finishing the attempt.
+    When I follow the emergency download link
+    And I click on "Miscellaneous" "link" confirming the dialogue
+    And I log out
+    And I log in as "admin"
+    And I am on site homepage
+    And I follow "Course 1"
+    And I follow "Quiz fault-tolerant"
+    And I follow "upload exported responses"
+    And I upload the saved responses file to "Response files" filemanager
+    And I press "Upload responses"
+    Then I should see "Processing file"
+    And I should see "Data processed successfully"
+    And I follow "Review this attempt"
+    And I should see "In progress" in the "State" "table_row"
+    And I should not see "Completed on" in the "quizreviewsummary" "table"
+    And I should see "Answer to the third question"
+    And the state of "Answer me A" question is shown as "Answer saved"
+    And the state of "Answer me B" question is shown as "Answer saved"
+    And the state of "Answer me C" question is shown as "Answer saved"
+
+  @javascript
+  Scenario: Download the responses so far, then re-upload them finishing the attempt.
+    When I follow the emergency download link
+    And I click on "Miscellaneous" "link" confirming the dialogue
+    And I log out
+    And I log in as "admin"
+    And I am on site homepage
+    And I follow "Course 1"
+    And I follow "Quiz fault-tolerant"
+    And I follow "upload exported responses"
+    And I upload the saved responses file to "Response files" filemanager
+    And I set the field "Submit and finish each attempt after processing the upload" to "Yes"
+    And I press "Upload responses"
+    Then I should see "Processing file"
+    And I should see "Data processed successfully"
+    And I follow "Review this attempt"
+    And I should see "Finished" in the "State" "table_row"
+    And I should see "Completed on" in the "quizreviewsummary" "table"
+    And I should see "Answer to the third question"
+    And the state of "Answer me A" question is shown as "Correct"
+    And the state of "Answer me B" question is shown as "Incorrect"
+    And the state of "Answer me C" question is shown as "Complete"
