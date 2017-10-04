@@ -297,6 +297,13 @@ class quizaccess_wifiresilience extends quiz_access_rule_base {
       }
 
       $quizid = $this->quizobj->get_quizid();
+      if(!$quizid){
+        print_error('invalidcourse');
+      }
+      $quiz_cmid = $this->quizobj->get_cmid();
+      if(!$quiz_cmid){
+        print_error('invalidcoursemodule');
+      }
       $wifi_settings = $DB->get_record('quizaccess_wifiresilience', array('quizid' => $quizid));
 
       $return  = '';
@@ -317,7 +324,7 @@ class quizaccess_wifiresilience extends quiz_access_rule_base {
                 $return .= '<li>Enable Web Services from <a href="'.$CFG->wwwroot.'/admin/search.php?query=enablewebservices">here</a>.</li>';
               }
               if (empty($wifi_settings->wifitoken) || trim($wifi_settings->wifitoken) =='') {
-                $return .= '<li>Add Token at plugin <a href="'.$CFG->wwwroot.'/admin/settings.php?section=modsettingsquizcatwifiresilience">plugin level</a>, or <a href="'.$CFG->wwwroot.'/course/modedit.php?update='.$this->quizobj->get_cmid().'&return=1">Quiz level</a> (In quiz settings. It has higher priority than site-level).</li>';
+                $return .= '<li>Add Token at plugin <a href="'.$CFG->wwwroot.'/admin/settings.php?section=modsettingsquizcatwifiresilience">plugin level</a>, or <a href="'.$CFG->wwwroot.'/course/modedit.php?update='.$quiz_cmid.'&return=1">Quiz level</a> (In quiz settings. It has higher priority than site-level).</li>';
               }
               $return .= '</ol></div>';
           }
@@ -335,34 +342,34 @@ class quizaccess_wifiresilience extends quiz_access_rule_base {
       }
         if($uploadresponses_role == 1){
           $return .= '<li>' .html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/upload.php',
-                          array('id' => $this->quizobj->get_cmid())),
+                          array('id' => $quiz_cmid)),
                           get_string('descriptionlink', 'quizaccess_wifiresilience')) . '</li>';
         }
 
         if($localresponses_role == 1){
           $return .= '<li>' . html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/local.php',
-                        array('id' => $this->quizobj->get_cmid())),
+                        array('id' => $quiz_cmid)),
                         get_string('loadlocalresponses', 'quizaccess_wifiresilience')).'</li>';
 
           $return .= '<li>' . html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/uploaded_syncedfiles.php',
-                        array('id' => $this->quizobj->get_cmid())),
+                        array('id' => $quiz_cmid)),
                         get_string('syncedfiles', 'quizaccess_wifiresilience')).'</li>';
         }
 
 
         if($inspectresponses_role == 1){
           $return .=  '<li>' . html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/inspect.php',
-                         array('id' => $this->quizobj->get_cmid())),
+                         array('id' => $quiz_cmid)),
                          get_string('inspect', 'quizaccess_wifiresilience')).'</li>';
         }
 
         if($browserchecks_role == 1){
         $return .= '<li>' . html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/cryptotest.php',
-                         array('id' => $this->quizobj->get_cmid())),
+                         array('id' => $quiz_cmid)),
                          get_string('testencryption', 'quizaccess_wifiresilience')).'</li>';
 
         $return .= '<li>' . html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/check/',
-                          array('id' => $this->quizobj->get_cmid())),
+                          array('id' => $quiz_cmid)),
                           get_string('technicalchecks', 'quizaccess_wifiresilience'),array('target' => '_blank')).'</li>';
 
         }
@@ -389,7 +396,7 @@ if($displayadminmsgs == 1 || $uploadresponses_role == 1 || $inspectresponses_rol
 
         $return .= '<div id="wifiresilience_tech_pre_checks_div" class="alert alert-warning" style="display:none; text-align:left">Technical Inspection:<br /></div>';
 
-        $serviceworker_params = '?cmid='.$this->quizobj->get_cmid().'&quizid='.$quizid.'&rev='.rand();
+        $serviceworker_params = '?cmid='.$quiz_cmid.'&quizid='.$quizid.'&rev='.rand();
         $return .= '<script>
         function wifiresilience_formatbytes(a,b){if(0==a)return"0 Bytes";var c=1e3,d=b||2,e=["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]}
 

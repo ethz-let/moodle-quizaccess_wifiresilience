@@ -28,8 +28,21 @@ define('DEBUG', false);
 //define('ABORT_AFTER_CONFIG', true);
 require_once(__DIR__ . '/../../../../config.php');
 
-$cmid = required_param('cmid', PARAM_INT);
-$quizid = required_param('quizid', PARAM_INT);
+$cmid = optional_param('cmid', -1, PARAM_INT);
+$quizid = optional_param('quizid', 0, PARAM_INT);
+
+$filename_file_name = "serviceworker.php";
+
+if($quizid == 0 || !$quizid){
+  header('Content-Disposition: inline; filename="'.$filename_file_name.'"');
+  header('Last-Modified: '. gmdate('D, d M Y H:i:s', time()) .' GMT');
+  header('Expires: '. gmdate('D, d M Y H:i:s', time() + 86000) .' GMT');
+  header('Pragma: ');
+  header('Accept-Ranges: none');
+  header('Content-Type: application/javascript; charset=utf-8');
+  echo "// NO QUIZ ID - Terminate Service Worker!!!!";
+  die;
+}
 
 $wifi_settings = $DB->get_record('quizaccess_wifiresilience', array('quizid' => $quizid));
 
@@ -969,6 +982,10 @@ function wifi_uploadResponses(cmid, token){
 
   if(!token || token ==''){
     console.log('[ETHz-SW] ServiceWorker: Background Sync TOKEN is not avialable, background sync is terminated.');
+    return;
+  }
+  if(!cmid || cmid =='' || cmid == -1){
+    console.log('[ETHz-SW] ServiceWorker: Background Sync CMID is not avialable, background sync is terminated.');
     return;
   }
 
