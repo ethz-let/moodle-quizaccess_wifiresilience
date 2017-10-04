@@ -50,6 +50,15 @@ $pageurl = $attemptobj->attempt_url(null, $page);
 $PAGE->set_url(quizaccess_wifiresilience::ATTEMPT_URL, $pageurl->params());
 
 $course = $attemptobj->get_course();
+if(!$course){
+  print_error('invalidcourse');
+}
+$courseid = $course->id;
+$cmid = $attemptobj->get_cmid();
+if(!$cmid){
+  print_error('invalidcoursemodule');
+}
+
 // Check login.
 require_login($course, false, $attemptobj->get_cm());
 
@@ -145,9 +154,6 @@ if($wifi_settings){
   }
 }
 
-$cmid = $attemptobj->get_cmid();
-$courseid = $attemptobj->get_courseid();
-
 $timeleft = $attemptobj->get_time_left_display(time());
 if ($timeleft !== false) {
     $ispreview = $attemptobj->is_preview();
@@ -199,12 +205,13 @@ $PAGE->requires->strings_for_js(array('submitallandfinish', 'confirmclose'), 'qu
 $PAGE->requires->string_for_js('flagged', 'question');
 $PAGE->requires->string_for_js('confirmation', 'admin');
 
+
 // Log this page view.
 $params = array(
         'objectid' => $attemptid,
         'relateduserid' => $attemptobj->get_userid(),
         'courseid' => $attemptobj->get_courseid(),
-        'context' => context_module::instance($attemptobj->get_cmid()),
+        'context' => context_module::instance($cmid),
         'other' => array(
                 'quizid' => $attemptobj->get_quizid()
         )

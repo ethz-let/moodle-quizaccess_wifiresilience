@@ -23,7 +23,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2017100300;
+$plugin->version = 2017100400;
 $plugin->requires = 2015041700;
 $plugin->cron = 0;
 $plugin->component = 'quizaccess_wifiresilience';
