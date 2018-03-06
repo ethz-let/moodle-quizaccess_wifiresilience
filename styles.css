@@ -1,4 +1,7 @@
-  /*
+.wifiresilience_hidden_form_elements{
+	display: none;
+}
+/*
 #page-mod-quiz-attempt .hidden {
 
     visibility: hidden;

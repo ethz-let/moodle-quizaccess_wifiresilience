@@ -104,7 +104,8 @@ class quizaccess_wifiresilience extends quiz_access_rule_base {
         $mform->setDefault('wifiresilience_wifitoken', $config->wifitoken);
 
   //      $mform->setAdvanced('wifiresilience_wifitoken', 1);
-
+        $mform->addElement('html', '<div class="wifiresilience_hidden_form_elements">');
+        
         $mform->addElement('textarea', 'wifiresilience_watchxhr',
                 get_string('watchxhr', 'quizaccess_wifiresilience'), 'cols="60" rows="25"');
         $mform->addHelpButton('wifiresilience_watchxhr',
@@ -184,6 +185,7 @@ class quizaccess_wifiresilience extends quiz_access_rule_base {
 
             }
         }
+        $mform->addElement('html', '</div>');
     }
 
     /**
