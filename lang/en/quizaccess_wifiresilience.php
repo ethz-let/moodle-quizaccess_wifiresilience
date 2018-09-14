@@ -29,31 +29,31 @@ $string['backtothequiz'] = 'Back to the quiz';
 $string['changesmadereallygoaway'] = 'Your responses have not been saved to the server. Are you sure you want to leave this attempt.';
 $string['dataprocessedsuccessfully'] = 'Data processed successfully ({$a}).';
 $string['inspectionprocessedsuccessfully'] = 'Data processed successfully.';
-$string['description'] = 'This Exam is in <strong>Wifi Resilience</strong> mode.';
+$string['description'] = 'This exam is in <strong>Wifi Resilience</strong> mode.';
 $string['uploadresponsesadmin'] = 'Adminstrators can: ';
 $string['or'] = 'or';
 $string['descriptionlink'] = 'Upload exported responses';
 $string['finishattemptsafterupload'] = 'Submit and finish the attempt contained in the response file?';
-$string['uploadfinishtime'] = 'Attempt/Submission Time';
+$string['uploadfinishtime'] = 'Attempt/submission Time';
 $string['lastsaved'] = 'Last saved: {$a}';
 $string['lastsavedtotheserver'] = 'Last saved to the server: {$a}';
 $string['lastsavedtothiscomputer'] = 'Last saved to this computer: {$a}';
 $string['loggedinaswronguser'] = 'You have logged in with an account other than the one that was attempting the quiz. That will not work. Click Continue to login again as the right user.';
 $string['logindialogueheader'] = 'You may need to log in again';
-$string['loginokagain'] = 'Your login is now OK.';
+$string['loginokagain'] = 'Your login is now ok.';
 $string['wifiresilienceenabled'] = 'Wifi Resilience Mode';
-$string['wifiresilienceenabled_desc'] = 'Whether the Wifi Resilience Mode should be enabled by default for new quizzes, and also whether it should be an advanced settings (behind \'Show more ...\') on the quiz settings form.';
-$string['wifiresilienceenabled_help'] = 'The goal of this option is to let students attempt a quiz even if the network connection is not reliable. For example on a train going through tunnels, or just with bad Wifi. The students can move between pages of the quiz even if the server is not avaialble, and all their answers are stored locally, and sent to the server when possible.';
+$string['wifiresilienceenabled_desc'] = 'You can configure whether the Wifi Resilience Mode should be enabled by default for new quizzes or not.';
+$string['wifiresilienceenabled_help'] = 'The goal of this option is to let students attempt a quiz even if the network connection is not reliable. For example on a train going through tunnels, or just with bad Wifi. The students can move between pages of the quiz even if the server is not available, and all their answers are stored locally, and sent to the server when possible.';
 $string['wifiresilience:uploadresponses'] = 'Upload response files';
 $string['wifiresilience:adminmessages'] = 'View administration messages';
-$string['wifiresilience:browserchecks'] = 'View Browser Checks';
+$string['wifiresilience:browserchecks'] = 'View browser checks';
 $string['wifiresilience:inspectresponses'] = 'Inspect responses';
-$string['wifiresilience:localresponses'] = 'Inspect Local Responses (Local Storage)';
-$string['wifiresilience:viewtechchecks'] = 'View Technical Checks (even when this option is disabled via quiz settings)';
-$string['wifiresilience:viewlivedevices'] = 'View Live Devices';
-$string['livedevices'] = 'Live Devices';
-$string['lastseen'] = 'Last Seen';
-$string['lastsync'] = 'Last Synced';
+$string['wifiresilience:localresponses'] = 'Inspect local responses (local storage)';
+$string['wifiresilience:viewtechchecks'] = 'View technical checks (even when this option is disabled via quiz settings)';
+$string['wifiresilience:viewlivedevices'] = 'View live devices';
+$string['livedevices'] = 'Live devices';
+$string['lastseen'] = 'Last seen';
+$string['lastsync'] = 'Last synced';
 $string['status'] = 'Status';
 $string['currentissue'] = 'Current issue';
 $string['pluginname'] = 'Quiz Wifi Resilience Mode';
@@ -64,8 +64,8 @@ $string['processingfile'] = 'Processing file {$a}';
 $string['decryptingcomplete'] = 'Decrypting file complete';
 $string['decryptingfile'] = 'Decrypting file {$a}';
 $string['inspectingfile'] = 'Inspecting file {$a}';
-$string['inspectingfiledesc'] = 'Here you can Decrypt Emergency Files, and Encrypt them again. Please use this tool with caution. The Inspection tool is built to give the exam admins the option to modify exam attempts; such as, but not limited to, course ID, Exam ID, Submission Time, Answer Modification, etc. ';
-$string['inspect'] = 'Inspect Response Files';
+$string['inspectingfiledesc'] = 'Here you can decrypt emergency files, and encrypt them again. Please use this tool with caution. The inspection tool is built to give the exam admins the option to modify exam attempts; such as, but not limited to, course ID, exam ID, submission time, answer modification, etc. ';
+$string['inspect'] = 'Inspect response files';
 $string['publickey'] = 'Encryption public key';
 $string['publickey_desc'] = 'This must correspond to the private key. You can generate it from the private key using <code>openssl rsa -pubout -in rsa_1024_priv.pem -out rsa_1024_pub.pem</code> then past the contents of rsa_1024_pub.pem here.';
 $string['responsefiles'] = 'Response files';
@@ -73,7 +73,7 @@ $string['responsefiles_help'] = 'During a quiz attempt you can download a respon
 $string['reviewthisattempt'] = 'Review this attempt';
 $string['savefailed'] = 'Note: From time to time you should:';
 $string['savetheresponses'] = 'Download copy of answers'; //Save the responses
-$string['savingdots'] = 'Saving to Server...';
+$string['savingdots'] = 'Saving to server...';
 $string['savingtryagaindots'] = 'Trying again to save to the server ...';
 $string['submitfailed'] = 'Exam submission failed';
 $string['submitfaileddownloadmessage'] = '<br /><strong>Or</strong><br />{$a}<br />(Note: NO data has been lost. Please let the exam invigilator know and they will take a copy of your downloaded file and process it.)';
@@ -81,78 +81,78 @@ $string['submitfailedmessage'] = 'Your responses could not be submitted. You can
 $string['submitting'] = '<h3>Submitting.. Please wait..</h3>';
 $string['submitallandfinishtryagain'] = 'Submit all and finish (try again)';
 $string['uploadfailed'] = 'The upload failed';
-$string['downloadedecryptedfile'] = 'Download Decrypted File';
-$string['testencryption'] = 'Test Device & Server Encryption';
+$string['downloadedecryptedfile'] = 'Download decrypted File';
+$string['testencryption'] = 'Test device and server encryption';
 $string['uploadingresponsesfor'] = 'Uploading responses for {$a}';
 $string['uploadmoreresponses'] = 'Upload more responses';
 $string['uploadresponses'] = 'Upload response files';
 $string['uploadresponsesfor'] = 'Upload response file for {$a}';
 $string['uploadinspection'] = 'Inspect responses';
 $string['uploadinspectionfor'] = 'Inspect responses for {$a}';
-$string['localresponsesfor'] = 'Responses Stored on <strong>this</strong> local machine for {$a}';
+$string['localresponsesfor'] = 'Responses stored on <strong>this</strong> local machine for {$a}';
 $string['loadlocalresponses'] = 'Check, download, save or delete responses stored on <strong>this</strong> computer';
-$string['takeattemptfromjson'] = 'Use unencrypted Attempt ID';
-$string['takeattemptfromjson_help'] = '***READ CAREFULLY*** If an attempt is already damaged or if you want to create new attempt to continue on it and avoid Question Sequence integrity issues, then use this option with absalute care!. Please note that the attempt ID still need to match an actual attempt, whether created before, or just created by Administrator (logged in as Student) in order to create an attempt to build on it (in order to upload Student original response file - Emergency file - we need a valid attempt).<br /><br /><font color="red">Please DO NOT tick this box unless you fully understand how attempts are managed!</font>';
+$string['takeattemptfromjson'] = 'Use unencrypted attempt ID';
+$string['takeattemptfromjson_help'] = '***READ CAREFULLY*** If an attempt is already damaged or if you want to create new attempt to continue on it and avoid question sequence integrity issues, then use this option with absolute care!. Please note that the attempt ID still need to match an actual attempt, whether created before, or just created by administrator (logged in as student) in order to create an attempt to build on it (in order to upload student original response file - emergency file - we need a valid attempt).<br /><br /><font color="red">Please DO NOT tick this box unless you fully understand how attempts are managed!</font>';
 $string['dangeryes'] = 'Yes (<font color="red">!!Danger!!</font>)';
-$string['prechecks'] = 'Display Technical Checks';
-$string['prechecks_help'] = 'This option will display the Technical Details of the browser before commencing the exam. Checks are for Service Workers, Local Storage, Request of Increase of Local Storage and others.';
-$string['techerrors'] = 'Display Technical Errors';
+$string['prechecks'] = 'Display technical checks';
+$string['prechecks_help'] = 'This option will display the technical details of the browser before commencing the exam. Checks are for service workers, local storage, request of increase of local storage and others.';
+$string['techerrors'] = 'Display technical errors';
 $string['techerrors_help'] = 'This feature is useful to understand the underlying technical reason for the failure of exam submission. It only shows the error at the bottom of the submission page if there is any.';
-$string['navdetails'] = 'Display Server & Device Status';
-$string['navdetails_help'] = 'Show Server & Device Status last time the data was saved (Locally and on Server). It also shows Online Status Details (whether Device/Server is connected or not). It also displays a link for Emergency File to be downloaded.';
-$string['watchxhr'] = 'Watch Live Events';
-$string['technicalchecks'] = 'Storage Checks for Current Browser';
-$string['watchxhr_help'] = 'One URL per line. Some question types require live checks or uploads with the server. If they are added here, the plugin will be able to count the time-offline for the user, and then add automatically it to the total extra time they get so they finish the exam with precise grace time or time limit.';
+$string['navdetails'] = 'Display server and device status';
+$string['navdetails_help'] = 'Show server and device status last time the data was saved (locally and on server). It also shows online status details (whether device/server is connected or not). It also displays a link for emergency file to be downloaded.';
+$string['watchxhr'] = 'Watch live events';
+$string['technicalchecks'] = 'Storage checks for current browser';
+$string['watchxhr_help'] = 'One URL per line. Some question types require live checks or uploads with the server. If they are added here, the plugin will be able to count the time-offline for the user, and then add it automatically to the total extra time they get so they finish the exam with precise grace time or time limit.';
 $string['fromfile'] = 'Submission time in uploaded file';
-$string['syncedfiles'] = 'Synced Response Files in background';
-$string['fetchandlog'] = 'Embedded Files Caching (Attachements)';
-$string['fetchandlog_help'] = 'One Per Line. If you want to cache attachements (of any static type; i.e. docx, pdf, xls, zip, html etc) that are embedded in some questions as extra resource or for further readings, then add the full URLs you want them to be cached. Example: https://example.org/instructions.docx will cache instructions.docx that is embedded in the question(s). Usually attachements in exams have "pluginfile.php" inside the link. Please note that for cross-origin (remote domains or different subdomains, please make sure both are served via https, and also those domains allow CORS. Important: This option can defeat security priniples of cross domain communications, so please user with care, or better only use locally hosted files on same domain).';
+$string['syncedfiles'] = 'Synced response files in background';
+$string['fetchandlog'] = 'Embedded files caching (attachements)';
+$string['fetchandlog_help'] = 'One per line. If you want to cache attachements (of any static type; i.e. docx, pdf, xls, zip, html etc) that are embedded in some questions as extra resource or for further readings, then add the full URLs you want them to be cached. Example: https://example.org/instructions.docx will cache instructions.docx that is embedded in the question(s). Usually attachements in exams have "pluginfile.php" inside the link. Please note that for cross-origin (remote domains or different subdomains, please make sure both are served via https, and also those domains allow CORS. Important: This option can defeat security principles of cross domain communications, so please use with care, or better only use locally hosted files on same domain).';
 $string['now'] = 'Now';
 $string['reference'] = 'Reference';
 $string['filetype'] = 'Type';
-$string['wifitoken'] = 'Background Sync Token';
-$string['serviceworkermgmt'] = 'Service Worker Management';
-$string['resetserviceworker'] = 'Reset Service Worker';
-$string['refreshserviceworker'] = 'Refresh Service Worker';
-$string['stopserviceworker'] = 'Stop Service Worker';
-$string['syncserviceworker'] = 'Fire BackgroundSync';
+$string['wifitoken'] = 'Background sync token';
+$string['serviceworkermgmt'] = 'Service worker management';
+$string['resetserviceworker'] = 'Reset service worker';
+$string['refreshserviceworker'] = 'Refresh service worker';
+$string['stopserviceworker'] = 'Stop service worker';
+$string['syncserviceworker'] = 'Fire backgroundsync';
 
 $string['loadingstep1'] = 'Setting up {$a}';
-$string['loadingstep2'] = 'Preparing Exam Structure..';
-$string['loadingstep3'] = 'Preparing Serice Worker Static & Dynamic Routes..';
-$string['loadingstep4'] = 'Preparing Exam Database..';
-$string['loadingstep5'] = 'Preparing Exam Questions..';
-$string['loadingstep6'] = 'Preparing Exam Navigation..';
-$string['loadingstep7'] = 'Encrypting Exam Data..';
-$string['loadingstep8'] = 'Verifying Network Status..';
-$string['loadingstep9'] = 'Watching Live Network Requests..';
-$string['loadingstep10'] = 'Exam Starting..';
+$string['loadingstep2'] = 'Preparing exam structure..';
+$string['loadingstep3'] = 'Preparing service worker static and dynamic routes..';
+$string['loadingstep4'] = 'Preparing exam database..';
+$string['loadingstep5'] = 'Preparing exam questions..';
+$string['loadingstep6'] = 'Preparing exam navigation..';
+$string['loadingstep7'] = 'Encrypting exam data..';
+$string['loadingstep8'] = 'Verifying network status..';
+$string['loadingstep9'] = 'Watching live network requests..';
+$string['loadingstep10'] = 'Exam starting..';
 
-$string['wifitoken_help'] = 'Web Service Token to send emergency files in background when the device is connected. This Token can be generated from (webservicetokens / Manage Tokens) in site administration pages.';
+$string['wifitoken_help'] = 'Web service token to send emergency files in background when the device is connected. This token can be generated from (webservicetokens / manage tokens) in site administration pages.';
 $string['precachefiles'] = 'Precache files';
-$string['precachefiles_help'] = 'Only Static Files. One link per line. If you would like the Service Worker to pre-cache specific files (only static file; ie. css, jpg, html etc), please add the direct link for them, one per line. Note: The precached URLs will automatically be served using a cache-first strategy.';
+$string['precachefiles_help'] = 'Only static files. One link per line. If you would like the service worker to pre-cache specific files (only static file; ie. css, jpg, html etc), please add the direct link for them, one per line. Note: The precached URLs will automatically be served using a cache-first strategy.';
 $string['excludelist'] = 'Exclude files';
-$string['excludelist_help'] = 'Link/File per line. Exclude Specific Files/Links from caching with Service Worker. This is useful when you want some files or links to be in NetworkOnly (never get cached) mode.';
-$string['quizfinishtime'] = 'Quiz Time Limit (max allowed quiz time)';
-$string['usefinalsubmissiontime'] = 'Use Final Submission Time from File (if available)';
-$string['usefinalsubmissiontime_help'] = 'When user attempt to submit and finish the test (or if auto submitted at the end by the quiz timer), a parameter called "final_submission_time" is added to the file showing when the submission has happened. If no final submission has happened, the value for "final_submission_time" is 0. if 0, then the script will ignore this parameter and use one of the below Finish Time options.';
+$string['excludelist_help'] = 'Link/file per line. Exclude specific files/links from caching with service worker. This is useful when you want some files or links to be in NetworkOnly (never get cached) mode.';
+$string['quizfinishtime'] = 'Quiz time limit (max allowed quiz time)';
+$string['usefinalsubmissiontime'] = 'Use final submission time from file (if available)';
+$string['usefinalsubmissiontime_help'] = 'When user attempt to submit and finish the test (or if auto submitted at the end by the quiz timer), a parameter called "final_submission_time" is added to the file showing when the submission has happened. If no final submission has happened, the value for "final_submission_time" is 0. if 0, then the script will ignore this parameter and use one of the below finish time options.';
 $string['countrealofflinetime'] = 'Deduct offline time (if available)';
-$string['countrealofflinetime_help'] = 'Deduct Offline Time from attempt time based on "real_offline_time". The attempt time, and regradless of the option (in the form below) you choose, will be minus the total offline time (time the user was not able to commence work in specific questions due to lack of internet).<br><br>Important: This value is already calculate in Final Submission Time. This option only works with attempts that has not been selected as "Finished".';
-$string['extraroutes'] = 'Extra Routes';
-$string['extraroutes_help'] = 'Add Exra routes to Exam Service Worker. If you want Exam Service Worker [ETHz-SW] to catch extra routes (file extensions, web addresses, etc) and treat them differently when the connection drops. you can add as an example:<br>
+$string['countrealofflinetime_help'] = 'Deduct offline time from attempt time based on "real_offline_time". The attempt time, and regradless of the option (in the form below) you choose, will be minus the total offline time (time the user was not able to commence work in specific questions due to lack of internet).<br><br>Important: This value is already calculated in final submission time. This option only works with attempts that have not been selected as "finished".';
+$string['extraroutes'] = 'Extra routes';
+$string['extraroutes_help'] = 'Add extra routes to exam service worker. If you want exam service worker [ETHz-SW] to catch extra routes (file extensions, web addresses, etc) and treat them differently when the connection drops. you can add as an example:<br>
 <code>
 // We want no more than 1000 files with extension "XYZ" in the cache.<br />
 // We check using a networkFirst Strategy.<br />
 global.toolbox.router.get(/\.(?:XYZ)$/, global.toolbox.<strong>networkFirst</strong>, {<br />
 &nbsp;&nbsp;&nbsp;cache: {<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: \'ETHz-exams-<strong>XYZ</strong>\', // Local Database Name (indexedDb).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: \'ETHz-exams-<strong>XYZ</strong>\', // Local database name (indexedDb).<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maxEntries: 1000, // Max number of files to save.<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maxAgeSeconds: 86400 // Max time in seconds before they get deleted/expired.<br />
 &nbsp;&nbsp;&nbsp;},<br />
 &nbsp;&nbsp;&nbsp;origin: /\.googleapis\.com$/ //Optional, if files located outside moodle domain.<br />
 });<br />
 </code>
-<h2 id="options"><a class="anchorjs-link " href="#options" aria-label="Anchor link for: options" style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Routes Options</h2>
+<h2 id="options"><a class="anchorjs-link " href="#options" aria-label="Anchor link for: options" style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Routes options</h2>
 
 <p>All options can be specified globally via properties of <code class="highlighter-rouge">toolbox.options</code>.
 Any individual options can be configured on a per-handler basis, via the <code class="highlighter-rouge">Object</code> passed as the
@@ -247,6 +247,6 @@ It can be used alone or in conjunction with <code class="highlighter-rouge">cach
 <p>Causes the resource at <code class="highlighter-rouge">url</code> to be added to the cache and returns a Promise that resolves with void. The <code class="highlighter-rouge">options</code> parameter supports the <code class="highlighter-rouge">debug</code> and <code class="highlighter-rouge">cache</code> <a href="#options">global options</a>.</p>
 
 <h3 id="toolboxuncacheurl-options"><a class="anchorjs-link " href="#toolboxuncacheurl-options" aria-label="Anchor link for: toolboxuncacheurl options"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a><code class="highlighter-rouge">toolbox.uncache(url, options)</code></h3>
-<p>Causes the resource at <code class="highlighter-rouge">url</code> to be removed from the cache and returns a Promise that resolves to true if the cache entry is deleted. The <code class="highlighter-rouge">options</code> parameter supports  the <code class="highlighter-rouge">debug</code> and <code class="highlighter-rouge">cache</code> <a href="#options">global options</a>.</p>
+<p>Causes the resource at <code class="highlighter-rouge">url</code> to be removed from the cache and returns a promise that resolves to true if the cache entry is deleted. The <code class="highlighter-rouge">options</code> parameter supports  the <code class="highlighter-rouge">debug</code> and <code class="highlighter-rouge">cache</code> <a href="#options">global options</a>.</p>
 
 ';
