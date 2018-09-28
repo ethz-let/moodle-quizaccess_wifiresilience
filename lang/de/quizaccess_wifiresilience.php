@@ -76,7 +76,7 @@ $string['savetheresponses'] = 'Kopie der Antworten herunterladen'; //Save the re
 $string['savingdots'] = 'Auf dem Server speichern...';
 $string['savingtryagaindots'] = 'Erneuter Versuch auf dem Server zu speichern ...';
 $string['submitfailed'] = 'Abgabe des Tests ist fehlgeschlagen';
-$string['submitfaileddownloadmessage'] = '<br /><strong>Oder</strong><br />{$a}<br />(Hinweis: Keine Daten sind verloren gegangen. Melden Sie sich bei der Prüfungsaufsicht, damit Ihr heruntergeladene Resultate-Datei gesichert und auf den Moodle Server hochgeladen werden kann.)';
+$string['submitfaileddownloadmessage'] = '<br /><strong>Oder</strong><br />{$a}<br />(Hinweis: Keine Daten sind verloren gegangen. Melden Sie sich bei der Prüfungsaufsicht, damit Ihre heruntergeladene Resultate-Datei gesichert und auf den Moodle Server hochgeladen werden kann.)';
 $string['submitfailedmessage'] = 'Ihre Antworten konnten nicht abgegeben werden. Sie können versuchen zu:';
 $string['submitting'] = '<h3>Abgabe.. Bitte warten..</h3>';
 $string['submitallandfinishtryagain'] = 'Alles abgeben und (erneut) beenden';
@@ -99,7 +99,7 @@ $string['prechecks_help'] = 'Diese Option zeigt die technischen Details des Brow
 $string['techerrors'] = 'Technische Fehler anzeigen';
 $string['techerrors_help'] = 'Dieses Option hilft das Fehlschlagen einer Testabgabe zu verstehen. Fehler, falls vorhanden, werden am Ende der Abgabeseite angezeigt.';
 $string['navdetails'] = 'Server & Geräte Status anzeigen';
-$string['navdetails_help'] = 'Server & Geräte Status anzeigen zum letzten gespeicherten Zeitpunkt (lokal und auf dem Server). Ebenso werden online Status Details angezeigt, z.B. ob die Verbindung zur Maschine/zum Server vorhanden ist oder nicht. Auch wird ein Link zum Runterladen der Notfall-datei angezeigt.';
+$string['navdetails_help'] = 'Server & Geräte Status anzeigen zum letzten gespeicherten Zeitpunkt (lokal und auf dem Server). Ebenso werden online Status Details angezeigt, z.B. ob die Verbindung zur Maschine/zum Server vorhanden ist oder nicht. Auch wird ein Link zum Runterladen der Notfall-Datei angezeigt.';
 $string['watchxhr'] = 'Live-Events ansehen';
 $string['technicalchecks'] = 'Speicher Überprüfungen für den aktuellen Browser';
 $string['watchxhr_help'] = 'Pro Reihe eine URL eintragen. Gewisse Fragetypen erfordern Live-Überprüfungen oder Hochladen auf den Server. Falls diese hier hinzugefügt werden, kann das Plugin die Offline-Zeit des Benutzers berechnen und dann automtisch zu der totalen zusätzlichen Zeit hinzufügen, so dass der Benutzer zur exakten Zeitlimite den Test beendet.';
@@ -118,21 +118,21 @@ $string['stopserviceworker'] = 'Service Worker anhalten';
 $string['syncserviceworker'] = 'Background Sync auslösen';
 
 $string['loadingstep1'] = 'Aufsetzen von {$a}';
-$string['loadingstep2'] = 'Die Prüfungs-Struktur wird vorbereitet..';
-$string['loadingstep3'] = 'Die Service Worker statische, sowie dynamische Routes werden vorbereitet..';
-$string['loadingstep4'] = 'Die Prüfungsdatenbank wird vorbereitet..';
-$string['loadingstep5'] = 'Die Prüfungsfragen werden vorbereitet..';
-$string['loadingstep6'] = 'Die Prüfungsnavigation wird vorbereitet..';
-$string['loadingstep7'] = 'Die Prüfungsdaten werden verschlüsselt..';
-$string['loadingstep8'] = 'Verifizierung des Netzwerk Status..';
-$string['loadingstep9'] = 'Live-Network-Anfragen verfolgen..';
-$string['loadingstep10'] = 'Starten der Prüfung..';
+$string['loadingstep2'] = 'Die Prüfungs-Struktur wird vorbereitet...';
+$string['loadingstep3'] = 'Die Service Worker statische, sowie dynamische Routes werden vorbereitet...';
+$string['loadingstep4'] = 'Die Prüfungsdatenbank wird vorbereitet...';
+$string['loadingstep5'] = 'Die Prüfungsfragen werden vorbereitet...';
+$string['loadingstep6'] = 'Die Prüfungsnavigation wird vorbereitet...';
+$string['loadingstep7'] = 'Die Prüfungsdaten werden verschlüsselt...';
+$string['loadingstep8'] = 'Verifizierung des Netzwerk Status...';
+$string['loadingstep9'] = 'Live-Network-Anfragen verfolgen...';
+$string['loadingstep10'] = 'Starten der Prüfung...';
 
-$string['wifitoken_help'] = 'Web Service Token um Notfall-Dateien im Hintergrund zu senden, während die Netzwerkverbindung vorhanden ist. Dieser Token kann in der Site-Administration (webservicetokens/ Manage Tokens) erstellt werden.';
+$string['wifitoken_help'] = 'Web Service Token um Notfall-Dateien im Hintergrund zu senden, während die Netzwerkverbindung vorhanden ist. Dieser Token kann in der Website-Administration (webservicetokens/ Manage Tokens) erstellt werden.';
 $string['precachefiles'] = 'Precache-Dateien';
-$string['precachefiles_help'] = 'Falls Sie wollen, dass der Service Worker spezifische Dateien precached(nur statische Dateien  wie css, jpg, html etc), geben Sie den direkten Link für diese ein. Pro Zeile einen Link. Hinweis: Die precached URLs werden automatisch gemäss einer cache-first Strategie geliefert.';
+$string['precachefiles_help'] = 'Falls Sie wollen, dass der Service Worker spezifische Dateien precached (nur statische Dateien  wie css, jpg, html etc), geben Sie den direkten Link für diese ein. Pro Zeile einen Link. Hinweis: Die precached URLs werden automatisch gemäss einer cache-first Strategie geliefert.';
 $string['excludelist'] = 'Dateien ausschliessen';
-$string['excludelist_help'] = 'Einen Link/eine Datei pro Zeile eingeben, um auszuschliessen, dass der Service Worker spezisische Links oder Dateien cached. Dies ist nützlich, wenn gewünscht wird, dass auf einzelne Dateien oder Links nur via Netzwerk und nie aus dem Cache geladen werden soll.';
+$string['excludelist_help'] = 'Einen Link/eine Datei pro Zeile eingeben, um auszuschliessen, dass der Service Worker spezifische Links oder Dateien cached. Dies ist nützlich, wenn gewünscht wird, dass auf einzelne Dateien oder Links nur via Netzwerk und nie aus dem Cache geladen werden soll.';
 $string['quizfinishtime'] = 'Quiz Zeitbegrenzung der Prüfung (max Prüfungszeit erlaubt)';
 $string['usefinalsubmissiontime'] = 'Endgültige Einreichungszeit aus der Antwort-Datei verwenden (falls vorhanden)';
 $string['usefinalsubmissiontime_help'] = 'Sobald ein Benutzer seinen Versuch beendet und abgibt (oder wenn der Versuch automtisch abgegeben wird), wird ein Parameter namens "final_submission_time" zur Datei hinzugefügt: Dieser Parameter enthält die Abgabe-Zeit. Falls keine endgültige Abgabezeit vorhanden ist, ist der Wert für "final_submission_time" 0. Falls 0, ignoriert das Skript diesen Paramater und eine der untenstehenden Optionen wird verwendet.';
@@ -161,14 +161,14 @@ Individuelle Optionen können auf einer Handler Basis mittels <code class="highl
 <h3 id="debug-boolean"><a class="anchorjs-link " href="#debug-boolean" aria-label="Anchor link for: debug boolean"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>debug [Boolean]</h3>
 <p>Bestimmt, ob zusätzliche Informationen in der Browserkonsole geloggt werden.</p>
 
-<p><em>Default</em>: <code class="highlighter-rouge">false</code></p>
+<p><em>Standard</em>: <code class="highlighter-rouge">false</code></p>
 
 <h3 id="networktimeoutseconds-number"><a class="anchorjs-link " href="#networktimeoutseconds-number" aria-label="Anchor link for: networktimeoutseconds number"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>networkTimeoutSeconds [Number]</h3>
 <p>Ein Timeout, welcher im <code class="highlighter-rouge">toolbox.networkFirst</code> integrierten Handler verwendet wird.
 Falls <code class="highlighter-rouge">networkTimeoutSeconds</code> gesetzt ist, wird jede Netzwerkanfrage, die länger als die konfigurierte Zeit dauert, automatisch auf die gecachte Antwort zurückgreifen, falls eine existiert. Falls
 <code class="highlighter-rouge">networkTimeoutSeconds</code> nicht gesetzt ist, kommt die eingebaute Netzwerk-Timeout Logik des Browsers zur Anwendung.</p>
 
-<p><em>Default</em>: <code class="highlighter-rouge">null</code></p>
+<p><em>Standard</em>: <code class="highlighter-rouge">null</code></p>
 
 <h3 id="cache-object"><a class="anchorjs-link " href="#cache-object" aria-label="Anchor link for: cache object" style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>cache [Object]</h3>
 <p>Verschiedene Eigenschaften von <code class="highlighter-rouge">cache</code> kontrollieren das Verhalten des Standardcache, oder den Cache, der von einem spezifischen Request Handler verwendet wird, sofern sie via
@@ -178,7 +178,7 @@ Falls <code class="highlighter-rouge">networkTimeoutSeconds</code> gesetzt ist, 
 <p>Der Name von <a href="https://developer.mozilla.org/en-US/docs/Web/API/Cache" target="_blank"><code class="highlighter-rouge">Cache</code></a>,
  der verwendet wird <a href="https://fetch.spec.whatwg.org/#response-class" target="_blank"><code class="highlighter-rouge">Antwort</code></a> um Objekte zu speichern. Die Verwendung eines eindeutigen Namens erlaubt es Ihnen, die maximale Grösse und das Alter der Einträge im Cache anzupassen.</p>
 
-<p><em>Default</em>: wird basierend auf der Laufzeit des Service Worker <code class="highlighter-rouge">registration.scope</code> Wertes erstellt.</p>
+<p><em>Standard</em>: wird basierend auf der Laufzeit des Service Worker <code class="highlighter-rouge">registration.scope</code> Wertes erstellt.</p>
 
 <h3 id="cachemaxentries-number"><a class="anchorjs-link " href="#cachemaxentries-number" aria-label="Anchor link for: cachemaxentries number"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>cache.maxEntries [Number]</h3>
 <p>Legt zum Verfallsdatum des Cache eine zuletzt-verwendet-Richtlinie fest für Einträge, die über die verschiedenen integrierten Handler gecached wurden.
@@ -189,24 +189,24 @@ Der Cache wird nie mehr Einträge als <code class="highlighter-rouge">cache.maxE
 Diese Option wird nur wirksam, wenn <code class="highlighter-rouge">cache.name</code> ebenfalls konfiguriert ist.
 Sie kann alleine oder in Verbindung mit <code class="highlighter-rouge">cache.maxAgeSeconds</code> verwendet werden.</p>
 
-<p><em>Default</em>: <code class="highlighter-rouge">null</code></p>
+<p><em>Standard</em>: <code class="highlighter-rouge">null</code></p>
 
 <h3 id="cachemaxageseconds-number"><a class="anchorjs-link " href="#cachemaxageseconds-number" aria-label="Anchor link for: cachemaxageseconds number"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>cache.maxAgeSeconds [Number]</h3>
 <p>Legt ein maximales Alter für Cache Einträge in Sekunden fest.
 Sie können dies mit einem Cache verwenden, welcher dafür vorgesehen ist,
-Einträge für ein dynamisches Set von Ressourcen ohne natürliche Limite zu speichern. Setzen Sie für <code class="highlighter-rouge">cache.maxAgeSeconds</code> z.B., <code class="highlighter-rouge">60 * 60 * 24</code> ein, bedeutet das, dass
+Einträge für ein dynamisches Set von Ressourcen ohne natürliche Limite zu speichern. Setzen Sie für <code class="highlighter-rouge">cache.maxAgeSeconds</code> z.B. <code class="highlighter-rouge">60 * 60 * 24</code> ein, bedeutet das, dass
 Einträge älter als einen Tag automatisch gelöscht werden.
 Diese Option wird nur wirksam, wenn <code class="highlighter-rouge">cache.name</code> ebenfalls konfiguriert ist.
 Sie kann alleine oder in Verbindung mit  <code class="highlighter-rouge">cache.maxEntries</code> verwendet werden.</p>
 
-<p><em>Default</em>: <code class="highlighter-rouge">null</code></p>
+<p><em>Standard</em>: <code class="highlighter-rouge">null</code></p>
 
 <h2 id="handlers"><a class="anchorjs-link " href="#handlers" aria-label="Anchor link for: handlers"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>Handlers</h2>
 
 <p> Es gibt fünf integrierte Handler, um die gebräuchlichsten Netzwerk-Strategien abzudecken. Mehr Informationen über offline Strategien finden Sie im <a href="http://jakearchibald.com/2014/offline-cookbook/">Offline-Cookbook</a>.</p>
 
 <h3 id="toolboxnetworkfirst"><a class="anchorjs-link " href="#toolboxnetworkfirst" aria-label="Anchor link for: toolboxnetworkfirst"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a><code class="highlighter-rouge">toolbox.networkFirst</code></h3>
-<p>Der Handler versucht, die Anfrage über Abruf aus dem Netzwerk zu bearbeiten. Gelingt dies, wird die Antwort im Cache gespeichert. Ansonsten wird vom Cache geladen. Dies ist die Strategie, die für das grundlegende Read-Through-Caching verwendet wird. Sie ist auch gut für API Anfragen, bei denen man immer die neuesten Daten möchte, aber falls diese nicht vorhanden sind, greift man lieber auf veraltete Daten zurück als auf gar keine .</p>
+<p>Der Handler versucht, die Anfrage über Abruf aus dem Netzwerk zu bearbeiten. Gelingt dies, wird die Antwort im Cache gespeichert. Ansonsten wird vom Cache geladen. Dies ist die Strategie, die für das grundlegende Read-Through-Caching verwendet wird. Sie ist auch gut für API Anfragen, bei denen man immer die neuesten Daten möchte, aber falls diese nicht vorhanden sind, greift man lieber auf veraltete Daten zurück als auf gar keine.</p>
 
 <h3 id="toolboxcachefirst"><a class="anchorjs-link " href="#toolboxcachefirst" aria-label="Anchor link for: toolboxcachefirst"  style="font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 1em; line-height: inherit; font-family: anchorjs-icons; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a><code class="highlighter-rouge">toolbox.cacheFirst</code></h3>
 <p>Wenn die Anfrage mit einem Cache-Eintrag übereinstimmt, antwortet dieser Handler damit. Ansonsten wird versucht, die Ressource via Netzwerkverbindung zu holen. Gelingt die Anfrage via Netzwerk, wird der Cache aktualisiert. Diese Option ist gut für Ressourcen, die sich nicht verändern oder andere Aktualisierungsmechanismen haben.</p>
