@@ -104,7 +104,7 @@ M.quizaccess_wifiresilience.autosave = {
         STATE_COLUMN:          ' .c1',
         ATTEMPT_ID_INPUT:      'input[name=attempt]',
         FINISH_ATTEMPT_INPUT:  'input[name=finishattempt]',
-        SUBMIT_BUTTON:         'input[type=submit]',
+        SUBMIT_BUTTON:         '#wifi_exam_submission_finish',
         FORM:                  'form',
         SAVING_NOTICE:         '#quiz-saving',
         LAST_SAVED_MESSAGE:    '#quiz-last-saved-message',
@@ -112,7 +112,7 @@ M.quizaccess_wifiresilience.autosave = {
         SAVE_FAILED_NOTICE:    '#mod_quiz_navblock .quiz-save-failed',
         LIVE_STATUS_AREA:      '#quiz-server-status'
     },
-
+    // SUBMIT_BUTTON:         'input[type=submit]',
     /**
      * The script which handles the autosaves.
      *
@@ -369,7 +369,10 @@ M.quizaccess_wifiresilience.autosave = {
         this.form.delegate('valuechange', this.value_changed, this.SELECTORS.VALUE_CHANGE_ELEMENTS, this);
         this.form.delegate('change',      this.value_changed, this.SELECTORS.CHANGE_ELEMENTS,       this);
 
-        var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous(this.SELECTORS.SUBMIT_BUTTON);
+        //var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).next(this.SELECTORS.SUBMIT_BUTTON);
+        var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
+
+      //  var submitAndFinishButton = Y.one("#submit_finish_btnss");
         submitAndFinishButton.detach('click');
         submitAndFinishButton.on('click', this.submit_and_finish_clicked, this);
 
@@ -1071,7 +1074,8 @@ M.quizaccess_wifiresilience.autosave = {
 
         this.stop_autosaving();
 
-        var submitButton = Y.one('input[name=finishattempt]').previous('input[type=submit]');
+      //  var submitButton = Y.one('input[name=finishattempt]').previous('input[type=submit]');
+        var submitButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
         this.get_submit_progress(submitButton.ancestor('.controls')).show();
         submitButton.ancestor('.singlebutton').hide();
         var failureMessage = this.get_submit_failed_message(submitButton.ancestor('.controls'));
@@ -1133,7 +1137,8 @@ M.quizaccess_wifiresilience.autosave = {
 
         // Re-display the submit button.
         this.form.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).remove();
-        var submitButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous('input[type=submit]');
+        var submitButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
+        //var submitButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous('input[type=submit]');
         var submitProgress = this.get_submit_progress(submitButton.ancestor('.controls'));
         submitButton.ancestor('.singlebutton').show();
         submitProgress.hide();
@@ -1149,7 +1154,8 @@ M.quizaccess_wifiresilience.autosave = {
 
         //change the label of submit again to "try again"
 
-        var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous(this.SELECTORS.SUBMIT_BUTTON);
+      //  var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous(this.SELECTORS.SUBMIT_BUTTON);
+        var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
         submitAndFinishButton.set('value',M.util.get_string('submitallandfinishtryagain', 'quizaccess_wifiresilience'));
 
         function response_is_json_string(str) {

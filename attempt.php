@@ -271,9 +271,9 @@ for ($i = 0; $i < $numpages; $i++) {
 
 $form .= html_writer::start_tag('div', array('class' => 'submitbtns wifi_previous_next_btn'));
 $form .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'previous',
-        'value' => get_string('navigateprevious','quiz'), 'class' => 'mod_quiz-prev-nav', 'id' => 'quizaccess_wifiresilience-prev_btn'));
+        'value' => get_string('navigateprevious','quiz'), 'class' => 'mod_quiz-prev-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-prev_btn'));
 $form .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
-        'value' => get_string('navigatenext','quiz'), 'class' => 'mod_quiz-next-nav', 'id' => 'quizaccess_wifiresilience-next_btn'));
+        'value' => get_string('navigatenext','quiz'), 'class' => 'mod_quiz-next-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-next_btn'));
 $form .= html_writer::end_tag('div');
 
 $accessmanager = $attemptobj->get_quizobj()->get_access_manager(time());
@@ -331,13 +331,27 @@ $controls = $output->summary_page_controls($attemptobj);
 $controls = '';
 // Return to place button.
 if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
-    $button = new single_button(
+
+    $button = '
+    <form action="'.new moodle_url($attemptobj->attempt_url(null, $attemptobj->get_currentpage())).'">
+    <input type="submit" id="quizaccess_wifiresilience_returntoattempt" value="'.get_string('returnattempt', 'quiz').'" class="btn btn-secondary">
+    <input type="hidden" name="attempt" value="'.$attemptobj->get_attemptid().'" />
+    <input type="hidden" name="cmid" value="'.$attemptobj->get_cmid().'" />
+    <input type="hidden" name="sesskey" value="'.sesskey().'" />
+    </form>
+    ';
+    /*
+    $button =  new single_button(
             new moodle_url($attemptobj->attempt_url(null, $attemptobj->get_currentpage())),
             get_string('returnattempt', 'quiz'));
-    $controls .= $output->container($output->container($output->render($button),
-            'controls'), 'submitbtns mdl-align wifi_return_to_attempt_btn');
+    */
+    //$output->render($button)
+    $controls .= $output->container($output->container($button, 'controls','wifi_return_to_attempt_div'), 'submitbtns mdl-align wifi_return_to_attempt_btn');
 }
 // Finish attempt button.
+
+
+
 $options = array(
     'attempt' => $attemptobj->get_attemptid(),
     'finishattempt' => 1,
@@ -345,10 +359,24 @@ $options = array(
     'slots' => '',
     'sesskey' => sesskey(),
 );
+/*
+$button = '
+<form action="'.new moodle_url($attemptobj->processattempt_url()).'" id="quizaccess_wifiresilience_timer_autosubmit_form">
+<input type="submit" id="quizaccess_wifiresilience_finishattempt" value="'.get_string('submitallandfinish', 'quiz').'" class="btn btn-secondary">
+<input type="hidden" name="attempt" value="'.$attemptobj->get_attemptid().'" />
+<input type="hidden" name="finishattempt" value="1" />
+<input type="hidden" name="timeup" value="0" />
+<input type="hidden" name="slots" value="" />
+<input type="hidden" name="sesskey" value="'.sesskey().'" />
+</form>
+';
+*/
+
 $button = new single_button(
         new moodle_url($attemptobj->processattempt_url(), $options),
         get_string('submitallandfinish', 'quiz'));
-$button->id = 'responseform';
+$button->id = 'quizaccess_wifiresilience_timer_autosubmit_form'; // responseform
+
 if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
     $button->add_action(new confirm_action(get_string('confirmclose', 'quiz'), null,
             get_string('submitallandfinish', 'quiz')));
@@ -360,23 +388,37 @@ if ($attemptobj->get_state() == quiz_attempt::OVERDUE) {
 } else if ($duedate) {
     $message = get_string('mustbesubmittedby', 'quiz', userdate($duedate));
 }
+
+
+$thebutton = preg_replace('/<input type="submit"\s(.+?)>/is', '<input type="submit" id="wifi_exam_submission_finish" class="btn btn-secondary" value="'.get_string('submitallandfinish', 'quiz').'">', $output->render($button));
+$thebutton = preg_replace('/<button type="submit"\s(.+?)>(.+?)<\/button>/is', '<input type="submit" id="wifi_exam_submission_finish" class="btn btn-secondary" value="$2">', $thebutton);
+
+
 //$controls .= $output->countdown_timer($attemptobj, time());
 $controls .= $output->container($message . $output->container(
-        $output->render($button), 'controls'), 'submitbtns mdl-align wifi_must_be_submitted_btn');
+        $thebutton, 'controls'), 'submitbtns mdl-align wifi_must_be_submitted_btn');
 //$controls .= $output;
 /******* END  CONTROL OVERRIDE******/
 
 
 $controls = preg_replace('~<div id="quiz-timer".*?</div>~', '', $controls);
+
 $controls = str_replace('<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/processattempt.php"',
             '<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/processattempt.php" id="quizaccess_wifiresilience_timer_autosubmit_form"',
              $controls);
+
+             /*
 $needle = '<input type="submit"';
 $replace = '<input type="submit" id="quizaccess_wifiresilience_returntoattempt"';
 $pos = strpos($controls, $needle);
 if ($pos !== false) {
    $controls = substr_replace($controls, $replace, $pos, strlen($needle));
 }
+
+*/
+
+
+
 /*
 $controls = str_replace('<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/attempt.php"',
             '<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/attempt.php" id="ATTEMPT_quizaccess_wifiresilience_form"',
@@ -395,7 +437,6 @@ $form .= html_writer::end_tag('form');
 
 // From mod_quiz_renderer::attempt_page.
 $html = '';
-
 $overlay_tags = '
 <script>
 wifiresilience_doc_ready_time = new Date().getTime();
@@ -465,6 +506,10 @@ $html .= html_writer::end_div('');
 
 // footer was here...........
 $html .= $output->footer();
+
+// New button instead of input submit in new themes need to be reverted to input in order for YUI to work correctly.
+//$html = preg_replace_callback('/<button type="submit"\s(.+?)>(.+?)<\/button>/is', '<input type="submit" id="wifi_exam_submission_buttons" class="btn btn-secondary" value="$2">', $html);
+
 
 
 $clean_exam_name = addslashes(format_string($attemptobj->get_quiz_name()));
