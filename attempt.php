@@ -612,7 +612,7 @@ $navflagged =  $OUTPUT->image_url('navflagged', 'quiz');
 $flagon = $OUTPUT->image_url('mod/quiz/flag-on', 'theme');
 $loadingsmall = $OUTPUT->image_url('i/loading_small', 'moodle');
 $folder24 = $OUTPUT->image_url('f/folder-24', 'core');
-$sprite = $OUTPUT->image_url('sprite', 'theme');
+//$sprite = $OUTPUT->image_url('sprite', 'theme');
 //theme=ethz&component=theme&image=sprite
 
 $examstaticflags = "
@@ -622,7 +622,7 @@ quizaccess_wifiresilience_flagging('$navflagged');
 quizaccess_wifiresilience_flagging('$flagon');
 quizaccess_wifiresilience_flagging('$loadingsmall');
 quizaccess_wifiresilience_flagging('$folder24');
-quizaccess_wifiresilience_flagging('$sprite');
+//quizaccess_wifiresilience_flagging('$sprite');
 ";
 
 $html .= '<script>
