@@ -93,8 +93,7 @@ if ($form->is_cancelled()) {
             $data_res = $original_content;
             $OUTPUT->notification("Data File is URL-ENCODED. Use URL-DECODED data.");
           }
-        //  print_r($data);exit;
-          //$file->get_content()
+
             $data = json_decode($data_res);
 
             if (!$data) {
@@ -109,42 +108,42 @@ if ($form->is_cancelled()) {
             }
 
             if (isset($data->iv) || isset($data->key)) {
-                if (!$privatekey) {
-                    throw new coding_exception('Got apparently encrypted responses, but there is no decryption key.');
-                }
+              if (!$privatekey) {
+                  throw new coding_exception('Got apparently encrypted responses, but there is no decryption key.');
+              }
 
-                $encryptedaeskey = base64_decode($data->key);
-                if (!$encryptedaeskey) {
-                    throw new coding_exception('Encrypted AES key not properly base-64 encoded.');
-                }
-                $encryptediv = base64_decode($data->iv);
-                if (!$encryptediv) {
-                    throw new coding_exception('Encrypted initial value not properly base-64 encoded.');
-                }
+              $encryptedaeskey = base64_decode($data->key);
+              if (!$encryptedaeskey) {
+                  throw new coding_exception('Encrypted AES key not properly base-64 encoded.');
+              }
+              $encryptediv = base64_decode($data->iv);
+              if (!$encryptediv) {
+                  throw new coding_exception('Encrypted initial value not properly base-64 encoded.');
+              }
 
-                $aeskeystring = '';
-                if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
-                    throw new coding_exception('Could not decrypt the AES key. ' . openssl_error_string());
-                }
+              $aeskeystring = '';
+              if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
+                  throw new coding_exception('Could not decrypt the AES key. ' . openssl_error_string());
+              }
 
-                $ivstring = '';
-                if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
-                    throw new coding_exception('Could not decrypt the AES key. ' . openssl_error_string());
-                }
+              $ivstring = '';
+              if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
+                  throw new coding_exception('Could not decrypt the AES key. ' . openssl_error_string());
+              }
 
-                $aeskey = base64_decode($aeskeystring);
-                if (!$aeskey) {
-                    throw new coding_exception('AES key not properly base-64 encoded.');
-                }
-                $iv = base64_decode($ivstring);
-                if (!$iv) {
-                    throw new coding_exception('Initial value not properly base-64 encoded.');
-                }
+              $aeskey = base64_decode($aeskeystring);
+              if (!$aeskey) {
+                  throw new coding_exception('AES key not properly base-64 encoded.');
+              }
+              $iv = base64_decode($ivstring);
+              if (!$iv) {
+                  throw new coding_exception('Initial value not properly base-64 encoded.');
+              }
 
-                $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
-                if (!$responses) {
-                    throw new coding_exception('Could not decrypt the responses. ' . openssl_error_string());
-                }
+              $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
+              if (!$responses) {
+                  throw new coding_exception('Could not decrypt the responses. ' . openssl_error_string());
+              }
 
             } else {
                 $responses = $data->responses;
@@ -162,7 +161,7 @@ if ($form->is_cancelled()) {
             }
 
             if (!isset($postdata['attempt'])) {
-                throw new coding_exception('The uploaded data did not include an attempt id.');
+               throw new coding_exception('The uploaded data did not include an attempt id.');
             }
 
             echo html_writer::tag('textarea', s(print_r($postdata, true)), array('readonly' => 'readonly'));
@@ -226,13 +225,85 @@ if ($form->is_cancelled()) {
                 if (isset($fromform->usefinalsubmissiontime) && isset($postdata['final_submission_time']) && $postdata['final_submission_time'] != 0){
                     $timenow = $postdata['final_submission_time'];
                 }
-                $attemptobj->process_finish($timenow, true); // Finish.
+
+
+            if(isset($fromform->createasnewattempt) && isset($data->userid) ){
+
+                  $quizobj = quiz::create($quiz->id, $data->userid);
+                  // Start the attempt.
+                  $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+                  $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+                //  $timenow = time();
+
+                  // Look for an existing attempt.
+                  $attempts = quiz_get_user_attempts($quizobj->get_quizid(), $data->userid, 'all', true);
+                  $lastattempt = end($attempts);
+
+
+                  // Get number for the next or unfinished attempt.
+                  if ($lastattempt) {
+                      $attemptnumber = $lastattempt->attempt + 1;
+                  } else {
+                      $lastattempt = false;
+                      $attemptnumber = 1;
+                  }
+                  $currentattemptid = null;
+
+                  $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $timenow, false, $data->userid);
+                  quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
+
+                  quiz_attempt_save_started($quizobj, $quba, $attempt);
+                  // Process some responses from the student.
+                  $attemptobj = quiz_attempt::create($attempt->id);
+
+                  $from = "[q";
+                  $to = ":";
+                  foreach($postdata as $key => $one) {
+                    if(strpos($key, ':1_') !== false){
+
+                      $firstpos = strpos($key, $from);
+                      $secondpos = strpos($key, $to);
+                      $qid = substr($key , $firstpos, $secondpos);
+                      break;
+                    }
+                  }
+
+                  foreach($postdata as $key => $one) {
+                      if(strpos($key, $qid) !== false){
+                        unset($postdata[$key]);
+                        $n = str_replace($qid,'q'.$attempt->uniqueid, $key);
+                        $postdata[$n] = $one;
+                      }
+                  }
+
+                  $newslots = $pieces = explode(",", $postdata['slots']);
+
+                  foreach ($newslots as $slot) {
+                      $qa = $attemptobj->get_question_attempt($slot);
+                      foreach($postdata as $key => $one) {
+                          if(strpos($key, $slot.'_:sequencecheck') !== false){
+                            $postdata[$key] = $qa->get_sequence_check_count();
+                          }
+                      }
+
+                  }
+
+                  $_POST = $postdata;
+                  //$attemptobj->process_submitted_actions($timenow, false);
+                  // Finish the attempt.
+                  $attemptobj = quiz_attempt::create($attempt->id);
+
+                }
+
+                  $attemptobj->process_finish($timenow, true);
+
+
+
             } else {
 
                 if(isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])){
                   $timenow = $timenow - $postdata['real_offline_time'];
                 }
-
                 $attemptobj->process_submitted_actions($timenow); // In progress.
             }
             $_POST = $originalpost;
