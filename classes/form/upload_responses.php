@@ -55,7 +55,7 @@ class upload_responses extends moodleform {
 
         $mform->disabledIf('usefinalsubmissiontime', 'finishattempts','eq', 0);
 
-        if(is_siteadmin()){
+      //  if(is_siteadmin()){
             $mform->addElement('checkbox', 'usefinalsubmissiontime',
                     get_string('usefinalsubmissiontime', 'quizaccess_wifiresilience'), '');
             $mform->addHelpButton('usefinalsubmissiontime', 'usefinalsubmissiontime', 'quizaccess_wifiresilience');
@@ -74,7 +74,7 @@ class upload_responses extends moodleform {
             $mform->addElement('checkbox', 'takeattemptfromjson',
                     get_string('takeattemptfromjson', 'quizaccess_wifiresilience'), get_string('dangeryes', 'quizaccess_wifiresilience'));
             $mform->addHelpButton('takeattemptfromjson', 'takeattemptfromjson', 'quizaccess_wifiresilience');
-        }
+       // }
 
         $this->add_action_buttons(true, get_string('uploadresponses', 'quizaccess_wifiresilience'));
     }

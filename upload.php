@@ -248,7 +248,8 @@ if ($form->is_cancelled()) {
                       $attemptnumber = 1;
                   }
                   $currentattemptid = null;
-
+                //  $sql = $DB->get_records_sql('select id, value from {question_attempt_step_data} where name = ? and attemptstepid in (select id from {question_attempt_steps} where questionattemptid = (select id from {question_attempts} where questionusageid = ?) )', array('_order', 421));
+               //   print_r($sql);exit;
                   $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $timenow, false, $data->userid);
                   quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
 
@@ -287,7 +288,85 @@ if ($form->is_cancelled()) {
                       }
 
                   }
+                  
+                  // Now arrange question shuffle/order in the database to match original _order.
+                  $original_uniqueid = str_replace('q','',$qid);
+                  $original_uniqueid = $original_uniqueid * 1;
+                  
+                  // now we need to take the original unique id from database (in case of restore/backup).
+                  $original_attempt_rec = $DB->get_record('quiz_attempts', array('id'=>$postdata['attempt']));
+                  $original_uniqueid = $original_attempt_rec->uniqueid;
+                  
+                  echo '<hr>Original Unique ID: '.$original_uniqueid.' | Current Unique ID: '.$attempt->uniqueid. '<hr>';
+                 
+                  // fix suffle (_order) issue. New attempt will match old attempt in _order.
+                  $original_orders = $DB->get_records_sql('SELECT random() as rand, qasd.id, quba.id AS qubaid,  qa.id AS questionattemptid, qa.questionusageid, qa.slot, qa.questionid, qas.id AS attemptstepid, qas.sequencenumber, qas.userid, qasd.name, qasd.value FROM {question_usages} quba LEFT JOIN {question_attempts} qa ON qa.questionusageid = quba.id LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id WHERE quba.id = :v1 ORDER BY qa.slot, qas.sequencenumber', array('v1' => $original_uniqueid));
+                  $current_orders = $DB->get_records_sql('SELECT random() as rand, qasd.id, quba.id AS qubaid,  qa.id AS questionattemptid, qa.questionusageid, qa.slot, qa.questionid, qas.id AS attemptstepid, qas.sequencenumber, qas.userid, qasd.name, qasd.value FROM {question_usages} quba LEFT JOIN {question_attempts} qa ON qa.questionusageid = quba.id LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id WHERE quba.id = :v1 ORDER BY qa.slot, qas.sequencenumber', array('v1' => $attempt->uniqueid));
+                  print_r($original_orders);
+                  echo "<hr>";
+                  print_r($current_orders);
+                  if($original_orders){
+                  	$qids = array();
+                  	$choiceqids = array();
+                  	$stemqids = array();
+                  	foreach($original_orders as $org_ord){
+                  		if($org_ord->name == '_order'){
+                  			$qids[$org_ord->questionid] = $org_ord->value;
+                  		}
+                  		if($org_ord->name == '_choiceorder'){
+                  			$choiceqids[$org_ord->questionid] = $org_ord->value;
+                  		}
+                  		if($org_ord->name == '_stemorder'){
+                  			$stemqids[$org_ord->questionid] = $org_ord->value;
+                  		}
+                  		
+                  	}
+                  	echo "<hr>";
+                  	print_r($qids);
+                  	echo "<hr>";
+                  	print_r($choiceqids);
+                  	echo "<hr>";
+                  	
+                  		foreach($current_orders as $curr_ord){
+                  			
+                  			// Update all attempts steps userid for the current.
+                  			
+                  			$sql = 'update {question_attempt_steps} set userid = :v1 where questionattemptid = :v2';
+                  			$DB->execute($sql, array('v1' => $data->userid, 'v2' => $curr_ord->questionattemptid));
 
+                  			// Now update records as per quesiton order
+                  			if($curr_ord->name == '_order'){
+                  				echo "_ORDER: Current quesiton id: $curr_ord->questionid<br>";
+                  				$sql = 'update {question_attempt_step_data} set value = :v1 where name = :v2 and attemptstepid = :v3';
+                  				
+                  				$DB->execute($sql, array('v1' => $qids[$curr_ord->questionid], 'v2' => '_order', 'v3' => $curr_ord->attemptstepid));
+                  				
+                  			}
+                  			// Now update records as per quesiton choiceorder
+                  			if($curr_ord->name == '_choiceorder'){
+                  				echo "CHOICE_ORDER: Current quesiton id: $curr_ord->questionid<br>";
+                  				$sql = 'update {question_attempt_step_data} set value = :v1 where name = :v2 and attemptstepid = :v3';
+                  				
+                  				$DB->execute($sql, array('v1' => $choiceqids[$curr_ord->questionid], 'v2' => '_choiceorder', 'v3' => $curr_ord->attemptstepid));
+                  				
+                  			}
+                  			// Now update records as per quesiton choiceorder
+                  			if($curr_ord->name == '_stemorder'){
+                  				echo "STEM_ORDER: Current quesiton id: $curr_ord->questionid<br>";
+                  				$sql = 'update {question_attempt_step_data} set value = :v1 where name = :v2 and attemptstepid = :v3';
+                  				
+                  				$DB->execute($sql, array('v1' => $stemqids[$curr_ord->questionid], 'v2' => '_stemorder', 'v3' => $curr_ord->attemptstepid));
+                  				
+                  			}
+
+                  		}
+
+                  	
+                  	
+                  }
+                  
+                  
+                  
                   $_POST = $postdata;
                   //$attemptobj->process_submitted_actions($timenow, false);
                   // Finish the attempt.

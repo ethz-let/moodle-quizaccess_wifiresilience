@@ -101,7 +101,8 @@ if ($finishattempt) {
 
 } else {
     // Process the responses.
-    $attemptobj->process_auto_save($timenow);
+
+   	$attemptobj->process_auto_save($timenow);
 
     // Update current page number.
     if ($thispage >= 0 && $attemptobj->get_currentpage() != $thispage) {
