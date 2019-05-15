@@ -541,11 +541,21 @@ function postfromCache(request) {
 
 if(event.request.url.indexOf('attempt.php') !== -1) {
 
+  // Display header values to debug SEB
+    var myHeaders = new Headers();
+    var useragentdetails = myHeaders.get('User-Agent');
+    console.log("Attempt Header User-Agent: " + useragentdetails); 
+  
+    for (var value of myHeaders.values()) {
+       console.log("Attempt Header: " + value); 
+    }
+    
+  
     event.respondWith(attemptnetworkOrCache(event.request).catch(function () {
       // return attemptuseFallback();
       return caches.match(OFFLINE_URL);
     }));
-} else if (event.request.method !== 'GET'){
+ } else if (event.request.method !== 'GET'){
 
       /*
       // Sync should be totally ingored to avoid false-postive response
