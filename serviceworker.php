@@ -545,7 +545,7 @@ if(event.request.url.indexOf('attempt.php') !== -1) {
       // return attemptuseFallback();
       return caches.match(OFFLINE_URL);
     }));
-} else if (event.request.method !== 'GET'){
+ } else if (event.request.method !== 'GET'){
 
       /*
       // Sync should be totally ingored to avoid false-postive response
