@@ -163,6 +163,8 @@ M.quizaccess_wifiresilience.navigation = {
         var topbar = Y.one('.navbar-fixed-top');
         if (topbar) {
             this.extraspaceattop = topbar.get('offsetHeight');
+        } else if(Y.one('#page-header-color')){
+            this.extraspaceattop = Y.one('#page-header-color').get('offsetHeight');
         }
 
         if (M.core_question_flags) {
@@ -332,6 +334,10 @@ M.quizaccess_wifiresilience.navigation = {
         var target = Y.one(fragmentidmatch[0]);
         if (target) {
             window.scrollTo(0, target.getY() - this.extraspaceattop);
+        } else if(Y.one(fragmentidmatch[0].replace('q','question-' + M.quizaccess_wifiresilience.autosave.usageid + '-'))) {
+            var target = Y.one(fragmentidmatch[0].replace('q','question-' + M.quizaccess_wifiresilience.autosave.usageid + '-'));
+            window.scrollTo(0, target.getY() - this.extraspaceattop);
+
         }
     },
 

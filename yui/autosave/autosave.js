@@ -98,7 +98,7 @@ M.quizaccess_wifiresilience.autosave = {
         CHANGE_DRAGS:           'li.matchdrag',
         HIDDEN_INPUTS:         'input[type=hidden]',
         NAV_BUTTON:            '#quiznavbutton',                       // Must have slot appended.
-        QUESTION_CONTAINER:    'div[data-qslot=',                      // Was #q for <= 3.6.
+        QUESTION_CONTAINER:    '#q',                      // Was #q for <= 3.6.
         STATE_HOLDER:          ' .state',
         SUMMARY_ROW:           '.quizsummaryofattempt tr.quizsummary', // Must have slot appended.
         STATE_COLUMN:          ' .c1',
@@ -222,6 +222,7 @@ M.quizaccess_wifiresilience.autosave = {
      * @private
      */
     delay_timer: null,
+    usageid: null,
 
     /**
      * Y.io transaction for the save ajax request.
@@ -311,7 +312,7 @@ M.quizaccess_wifiresilience.autosave = {
      * @param {Number} delay the delay, in seconds, between a change being detected, and
      * a save happening.
      */
-    init: function(delay, keyname, courseid, cmid, display_tech_errors, display_nav_details) {
+    init: function(delay, keyname, courseid, cmid, display_tech_errors, display_nav_details, usageid) {
         this.form = Y.one(this.SELECTORS.QUIZ_FORM);
         if (!this.form) {
             Y.log('No response form found. Why did you try to set up autosave?', 'debug', '[ETHz-SW] Sync');
@@ -331,6 +332,7 @@ M.quizaccess_wifiresilience.autosave = {
 
 
         this.attemptid = Y.one(this.SELECTORS.ATTEMPT_ID_INPUT).get('value');
+        this.usageid = usageid;
         // try to get real offline time from SessionStorage for people who
         // are refreshing the attempt.
         if(typeof(Storage) !== "undefined") {
@@ -759,8 +761,12 @@ M.quizaccess_wifiresilience.autosave = {
     set_question_state_string: function(slot, newstate) {
         Y.log('State of question ' + slot + ' changed to ' + newstate + '.',
                 'debug', '[ETHz-SW] Sync');
-        Y.one(this.SELECTORS.QUESTION_CONTAINER + slot + this.SELECTORS.STATE_HOLDER)
-                .setHTML(Y.Escape.html(newstate));
+        // If 3.6 or less
+        if(Y.one(this.SELECTORS.QUESTION_CONTAINER + slot)){
+           Y.one(this.SELECTORS.QUESTION_CONTAINER + slot + this.SELECTORS.STATE_HOLDER).setHTML(Y.Escape.html(newstate));
+        } else {
+          Y.one('div[id="question-' + this.usageid + '-' + slot + '"]' + this.SELECTORS.STATE_HOLDER).setHTML(Y.Escape.html(newstate));
+        }
         var summaryRow = Y.one(this.SELECTORS.SUMMARY_ROW + slot + this.SELECTORS.STATE_COLUMN);
         if (summaryRow) {
             summaryRow.setHTML(Y.Escape.html(newstate));

@@ -175,7 +175,7 @@ $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-localforage',
                 'M.quizaccess_wifiresilience.localforage.init', array($exam_storage_keyname));
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-autosave',
-                'M.quizaccess_wifiresilience.autosave.init', array($autosaveperiod, $exam_storage_keyname, $courseid, $cmid, $display_tech_errors, $display_nav_details));
+                'M.quizaccess_wifiresilience.autosave.init', array($autosaveperiod, $exam_storage_keyname, $courseid, $cmid, $display_tech_errors, $display_nav_details, $attemptobj->get_uniqueid()));
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-navigation',
                 'M.quizaccess_wifiresilience.navigation.init', array($page));
