@@ -138,7 +138,7 @@ M.quizaccess_wifiresilience.navigation = {
 
       //  Y.all(this.SELECTORS.ALL_PAGE_DIVS).addClass('quizaccess_wifiresilience_hidden');
         this.navigate_to_page(+currentpage);
-        Y.all(this.SELECTORS.ALL_PAGE_DIVS).removeClass('quiz-loading-hide');
+        Y.all(this.SELECTORS.ALL_PAGE_DIVS).removeClass('xquiz-loading-hide');
 
         Y.delegate('click', this.nav_button_click, this.SELECTORS.NAV_BLOCK, this.SELECTORS.NAV_BUTTON, this);
         Y.delegate('click', this.nav_button_click, this.SELECTORS.SUMMARY_TABLE, this.SELECTORS.SUMMARY_TABLE_LINK, this);

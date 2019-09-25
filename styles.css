@@ -1,5 +1,5 @@
 .wifiresilience_hidden_form_elements{
-	display: none;
+    display: none;
 }
 /*
 #page-mod-quiz-attempt .hidden {
@@ -11,9 +11,11 @@
   display: none;
 }
 /*#page-mod-quiz-attempt .region-content .quiz-loading-hide*/
-#page-mod-quiz-attempt .quiz-loading-hide {
-    opacity: 0;
-    display:none;
+#page-mod-quiz-attempt .xquiz-loading-hide {
+   /*
+   opacity: 0;
+   display:none;
+    */
 }
 
 #page-mod-quiz-accessrule-wifiresilience-upload #region-main textarea {

@@ -98,13 +98,13 @@ M.quizaccess_wifiresilience.autosave = {
         CHANGE_DRAGS:           'li.matchdrag',
         HIDDEN_INPUTS:         'input[type=hidden]',
         NAV_BUTTON:            '#quiznavbutton',                       // Must have slot appended.
-        QUESTION_CONTAINER:    '#q',                                   // Must have slot appended.
+        QUESTION_CONTAINER:    'div[data-qslot=',                      // Was #q for <= 3.6.
         STATE_HOLDER:          ' .state',
         SUMMARY_ROW:           '.quizsummaryofattempt tr.quizsummary', // Must have slot appended.
         STATE_COLUMN:          ' .c1',
         ATTEMPT_ID_INPUT:      'input[name=attempt]',
         FINISH_ATTEMPT_INPUT:  'input[name=finishattempt]',
-        SUBMIT_BUTTON:         'input[type=submit]',
+        SUBMIT_BUTTON:         '#wifi_exam_submission_finish',
         FORM:                  'form',
         SAVING_NOTICE:         '#quiz-saving',
         LAST_SAVED_MESSAGE:    '#quiz-last-saved-message',
@@ -112,7 +112,7 @@ M.quizaccess_wifiresilience.autosave = {
         SAVE_FAILED_NOTICE:    '#mod_quiz_navblock .quiz-save-failed',
         LIVE_STATUS_AREA:      '#quiz-server-status'
     },
-
+    // SUBMIT_BUTTON:         'input[type=submit]',
     /**
      * The script which handles the autosaves.
      *
@@ -122,6 +122,8 @@ M.quizaccess_wifiresilience.autosave = {
      * @private
      */
     AUTOSAVE_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/sync.php',
+
+    EXAM_TIME_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/gettime.php',
 
 
     /**
@@ -152,7 +154,7 @@ M.quizaccess_wifiresilience.autosave = {
      * @default 60000 , 60 Seconds (Original: 120000 - 120 seconds - 2 mins)
      * @private
      */
-    delay: 60000,
+    delay: 20000,
 
     /**
      * The total_offline_time (in seconds) for the device.
@@ -173,7 +175,8 @@ M.quizaccess_wifiresilience.autosave = {
     userid: null,
     attemptid: null,
     display_tech_errors: 0,
-    display_nav_details:0,
+    display_nav_details: 0,
+    disconnection_events: [],
     /**
      * The final_submission_time (in unix seconds) for the device.
      *
@@ -279,6 +282,7 @@ M.quizaccess_wifiresilience.autosave = {
      * @private
      */
     local_storage_key: null,
+    sync_string_errors: '',
 
     /**
      * A copy of the data in local storage.
@@ -313,9 +317,9 @@ M.quizaccess_wifiresilience.autosave = {
             Y.log('No response form found. Why did you try to set up autosave?', 'debug', '[ETHz-SW] Sync');
             return;
         }
+
         quizaccess_wifiresilience_progress_step = 5;
-        quizaccess_wifiresilience_progress_step_txt = "Preparing Exam Questions.. ";
-        $("#quizaccess_wifiresilience_result").html(quizaccess_wifiresilience_progress_step_txt);
+        $("#quizaccess_wifiresilience_result").html(M.util.get_string('loadingstep5', 'quizaccess_wifiresilience'));
 
         this.connected = true; //intially
         this.livewatch = true; //intially
@@ -323,13 +327,15 @@ M.quizaccess_wifiresilience.autosave = {
         this.real_offline_time = 0;
         this.display_tech_errors = display_tech_errors;
         this.display_nav_details = display_nav_details;
+        this.sync_string_errors = '';
+
 
         this.attemptid = Y.one(this.SELECTORS.ATTEMPT_ID_INPUT).get('value');
         // try to get real offline time from SessionStorage for people who
         // are refreshing the attempt.
         if(typeof(Storage) !== "undefined") {
-          if (sessionStorage.getItem('ethz-offline-'+this.attemptid)) {
-            this.real_offline_time = Number(sessionStorage.getItem('offline-'+this.attemptid));
+          if (sessionStorage.getItem('real-offline-time-'+this.attemptid)) {
+            this.real_offline_time = Number(sessionStorage.getItem('real-offline-time-'+this.attemptid));
           }
         }
         this.last_disconnection_time = 0;
@@ -363,7 +369,10 @@ M.quizaccess_wifiresilience.autosave = {
         this.form.delegate('valuechange', this.value_changed, this.SELECTORS.VALUE_CHANGE_ELEMENTS, this);
         this.form.delegate('change',      this.value_changed, this.SELECTORS.CHANGE_ELEMENTS,       this);
 
-        var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous(this.SELECTORS.SUBMIT_BUTTON);
+        //var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).next(this.SELECTORS.SUBMIT_BUTTON);
+        var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
+
+      //  var submitAndFinishButton = Y.one("#submit_finish_btnss");
         submitAndFinishButton.detach('click');
         submitAndFinishButton.on('click', this.submit_and_finish_clicked, this);
 
@@ -440,10 +449,14 @@ M.quizaccess_wifiresilience.autosave = {
           this.serviceworker_supported = 0;
         }
 
-        var quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
+        // try to get questions status in localstorage
+        M.quizaccess_wifiresilience.localforage.try_to_get_question_states();
+
+      //  var quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
         quizaccess_wifiresilience_progress.animate({
-          width: "50%"
+          width: examviewportmaxwidth * 5 / 10 + "px"
         });
+        //this.get_live_exam_time();
 
     },
 
@@ -458,7 +471,20 @@ M.quizaccess_wifiresilience.autosave = {
 
           var name = decodeURIComponent(p[0]);
           var val = decodeURIComponent(p[1]);
-          var $el = $('[name="'+name+'"]'), type = $el.attr('type');
+
+          if(name == 'sesskey'){ // Not interested!.
+              continue;
+          }
+
+          var $el = $('[name="'+name+'"]');
+
+          // Fallback to the ID when the name is not present (in the case of content editable).
+          if($el.length == 0 ) {
+            $el = $('[id="'+name+'"]');
+          }
+
+          var type = $el.attr('type');
+
           // get all targets and all origins
 
           if(name.indexOf('_sub') !== -1){
@@ -482,6 +508,13 @@ M.quizaccess_wifiresilience.autosave = {
 
             }
           }
+          if(name.indexOf('qtype_sc_changed_value') !== -1){
+
+                  var distractorid = $el.attr('id');
+                  splitdistractor = distractorid.split('_');
+                  var code = 'require(["qtype_sc/question_behaviour"], function(amd) {amd.wifi_init('+escape(splitdistractor[4])+');});';
+                  eval(code);
+          }
       //    reloaded_form_str += name + ':' + val + ' (' + type + ')\n';
           // || '#' + e.target.getAttribute('id');
           switch(type){
@@ -495,8 +528,9 @@ M.quizaccess_wifiresilience.autosave = {
                   $el.val(val);
           }
 
-        Y.log('[LOCALSTORAGE]: Exam Reloaded before Saving. '+reloaded_form_str, 'debug', '[ETHz-SW] Sync');
+
       }
+      Y.log('[LOCALSTORAGE]: Exam Reloaded before Saving. '+reloaded_form_str, 'debug', '[ETHz-SW] Sync');
     },
 
     save_hidden_field_values: function() {
@@ -572,21 +606,24 @@ M.quizaccess_wifiresilience.autosave = {
     value_changed_drag: function(e) {
       Y.log('Detected a value change in DRAG question.', 'debug', '[ETHz-SW] Sync');
       this.start_save_timer_if_necessary();
+      this.mark_question_changed_if_necessary(name);
     },
 
     connection_changed: function(e) {
       Y.log('Detected change in Connection Status to '+this.connected, 'debug', '[ETHz-SW] Timer');
 
+      //calculate the time we got connected.
+      var total_seconds_missing = 0;
+      if(this.offline_happened_on != 0) {
+          total_seconds_missing = Math.floor((new Date().getTime() - this.offline_happened_on)/1000); // Getting ms
+          this.total_offline_time += total_seconds_missing;
+          this.disconnection_events.push(total_seconds_missing);
+          this.last_disconnection_time = total_seconds_missing;
+          this.offline_happened_on = 0;
+          this.last_disconnection_time = 0;
+      }
+
       if(this.connected){
-        //calculate the time we got connected.
-        var total_seconds_missing = 0;
-
-        if(this.offline_happened_on != 0){
-            total_seconds_missing = Math.floor((new Date().getTime() - this.offline_happened_on)/1000); // Getting ms
-            this.total_offline_time += total_seconds_missing;
-            this.last_disconnection_time = total_seconds_missing;
-        }
-
         // Reset seconds of offline
           this.offline_happened_on = 0;
           // Update end time
@@ -594,8 +631,9 @@ M.quizaccess_wifiresilience.autosave = {
           // M.mod_quiz.timer.update(e);
 
           this.last_disconnection_time = 0;
-
-          Y.log('Total disconnection seconds (will not be compensated because the user is able to continue the exam): ['+ total_seconds_missing +'] Seconds', 'debug', '[ETHz-SW] Timer');
+          if(total_seconds_missing != 0){
+            Y.log('Total disconnection seconds (will not be compensated because the user is able to continue the exam): ['+ total_seconds_missing +'] Seconds', 'debug', '[ETHz-SW] Timer');
+          }
 
       } else {
           //Log the time it happened. Because its not real, then dont stop the timer.
@@ -608,11 +646,19 @@ M.quizaccess_wifiresilience.autosave = {
 
     real_connection_icon_status: function(status) {
 
+      Y.log('Is Exam Server up and running?! '+status, 'debug', '[ETHz-SW] Server Status');
+
       var el = document.querySelector('#quizaccess_wifiresilience_connection');
+      // verify actual internet is offline first!
+      var cxn_hidden = document.querySelector('#quizaccess_wifiresilience_hidden_cxn_status');
+      if(cxn_hidden.value == 0){ // actual network is down
+        status = false;
+        Y.log('Device is not connected to internet - Ignore Server Status and mark it as offline: '+status, 'debug', '[ETHz-SW] Server Status');
+      }
       if (status) {
         if (el.classList) {
           el.classList.add('connected');
-          el.classList.remove('serverdown');
+          el.classList.remove('disconnected');
         } else {
           el.addClass('connected');
           el.removeClass('disconnected');
@@ -695,6 +741,10 @@ M.quizaccess_wifiresilience.autosave = {
         if (slot) {
             this.set_question_state_string(slot, M.util.get_string('answerchanged', 'quizaccess_wifiresilience'));
             this.set_question_state_class(slot, 'answersaved');
+
+            // OK, this should trigger change in indexedDB in case of offline reload.
+            M.quizaccess_wifiresilience.localforage.update_question_state_class(slot, 'answersaved');
+            M.quizaccess_wifiresilience.localforage.update_question_state_string(slot, M.util.get_string('answerchanged', 'quizaccess_wifiresilience'));
         }
     },
 
@@ -744,9 +794,9 @@ M.quizaccess_wifiresilience.autosave = {
         this.locally_stored_data.last_change = new Date();
         this.locally_stored_data.responses = Y.IO.stringify(this.form); // Original
 
-        // SLOW!! var stringified_data = Y.JSON.stringify(this.locally_stored_data);
+        var stringified_data = Y.JSON.stringify(this.locally_stored_data);
         // IndexedDB or WebSQL
-      // SLOW!!  M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
+        M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
 
         // SLOW!! Localstorage
          //SLOW!! localStorage.setItem(this.local_storage_key, stringified_data);
@@ -756,9 +806,11 @@ M.quizaccess_wifiresilience.autosave = {
         this.exam_localstorage_saving_status_str();
 
         if (this.delay_timer || this.save_transaction) {
+          //  Y.log('Syncing with Server is not necessary. Delaying Sync: '+this.delay +' milliseconds.', 'debug', '[ETHz-SW] Sync');
             // Already counting down or saving.
             return;
         }
+        Y.log('Changes worth syncing? Yes.. Flag Syncing to run after: '+this.delay+' milliseconds.', 'debug', '[ETHz-SW] Sync');
 
         this.start_save_timer();
     },
@@ -774,7 +826,16 @@ M.quizaccess_wifiresilience.autosave = {
         }
         this.delay_timer = null;
     },
-
+   get_live_exam_time: function() {
+      Y.log('Trying to get Exam End Time in case of changes', 'debug', '[ETHz-SW] Sync');
+    },
+    exam_time_done: function(transactionid, response) {
+      Y.log('Exam End Time checks on server: SUCCESS. Exam End Time: ' + timeresult.duedate, 'debug', '[ETHz-SW] Sync');
+    },
+    exam_time_failed: function(transactionid, response) {
+      Y.log('Exam End Time checks on server: FAILED. ' + response.responseText, 'debug', '[ETHz-SW] Sync');
+      // Do not do anything, stay on original attemp end time :-)
+    },
     save_changes: function() {
         this.cancel_delay();
         this.dirty = false;
@@ -806,9 +867,10 @@ M.quizaccess_wifiresilience.autosave = {
                 failure: this.save_failed
             },
             context: this,
-            timeout: this.SAVE_TIMEOUT
+            timeout: this.SAVE_TIMEOUT,
+            sync: false
         });
-      //  this.save_start_time = new Date(); AMRO WATTACH moved to save_done
+      this.save_start_time = new Date(); //AMRO WATTACH moved to save_done
       if(this.display_nav_details == 1){
         Y.one(this.SELECTORS.SAVING_NOTICE).setStyle('display', 'block');
       }
@@ -822,9 +884,8 @@ M.quizaccess_wifiresilience.autosave = {
             this.save_failed(transactionid, response);
             return;
         }
-
         if (result.result === 'lostsession') {
-            Y.log('Session loss detected.', 'debug', '[ETHz-SW] Sync');
+            Y.log('Session loss detected. Re-Login required', 'debug', '[ETHz-SW] Sync');
             this.save_transaction = null;
             this.dirty = true;
             this.try_to_restore_session();
@@ -832,19 +893,65 @@ M.quizaccess_wifiresilience.autosave = {
         }
 
         if (result.result !== 'OK') {
+            if(result.error){
+              var sync_errors =  result.error + ' (Code: '+ result.errorcode+') Info: ' + result.debuginfo;
+              this.sync_string_errors = result.error;
+              Y.log('Error: ' + sync_errors, 'debug', '[ETHz-SW] Sync');
+            }
             this.save_failed(transactionid, response);
             return;
         }
-        this.save_start_time = new Date(); //AMRO
-        this.last_successful_server_save_timestamp = this.save_start_time;
-        Y.log('Full Sync to server completed.', 'debug', '[ETHz-SW] Sync');
+        this.sync_string_errors = '';
+
+      //  this.save_start_time = new Date(); //AMRO
+
+        this.last_successful_server_save_timestamp = new Date();
+
         this.save_transaction = null;
+
+        // is there a change happened to quiz end time? if so, then compensate it
+        var original_end_time = Y.one('#original_end_time').get('value');
+        if(!isNaN(result.timerstartvalue) && M.mod_quiz.timer.endtime && original_end_time != result.timelimit) {
+        //  M.mod_quiz.timer.endtime = result.timerstartvalue;
+          var addexloadingtime = 0;
+          if(exam_extra_page_load_time && exam_extra_page_load_time != 'undefined'){
+            addexloadingtime = exam_extra_page_load_time;
+          }
+            Y.log('Page load comepnsation autosave (exam end): ' + addexloadingtime, 'debug', '[ETHz-SW] Sync');
+          //  alert("old ssend time: "+result.timerstartvalue +' --- '+ addexloadingtime);
+            var t = new Date().getTime();
+        //    var t = d.getTime();
+            M.mod_quiz.timer.endtime = exam_extra_page_load_time + t + result.timerstartvalue * 1000;
+          //M.pageloadstarttime.getTime()
+
+
+          // Save it in localstorage in case of page reload while offline!
+          /*
+          if(typeof(Storage) !== "undefined") {
+            sessionStorage.setItem('ethz-new-secondsleft-'+this.attemptid, result.timerstartvalue);
+          }
+          */
+          Y.log('Exam End Time checks on server: SUCCESS. Exam End Time: ' + result.timerstartvalue, 'debug', '[ETHz-SW] Sync');
+        }else{
+          Y.log('Exam End Time checks on server: Original Exam End Time: ' + original_end_time + ' & Last Server Check End Time: ' + result.timelimit +'. No Need to Compensate or Update Quiz Timer.' , 'debug', '[ETHz-SW] Sync');
+        }
+        this.real_connection_icon_status(true);
+
+
         this.update_status_for_successful_save();
+
 
         this.update_question_state_classes(result.questionstates);
         this.update_question_state_strings(result.questionstatestrs);
 
+        Y.log('[SUCCESSFUL] Full Sync to server completed.', 'debug', '[ETHz-SW] Sync');
+
         this.real_connection_icon_status(true);
+
+        // save questions status in localstorage
+        M.quizaccess_wifiresilience.localforage.save_question_state_classes(result.questionstates);
+        M.quizaccess_wifiresilience.localforage.save_question_state_strings(result.questionstatestrs);
+        //Y.log('Questions Status Classes & Strings Saved in localstorage.', 'debug', '[ETHz-SW] Sync');
 
         if (this.dirty) {
             Y.log('Dirty after syncing. Need to re-sync again.', 'debug', '[ETHz-SW] Sync');
@@ -887,6 +994,15 @@ M.quizaccess_wifiresilience.autosave = {
      */
     warn_if_unsaved_data: function(e) {
 
+        // For timer on reload when offline.
+        var sessionstorage_attempt_key = 'ethz-secondsleft-'+this.attemptid;
+        if (!navigator.onLine) {
+            var secondsleft = Math.floor((M.mod_quiz.timer.endtime - new Date().getTime())/1000);
+            sessionStorage.setItem(sessionstorage_attempt_key, secondsleft);
+        } else {
+            sessionStorage.removeItem(sessionstorage_attempt_key);
+        }
+
         if (!this.dirty && !this.save_transaction) {
             return;
         }
@@ -910,11 +1026,13 @@ M.quizaccess_wifiresilience.autosave = {
         // try to set real offline time from SessionStorage for people who
         // are refreshing the attempt.
         if(typeof(Storage) !== "undefined") {
-          sessionStorage.removeItem('ethz-offline-'+this.attemptid);
-          sessionStorage.setItem('ethz-offline-'+this.attemptid, M.mod_quiz.timer.endtime);
+      //    sessionStorage.removeItem('ethz-offline-'+this.attemptid);
+          sessionStorage.setItem('ethz-offline-'+this.attemptid, this.real_offline_time);
 
           // now insert in session storage for refresh in service worker :)
-          sessionStorage.removeItem('ethz-offline-lastpage-'+this.attemptid);
+
+      //    sessionStorage.setItem('real-offline-time-'+this.attemptid, this.real_offline_time);
+      //    sessionStorage.removeItem('ethz-offline-lastpage-'+this.attemptid);
           sessionStorage.setItem('ethz-offline-lastpage-'+this.attemptid, M.quizaccess_wifiresilience.navigation.currentpage);
 
         }
@@ -967,7 +1085,8 @@ M.quizaccess_wifiresilience.autosave = {
 
         this.stop_autosaving();
 
-        var submitButton = Y.one('input[name=finishattempt]').previous('input[type=submit]');
+      //  var submitButton = Y.one('input[name=finishattempt]').previous('input[type=submit]');
+        var submitButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
         this.get_submit_progress(submitButton.ancestor('.controls')).show();
         submitButton.ancestor('.singlebutton').hide();
         var failureMessage = this.get_submit_failed_message(submitButton.ancestor('.controls'));
@@ -989,7 +1108,8 @@ M.quizaccess_wifiresilience.autosave = {
                 failure: this.submit_failed
             },
             context: this,
-            timeout: this.SAVE_TIMEOUT_FULL_SUBMISSION
+            timeout: this.SAVE_TIMEOUT_FULL_SUBMISSION,
+            sync: false
         });
         this.save_start_time = new Date();
     },
@@ -1028,7 +1148,8 @@ M.quizaccess_wifiresilience.autosave = {
 
         // Re-display the submit button.
         this.form.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).remove();
-        var submitButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous('input[type=submit]');
+        var submitButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
+        //var submitButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous('input[type=submit]');
         var submitProgress = this.get_submit_progress(submitButton.ancestor('.controls'));
         submitButton.ancestor('.singlebutton').show();
         submitProgress.hide();
@@ -1044,7 +1165,8 @@ M.quizaccess_wifiresilience.autosave = {
 
         //change the label of submit again to "try again"
 
-        var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous(this.SELECTORS.SUBMIT_BUTTON);
+      //  var submitAndFinishButton = Y.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).previous(this.SELECTORS.SUBMIT_BUTTON);
+        var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
         submitAndFinishButton.set('value',M.util.get_string('submitallandfinishtryagain', 'quizaccess_wifiresilience'));
 
         function response_is_json_string(str) {

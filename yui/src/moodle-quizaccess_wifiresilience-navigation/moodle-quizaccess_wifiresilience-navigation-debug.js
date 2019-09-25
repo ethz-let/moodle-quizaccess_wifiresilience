@@ -112,11 +112,11 @@ M.quizaccess_wifiresilience.navigation = {
         this.attemptid = Y.one(this.SELECTORS.ATTEMPT_ID_INPUT).get('value');
 
         quizaccess_wifiresilience_progress_step = 6;
-        quizaccess_wifiresilience_progress_step_txt = "Preparing Exam Navigation.. ";
-        $("#quizaccess_wifiresilience_result").html(quizaccess_wifiresilience_progress_step_txt);
+      //  quizaccess_wifiresilience_progress_step_txt = "Preparing Exam Navigation.. ";
+        $("#quizaccess_wifiresilience_result").html(M.util.get_string('loadingstep6', 'quizaccess_wifiresilience'));
 
 
-        Y.on('load', this.preload_images, window, this);
+      //  Y.on('load', this.preload_images, window, this);
 
         Y.all('textarea').each(function (textarea) {
             // This may appear to be a no-op, but in fact, it is required so
@@ -138,7 +138,7 @@ M.quizaccess_wifiresilience.navigation = {
 
       //  Y.all(this.SELECTORS.ALL_PAGE_DIVS).addClass('quizaccess_wifiresilience_hidden');
         this.navigate_to_page(+currentpage);
-        Y.all(this.SELECTORS.ALL_PAGE_DIVS).removeClass('quiz-loading-hide');
+        Y.all(this.SELECTORS.ALL_PAGE_DIVS).removeClass('xquiz-loading-hide');
 
         Y.delegate('click', this.nav_button_click, this.SELECTORS.NAV_BLOCK, this.SELECTORS.NAV_BUTTON, this);
         Y.delegate('click', this.nav_button_click, this.SELECTORS.SUMMARY_TABLE, this.SELECTORS.SUMMARY_TABLE_LINK, this);
@@ -171,9 +171,9 @@ M.quizaccess_wifiresilience.navigation = {
 
         Y.log('Initialised Wifi-Resilient Exam mode.', 'debug', '[ETHz-SW] Navigation');
 
-        var quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
+      //  var quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
         quizaccess_wifiresilience_progress.animate({
-          width: "60%"
+          width: examviewportmaxwidth * 6 / 10 + "px"
         });
     },
 

@@ -51,12 +51,12 @@ $PAGE->set_url(quizaccess_wifiresilience::ATTEMPT_URL, $pageurl->params());
 
 $course = $attemptobj->get_course();
 if(!$course){
-  print_error('invalidcourse');
+    print_error('invalidcourse');
 }
 $courseid = $course->id;
 $cmid = $attemptobj->get_cmid();
 if(!$cmid){
-  print_error('invalidcoursemodule');
+    print_error('invalidcoursemodule');
 }
 
 // Check login.
@@ -101,7 +101,7 @@ $output = $PAGE->get_renderer('mod_quiz');
 $messages = $accessmanager->prevent_access();
 if (!$attemptobj->is_preview_user() && $messages) {
     print_error('attempterror', 'quiz', $attemptobj->view_url(),
-    $output->access_messages($messages));
+                    $output->access_messages($messages));
 }
 if ($accessmanager->is_preflight_check_required($attemptobj->get_attemptid())) {
     redirect($attemptobj->start_attempt_url(null, $page));
@@ -127,9 +127,9 @@ if (!$autosaveperiod) {
 
 $user_id = '-u' . $USER->id;
 /*
-$emergencysavefilename = clean_filename(format_string($attemptobj->get_quiz_name()) .
-        $user_id . '-a' . $attemptid . '-d197001010000.eth');
-*/
+ $emergencysavefilename = clean_filename(format_string($attemptobj->get_quiz_name()) .
+ $user_id . '-a' . $attemptid . '-d197001010000.eth');
+ */
 
 $wifi_settings = $DB->get_record('quizaccess_wifiresilience', array('quizid' => $attemptobj->get_quizid()));
 
@@ -140,18 +140,18 @@ $fetchandlogconfig = 0;
 
 
 if($wifi_settings){
-  if(!empty($wifi_settings->techerrors) && $wifi_settings->techerrors != 0){
-      $display_tech_errors = 1;
-  }
-  if(!empty($wifi_settings->navdetails) && $wifi_settings->navdetails != 0){
-      $display_nav_details = 1;
-  }
-  if(!empty($wifi_settings->watchxhr) && trim($wifi_settings->navdetails) != ''){
-      $watchlist_config = 1;
-  }
-  if(!empty($wifi_settings->fetchandlog) && trim($wifi_settings->fetchandlog) != ''){
-      $fetchandlogconfig = 1;
-  }
+    if(!empty($wifi_settings->techerrors) && $wifi_settings->techerrors != 0){
+        $display_tech_errors = 1;
+    }
+    if(!empty($wifi_settings->navdetails) && $wifi_settings->navdetails != 0){
+        $display_nav_details = 1;
+    }
+    if(!empty($wifi_settings->watchxhr) && trim($wifi_settings->navdetails) != ''){
+        $watchlist_config = 1;
+    }
+    if(!empty($wifi_settings->fetchandlog) && trim($wifi_settings->fetchandlog) != ''){
+        $fetchandlogconfig = 1;
+    }
 }
 
 $timeleft = $attemptobj->get_time_left_display(time());
@@ -164,7 +164,7 @@ if ($timeleft !== false) {
         $timerstartvalue = max($timerstartvalue, 1);
     }
 } else {
-  $timerstartvalue = 0;
+    $timerstartvalue = 0;
 }
 
 $exam_storage_keyname =  'ETHz-crs' .$courseid . '-cm' . $cmid . '-id' . $attemptobj->get_quizid() . $user_id . '-a' . $attemptid;
@@ -172,35 +172,35 @@ $exam_storage_keyname =  'ETHz-crs' .$courseid . '-cm' . $cmid . '-id' . $attemp
 $emergencysavefilename = $exam_storage_keyname . '-d197001010000.eth';
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-localforage',
-        'M.quizaccess_wifiresilience.localforage.init', array($exam_storage_keyname));
+                'M.quizaccess_wifiresilience.localforage.init', array($exam_storage_keyname));
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-autosave',
-        'M.quizaccess_wifiresilience.autosave.init', array($autosaveperiod, $exam_storage_keyname, $courseid, $cmid, $display_tech_errors, $display_nav_details));
+                'M.quizaccess_wifiresilience.autosave.init', array($autosaveperiod, $exam_storage_keyname, $courseid, $cmid, $display_tech_errors, $display_nav_details));
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-navigation',
-        'M.quizaccess_wifiresilience.navigation.init', array($page));
+                'M.quizaccess_wifiresilience.navigation.init', array($page));
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-download',
-        'M.quizaccess_wifiresilience.download.init',
-        array($emergencysavefilename, get_config('quizaccess_wifiresilience', 'publickey')));
+                'M.quizaccess_wifiresilience.download.init',
+                array($emergencysavefilename, get_config('quizaccess_wifiresilience', 'publickey')));
 
 $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-isoffline',
-        'M.quizaccess_wifiresilience.isoffline.init', array());
+                'M.quizaccess_wifiresilience.isoffline.init', array());
 
 
 if($watchlist_config == 1){
 
-  $watchlist = preg_replace('#\s+#',',',trim($wifi_settings->watchxhr));
-  $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-watching',
-                  'M.quizaccess_wifiresilience.watching.init', array($watchlist));
+    $watchlist = preg_replace('#\s+#',',',trim($wifi_settings->watchxhr));
+    $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-watching',
+                    'M.quizaccess_wifiresilience.watching.init', array($watchlist));
 }
 
 
 $PAGE->requires->strings_for_js(array('answerchanged', 'savetheresponses', 'submitting',
-        'submitfailed', 'submitfailedmessage', 'submitfaileddownloadmessage',
-        'lastsaved', 'lastsavedtotheserver', 'lastsavedtothiscomputer',
-        'savingdots','submitallandfinishtryagain', 'savingtryagaindots', 'savefailed', 'logindialogueheader',
-        'changesmadereallygoaway','loadingstep4','loadingstep5','loadingstep6','loadingstep7','loadingstep8', 'currentissue'), 'quizaccess_wifiresilience');
+    'submitfailed', 'submitfailedmessage', 'submitfaileddownloadmessage',
+    'lastsaved', 'lastsavedtotheserver', 'lastsavedtothiscomputer',
+    'savingdots','submitallandfinishtryagain', 'savingtryagaindots', 'savefailed', 'logindialogueheader',
+    'changesmadereallygoaway','loadingstep4','loadingstep5','loadingstep6','loadingstep7','loadingstep8', 'currentissue'), 'quizaccess_wifiresilience');
 $PAGE->requires->strings_for_js(array('submitallandfinish', 'confirmclose'), 'quiz');
 $PAGE->requires->string_for_js('flagged', 'question');
 $PAGE->requires->string_for_js('confirmation', 'admin');
@@ -208,13 +208,13 @@ $PAGE->requires->string_for_js('confirmation', 'admin');
 
 // Log this page view.
 $params = array(
-        'objectid' => $attemptid,
-        'relateduserid' => $attemptobj->get_userid(),
-        'courseid' => $attemptobj->get_courseid(),
-        'context' => context_module::instance($cmid),
-        'other' => array(
-                'quizid' => $attemptobj->get_quizid()
-        )
+    'objectid' => $attemptid,
+    'relateduserid' => $attemptobj->get_userid(),
+    'courseid' => $attemptobj->get_courseid(),
+    'context' => context_module::instance($cmid),
+    'other' => array(
+        'quizid' => $attemptobj->get_quizid()
+    )
 );
 $event = \mod_quiz\event\attempt_viewed::create($params);
 $event->add_record_snapshot('quiz_attempts', $attemptobj->get_attempt());
@@ -238,9 +238,9 @@ if ($attemptobj->is_last_page($page)) {
 }
 
 if($page == 0 || !$page){
-  $previouspage =  -1;
+    $previouspage =  -1;
 } else{
-  $previouspage =  $page - 1;
+    $previouspage =  $page - 1;
 }
 
 
@@ -251,29 +251,29 @@ $form = '';
 
 // Start the form.
 $form .= html_writer::start_tag('form',
-        array('action' => $attemptobj->processattempt_url(), 'method' => 'post',
-        'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
-        'id' => 'responseform'
-      ));
+                array('action' => $attemptobj->processattempt_url(), 'method' => 'post',
+                    'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
+                    'id' => 'responseform'
+                ));
 $form .= html_writer::start_tag('div');
 
 // Print all the questions on every page.
 $numpages = $attemptobj->get_num_pages();
 for ($i = 0; $i < $numpages; $i++) {
-    $form .= html_writer::start_div('quiz-loading-hide',
-            array('id' => 'quizaccess_wifiresilience-attempt_page-' . $i));
+    $form .= html_writer::start_div('xquiz-loading-hide',
+                    array('id' => 'quizaccess_wifiresilience-attempt_page-' . $i, 'data-qslot' => $i+1));
     foreach ($attemptobj->get_slots($i) as $slot) {
         $form .= $attemptobj->render_question($slot, false, $output,
-                $attemptobj->attempt_url($slot, $page));
+                        $attemptobj->attempt_url($slot, $page));
     }
     $form .= html_writer::end_div('');
 }
 
 $form .= html_writer::start_tag('div', array('class' => 'submitbtns wifi_previous_next_btn'));
 $form .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'previous',
-        'value' => get_string('navigateprevious','quiz'), 'class' => 'mod_quiz-prev-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-prev_btn'));
+    'value' => get_string('navigateprevious','quiz'), 'class' => 'mod_quiz-prev-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-prev_btn'));
 $form .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
-        'value' => get_string('navigatenext','quiz'), 'class' => 'mod_quiz-next-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-next_btn'));
+    'value' => get_string('navigatenext','quiz'), 'class' => 'mod_quiz-next-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-next_btn'));
 $form .= html_writer::end_tag('div');
 
 $accessmanager = $attemptobj->get_quizobj()->get_access_manager(time());
@@ -282,38 +282,38 @@ if($endtime === false) $endtime = 0;
 
 // Some hidden fields to track what is going on.
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
-        'value' => $attemptobj->get_attemptid()));
+    'value' => $attemptobj->get_attemptid()));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'thispage',
-        'value' => $page, 'id' => 'followingpage'));
+    'value' => $page, 'id' => 'followingpage'));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'previouspage',
-                'value' => $previouspage));
+    'value' => $previouspage));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'nextpage',
-        'value' => $nextpage));
+    'value' => $nextpage));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'timeup',
-        'value' => '0', 'id' => 'timeup'));
+    'value' => '0', 'id' => 'timeup'));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey',
-        'value' => sesskey()));
+    'value' => sesskey()));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'scrollpos',
-        'value' => '', 'id' => 'scrollpos'));
+    'value' => '', 'id' => 'scrollpos'));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden',
-        'value' => $USER->id, 'id' => 'quiz-userid'));
+    'value' => $USER->id, 'id' => 'quiz-userid'));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden',
-         'value' => $endtime, 'id' => 'original_end_time'));
+    'value' => $endtime, 'id' => 'original_end_time'));
 $form .= html_writer::empty_tag('input', array('type' => 'hidden',
-                'value' => '1', 'id' => 'quizaccess_wifiresilience_hidden_cxn_status', 'name' => 'quizaccess_wifiresilience_cxn_status'));
+    'value' => '1', 'id' => 'quizaccess_wifiresilience_hidden_cxn_status', 'name' => 'quizaccess_wifiresilience_cxn_status'));
 
 $form .= html_writer::empty_tag('input', array('type' => 'hidden',
-                'value' => '1', 'id' => 'quizaccess_wifiresilience_hidden_livewatch_status', 'name' => 'quizaccess_wifiresilience_livewatch_status'));
+    'value' => '1', 'id' => 'quizaccess_wifiresilience_hidden_livewatch_status', 'name' => 'quizaccess_wifiresilience_livewatch_status'));
 
-        /*
-$form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'total_offline_time',
-                'value' => 0, , 'id' => 'total_offline_time'));
-*/
+/*
+ $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'total_offline_time',
+ 'value' => 0, , 'id' => 'total_offline_time'));
+ */
 // Add a hidden field with questionids. Do this at the end of the form, so
 // if you navigate before the form has finished loading, it does not wipe all
 // the student's answers.
 $form .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'slots',
-        'value' => implode(',', $attemptobj->get_slots())));
+    'value' => implode(',', $attemptobj->get_slots())));
 
 // Summary page. Code from mod_quiz_renderer::summary_page.
 $summary = '';
@@ -324,8 +324,8 @@ $summary .= $output->summary_table($attemptobj, $attemptobj->get_display_options
 
 
 /*
-$controls = $output->summary_page_controls($attemptobj);
-*/
+ $controls = $output->summary_page_controls($attemptobj);
+ */
 /******* NOW CONTROL OVERRIDE******/
 
 $controls = '';
@@ -341,10 +341,10 @@ if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
     </form>
     ';
     /*
-    $button =  new single_button(
-            new moodle_url($attemptobj->attempt_url(null, $attemptobj->get_currentpage())),
-            get_string('returnattempt', 'quiz'));
-    */
+     $button =  new single_button(
+     new moodle_url($attemptobj->attempt_url(null, $attemptobj->get_currentpage())),
+     get_string('returnattempt', 'quiz'));
+     */
     //$output->render($button)
     $controls .= $output->container($output->container($button, 'controls','wifi_return_to_attempt_div'), 'submitbtns mdl-align wifi_return_to_attempt_btn');
 }
@@ -360,26 +360,26 @@ $options = array(
     'sesskey' => sesskey(),
 );
 /*
-$button = '
-<form action="'.new moodle_url($attemptobj->processattempt_url()).'" id="quizaccess_wifiresilience_timer_autosubmit_form">
-<input type="submit" id="quizaccess_wifiresilience_finishattempt" value="'.get_string('submitallandfinish', 'quiz').'" class="btn btn-secondary">
-<input type="hidden" name="attempt" value="'.$attemptobj->get_attemptid().'" />
-<input type="hidden" name="finishattempt" value="1" />
-<input type="hidden" name="timeup" value="0" />
-<input type="hidden" name="slots" value="" />
-<input type="hidden" name="sesskey" value="'.sesskey().'" />
-</form>
-';
-*/
+ $button = '
+ <form action="'.new moodle_url($attemptobj->processattempt_url()).'" id="quizaccess_wifiresilience_timer_autosubmit_form">
+ <input type="submit" id="quizaccess_wifiresilience_finishattempt" value="'.get_string('submitallandfinish', 'quiz').'" class="btn btn-secondary">
+ <input type="hidden" name="attempt" value="'.$attemptobj->get_attemptid().'" />
+ <input type="hidden" name="finishattempt" value="1" />
+ <input type="hidden" name="timeup" value="0" />
+ <input type="hidden" name="slots" value="" />
+ <input type="hidden" name="sesskey" value="'.sesskey().'" />
+ </form>
+ ';
+ */
 
 $button = new single_button(
-        new moodle_url($attemptobj->processattempt_url(), $options),
-        get_string('submitallandfinish', 'quiz'));
+                new moodle_url($attemptobj->processattempt_url(), $options),
+                get_string('submitallandfinish', 'quiz'));
 $button->id = 'quizaccess_wifiresilience_timer_autosubmit_form'; // responseform
 
 if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
     $button->add_action(new confirm_action(get_string('confirmclose', 'quiz'), null,
-            get_string('submitallandfinish', 'quiz')));
+                    get_string('submitallandfinish', 'quiz')));
 }
 $duedate = $attemptobj->get_due_date();
 $message = '';
@@ -396,7 +396,7 @@ $thebutton = preg_replace('/<button type="submit"\s(.+?)>(.+?)<\/button>/is', '<
 
 //$controls .= $output->countdown_timer($attemptobj, time());
 $controls .= $output->container($message . $output->container(
-        $thebutton, 'controls'), 'submitbtns mdl-align wifi_must_be_submitted_btn');
+                $thebutton, 'controls'), 'submitbtns mdl-align wifi_must_be_submitted_btn');
 //$controls .= $output;
 /******* END  CONTROL OVERRIDE******/
 
@@ -404,26 +404,26 @@ $controls .= $output->container($message . $output->container(
 $controls = preg_replace('~<div id="quiz-timer".*?</div>~', '', $controls);
 
 $controls = str_replace('<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/processattempt.php"',
-            '<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/processattempt.php" id="quizaccess_wifiresilience_timer_autosubmit_form"',
-             $controls);
+                '<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/processattempt.php" id="quizaccess_wifiresilience_timer_autosubmit_form"',
+                $controls);
 
-             /*
-$needle = '<input type="submit"';
-$replace = '<input type="submit" id="quizaccess_wifiresilience_returntoattempt"';
-$pos = strpos($controls, $needle);
-if ($pos !== false) {
-   $controls = substr_replace($controls, $replace, $pos, strlen($needle));
-}
+/*
+ $needle = '<input type="submit"';
+ $replace = '<input type="submit" id="quizaccess_wifiresilience_returntoattempt"';
+ $pos = strpos($controls, $needle);
+ if ($pos !== false) {
+ $controls = substr_replace($controls, $replace, $pos, strlen($needle));
+ }
 
-*/
+ */
 
 
 
 /*
-$controls = str_replace('<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/attempt.php"',
-            '<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/attempt.php" id="ATTEMPT_quizaccess_wifiresilience_form"',
-            $controls);
-            */
+ $controls = str_replace('<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/attempt.php"',
+ '<form method="post" action="'.$CFG->wwwroot.'/mod/quiz/attempt.php" id="ATTEMPT_quizaccess_wifiresilience_form"',
+ $controls);
+ */
 //preg_match_all('/<form[^>]+>/i',$controls, $found_forms);
 //print_r($found_forms);
 //$controls = preg_replace('~<div id="quiz-timer".*?</div>~', '', $controls);
@@ -465,19 +465,22 @@ $old = array('\/mod\/quiz\/module.js','<body');
 $new = array('\/mod\/quiz\/accessrule\/wifiresilience\/js\/module.js', $overlay_tags.'<body');
 // Dirty hack to play with the quiz timer :-)
 $html .= str_replace($old, $new, $output->header());
+
+
+
 // Now make the overlay on top of the page so to hide any potential Displays
 //$html .= str_replace('<div id="page">','<div id="page">'.,$html);
 //$html .= str_replace('<body',$overlay_tags.'<body', $html);
 
 /*
-preg_replace("~<body(.*?)>~is", $html, $matches);
-//echo $matches[0]; exit;
-if(isset($matches[0])){
-  $html .= str_replace($matches[0], $matches[0].$overlay_tags, $html);
-}else{
-  $html .= $overlay_tags;
-}
-*/
+ preg_replace("~<body(.*?)>~is", $html, $matches);
+ //echo $matches[0]; exit;
+ if(isset($matches[0])){
+ $html .= str_replace($matches[0], $matches[0].$overlay_tags, $html);
+ }else{
+ $html .= $overlay_tags;
+ }
+ */
 $html .= $output->quiz_notices($messages);
 $html .= $form;
 $html .= $summary;
@@ -485,23 +488,23 @@ $html .= $summary;
 
 // Some hidden images and calls.
 /*
-// Base 64 needed images first.
-function quizaccess_wifiresilience_get_datauri($image, $mime = "image/png") {
-	return 'data: '.$mime.';base64,'.base64_encode(file_get_contents($image));
-}
-*/
+ // Base 64 needed images first.
+ function quizaccess_wifiresilience_get_datauri($image, $mime = "image/png") {
+ return 'data: '.$mime.';base64,'.base64_encode(file_get_contents($image));
+ }
+ */
 
 /*
-$html .= html_writer::start_div('quizaccess_wifiresilience_hidden_statics',
-        array('id' => 'id_quizaccess_wifiresilience_hidden_statics'));
-$html .= '<img id="wifiresilience_flagged_image" src="'.$OUTPUT->image_url('i/flagged', 'moodle').'">';
-$html .= '<img id="wifiresilience_unflagged_image"  src="'.$OUTPUT->image_url('i/unflagged', 'moodle').'">';
-$html .= '<img id="wifiresilience_small_image" src="'.$OUTPUT->image_url('i/loading_small', 'moodle').'">';
-$html .= '<img id="wifiresilience_navflagged" src="'.$OUTPUT->image_url('navflagged', 'quiz').'">';
-$html .= '<img id="wifiresilience_folder_24" src="'.$OUTPUT->image_url('f/folder-24', 'core').'">';
-$html .= '<span id="wifiresilience_current_step" style="display:none;"></span>';
-$html .= html_writer::end_div('');
-*/
+ $html .= html_writer::start_div('quizaccess_wifiresilience_hidden_statics',
+ array('id' => 'id_quizaccess_wifiresilience_hidden_statics'));
+ $html .= '<img id="wifiresilience_flagged_image" src="'.$OUTPUT->image_url('i/flagged', 'moodle').'">';
+ $html .= '<img id="wifiresilience_unflagged_image"  src="'.$OUTPUT->image_url('i/unflagged', 'moodle').'">';
+ $html .= '<img id="wifiresilience_small_image" src="'.$OUTPUT->image_url('i/loading_small', 'moodle').'">';
+ $html .= '<img id="wifiresilience_navflagged" src="'.$OUTPUT->image_url('navflagged', 'quiz').'">';
+ $html .= '<img id="wifiresilience_folder_24" src="'.$OUTPUT->image_url('f/folder-24', 'core').'">';
+ $html .= '<span id="wifiresilience_current_step" style="display:none;"></span>';
+ $html .= html_writer::end_div('');
+ */
 
 
 // footer was here...........
@@ -529,6 +532,9 @@ if(!examviewportmaxwidth || examviewportmaxwidth == 0 || examviewportmaxwidth ==
      width: examviewportmaxwidth * 2 / 10 + "px"
    });
 
+$(window).on(\'pageshow\',function(){
+
+ });
     $(document).ready(function(){
       quizaccess_wifiresilience_progress_step = 2;
       $("#quizaccess_wifiresilience_result").html("'.get_string('loadingstep2','quizaccess_wifiresilience').'");
@@ -538,7 +544,6 @@ if(!examviewportmaxwidth || examviewportmaxwidth == 0 || examviewportmaxwidth ==
       });
 
     $(window).on("load", function() {
-
 
 
       quizaccess_wifiresilience_progress_step = 10;
@@ -551,9 +556,7 @@ if(!examviewportmaxwidth || examviewportmaxwidth == 0 || examviewportmaxwidth ==
 	  // What if forced to go to summary page to force sumbission after leaving the quiz and coming back?
       if(typeof(M.quizaccess_wifiresilience.navigation) != "undefined"){
 
-        Y.all(M.quizaccess_wifiresilience.navigation.SELECTORS.ALL_PAGE_DIVS).addClass("quizaccess_wifiresilience_hidden");
-        Y.one(M.quizaccess_wifiresilience.navigation.SELECTORS.QUIZ_FORM).removeClass("quizaccess_wifiresilience_hidden");
-        Y.one(M.quizaccess_wifiresilience.navigation.SELECTORS.PAGE_DIV_ROOT + '.$page.').removeClass("quizaccess_wifiresilience_hidden");
+
         // Add sequentional note - No navigation numbers should be clickable
         // Y.one("#mod_quiz_navblock_title").append(" <sup> '.get_string('navmethod_seq','mod_quiz').'</sup><br />");
         // Catch also auto submit form #quizaccess_wifiresilience_timer_autosubmit_form made by Timer
@@ -591,13 +594,23 @@ if(!examviewportmaxwidth || examviewportmaxwidth == 0 || examviewportmaxwidth ==
     if(typeof(M.quizaccess_wifiresilience.navigation) != "undefined"){
       // Only if Timer auto submit enabled.
         if(M.mod_quiz.timer.endtime && M.mod_quiz.timer.endtime != 0 && M.mod_quiz.timer.endtime != "undefined"){
-          wifiresilience_window_load_time = (new Date().getTime()) - M.pageloadstarttime.getTime() + 2000; //wifiresilience_doc_ready_time;
-          //M.mod_quiz.timer.endtime = M.mod_quiz.timer.endtime + wifiresilience_window_load_time + 2000; // +2 seconds for fadeout?
+          wifiresilience_window_load_time = (new Date().getTime()) - M.pageloadstarttime.getTime() + 12000; //wifiresilience_doc_ready_time;
+          //M.mod_quiz.timer.endtime = M.mod_quiz.timer.endtime + wifiresilience_window_load_time + 12000; // +7 seconds for fadeout?
 
          }
     }
+if(typeof(M.quizaccess_wifiresilience.navigation) != "undefined"){
+    setTimeout( function(){
+  Y.all(M.quizaccess_wifiresilience.navigation.SELECTORS.ALL_PAGE_DIVS).addClass("quizaccess_wifiresilience_hidden");
+  Y.one(M.quizaccess_wifiresilience.navigation.SELECTORS.QUIZ_FORM).removeClass("quizaccess_wifiresilience_hidden");
+  Y.one(M.quizaccess_wifiresilience.navigation.SELECTORS.PAGE_DIV_ROOT + '.$page.').removeClass("quizaccess_wifiresilience_hidden");
+    $("#quizaccess_wifiresilience_overlay").fadeOut();
+}  , 10000 );
 
-      $("#quizaccess_wifiresilience_overlay").fadeOut();
+} else {
+    $("#quizaccess_wifiresilience_overlay").fadeOut();
+}
+
 
   });
 
@@ -622,7 +635,6 @@ quizaccess_wifiresilience_flagging('$navflagged');
 quizaccess_wifiresilience_flagging('$flagon');
 quizaccess_wifiresilience_flagging('$loadingsmall');
 quizaccess_wifiresilience_flagging('$folder24');
-//quizaccess_wifiresilience_flagging('$sprite');
 ";
 
 $html .= '<script>
@@ -648,32 +660,32 @@ $html .= '<script>
 
 if($fetchandlogconfig){
 
-  $fetchandlog = '';
-  $link_pieces = preg_split("/\\r\\n|\\r|\\n/", $wifi_settings->fetchandlog);
-  if(count($link_pieces) != 0){
-    foreach($link_pieces as $tobefetched){
-      $tobefetched_cleaned = str_replace('pluginfile.php', 'mod/quiz/accessrule/wifiresilience/examfile.php', $tobefetched);
-      $html = str_replace($tobefetched, $tobefetched_cleaned, $html);
-      $fetchandlog .= 'quizaccess_wifiresilience_fetch_and_log("'.$tobefetched_cleaned.'"); ';
+    $fetchandlog = '';
+    $link_pieces = preg_split("/\\r\\n|\\r|\\n/", $wifi_settings->fetchandlog);
+    if(count($link_pieces) != 0){
+        foreach($link_pieces as $tobefetched){
+            $tobefetched_cleaned = str_replace('pluginfile.php', 'mod/quiz/accessrule/wifiresilience/examfile.php', $tobefetched);
+            $html = str_replace($tobefetched, $tobefetched_cleaned, $html);
+            $fetchandlog .= 'quizaccess_wifiresilience_fetch_and_log("'.$tobefetched_cleaned.'"); ';
+        }
+
     }
 
-  }
+    /*
+     $html .= html_writer::start_div('quizaccess_wifiresilience_hidden_statics',
+     array('id' => 'id_quizaccess_wifiresilience_hidden_statics'));
+     $html .= '<img id="wifiresilience_flagged_image" src="'.$OUTPUT->image_url('i/flagged', 'moodle').'">';
+     $html .= '<img id="wifiresilience_unflagged_image"  src="'.$OUTPUT->image_url('i/unflagged', 'moodle').'">';
+     $html .= '<img id="wifiresilience_small_image" src="'.$OUTPUT->image_url('i/loading_small', 'moodle').'">';
+     $html .= '<img id="wifiresilience_navflagged" src="'.$OUTPUT->image_url('navflagged', 'quiz').'">';
+     $html .= '<img id="wifiresilience_folder_24" src="'.$OUTPUT->image_url('f/folder-24', 'core').'">';
+     $html .= '<span id="wifiresilience_current_step" style="display:none;"></span>';
+     $html .= html_writer::end_div('');
+     */
 
-/*
-  $html .= html_writer::start_div('quizaccess_wifiresilience_hidden_statics',
-          array('id' => 'id_quizaccess_wifiresilience_hidden_statics'));
-  $html .= '<img id="wifiresilience_flagged_image" src="'.$OUTPUT->image_url('i/flagged', 'moodle').'">';
-  $html .= '<img id="wifiresilience_unflagged_image"  src="'.$OUTPUT->image_url('i/unflagged', 'moodle').'">';
-  $html .= '<img id="wifiresilience_small_image" src="'.$OUTPUT->image_url('i/loading_small', 'moodle').'">';
-  $html .= '<img id="wifiresilience_navflagged" src="'.$OUTPUT->image_url('navflagged', 'quiz').'">';
-  $html .= '<img id="wifiresilience_folder_24" src="'.$OUTPUT->image_url('f/folder-24', 'core').'">';
-  $html .= '<span id="wifiresilience_current_step" style="display:none;"></span>';
-  $html .= html_writer::end_div('');
-*/
+    if($fetchandlog){
 
-  if($fetchandlog){
-
-  $html .= '<script>
+        $html .= '<script>
     // Prefetch Script
     const pluginCacheNamePre = \'ETHz-SW-runtime-routes\';
     const quizaccess_wifiresilience_fetch_and_log = async (url) => {
@@ -696,7 +708,7 @@ if($fetchandlogconfig){
     '.$fetchandlog.'
     });
     </script>';
-  }
+    }
 
 }
 

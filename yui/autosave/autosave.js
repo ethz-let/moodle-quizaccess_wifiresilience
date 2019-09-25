@@ -98,7 +98,7 @@ M.quizaccess_wifiresilience.autosave = {
         CHANGE_DRAGS:           'li.matchdrag',
         HIDDEN_INPUTS:         'input[type=hidden]',
         NAV_BUTTON:            '#quiznavbutton',                       // Must have slot appended.
-        QUESTION_CONTAINER:    '#q',                                   // Must have slot appended.
+        QUESTION_CONTAINER:    'div[data-qslot=',                      // Was #q for <= 3.6.
         STATE_HOLDER:          ' .state',
         SUMMARY_ROW:           '.quizsummaryofattempt tr.quizsummary', // Must have slot appended.
         STATE_COLUMN:          ' .c1',
@@ -154,7 +154,7 @@ M.quizaccess_wifiresilience.autosave = {
      * @default 60000 , 60 Seconds (Original: 120000 - 120 seconds - 2 mins)
      * @private
      */
-    delay: 45000,
+    delay: 20000,
 
     /**
      * The total_offline_time (in seconds) for the device.
@@ -472,6 +472,10 @@ M.quizaccess_wifiresilience.autosave = {
           var name = decodeURIComponent(p[0]);
           var val = decodeURIComponent(p[1]);
 
+          if(name == 'sesskey'){ // Not interested!.
+              continue;
+          }
+
           var $el = $('[name="'+name+'"]');
 
           // Fallback to the ID when the name is not present (in the case of content editable).
@@ -503,6 +507,13 @@ M.quizaccess_wifiresilience.autosave = {
               }
 
             }
+          }
+          if(name.indexOf('qtype_sc_changed_value') !== -1){
+
+                  var distractorid = $el.attr('id');
+                  splitdistractor = distractorid.split('_');
+                  var code = 'require(["qtype_sc/question_behaviour"], function(amd) {amd.wifi_init('+escape(splitdistractor[4])+');});';
+                  eval(code);
           }
       //    reloaded_form_str += name + ':' + val + ' (' + type + ')\n';
           // || '#' + e.target.getAttribute('id');
@@ -783,9 +794,9 @@ M.quizaccess_wifiresilience.autosave = {
         this.locally_stored_data.last_change = new Date();
         this.locally_stored_data.responses = Y.IO.stringify(this.form); // Original
 
-        // SLOW!! var stringified_data = Y.JSON.stringify(this.locally_stored_data);
+        var stringified_data = Y.JSON.stringify(this.locally_stored_data);
         // IndexedDB or WebSQL
-      // SLOW!!  M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
+        M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
 
         // SLOW!! Localstorage
          //SLOW!! localStorage.setItem(this.local_storage_key, stringified_data);
