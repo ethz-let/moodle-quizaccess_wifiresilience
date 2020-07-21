@@ -15,7 +15,6 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Auto-save functionality for during quiz attempts.
  *
@@ -465,7 +464,8 @@ M.quizaccess_wifiresilience.autosave = {
     try_to_use_locally_saved_responses: function() {
 
       var prefill = this.locally_stored_data.responses;
-
+      var alreadyusedparams = [];
+//console.error(prefill);
       var hashParams = prefill.split('&'); // substr(1) to remove the `#`
       var reloaded_form_str = 'Loading (From localStorage)\n';
       for(var i = 0; i < hashParams.length; i++){
@@ -485,7 +485,20 @@ M.quizaccess_wifiresilience.autosave = {
             $el = $('[id="'+name+'"]');
           }
 
-          var type = $el.attr('type');
+          if($el.length > 1 && alreadyusedparams.indexOf(name) > -1){
+
+             var $eltemp = $('[name="'+name+'"]')[1];
+             // Fallback to the ID when the name is not present (in the case of content editable).
+             if($eltemp.length == 0 ) {
+               $eltemp = $('[id="'+name+'"]')[1];
+             }
+             $el = $($eltemp);
+             var type = $el.attr('type')
+             console.log("DUPLICATE FIELD: More than one element hold same name/id. Now we are selecting: ", $el);
+          } else {
+            var type = $el.attr('type');
+          }
+          alreadyusedparams.push(name);
 
           // get all targets and all origins
 
@@ -510,24 +523,85 @@ M.quizaccess_wifiresilience.autosave = {
 
             }
           }
+/*
           if(name.indexOf('qtype_sc_changed_value') !== -1){
 
                   var distractorid = $el.attr('id');
                   splitdistractor = distractorid.split('_');
                   var code = 'require(["qtype_sc/question_behaviour"], function(amd) {amd.wifi_init('+escape(splitdistractor[4])+');});';
-                  eval(code);
-          }
+                eval(code);
+              //Martin. debug
+          } */
+
       //    reloaded_form_str += name + ':' + val + ' (' + type + ')\n';
           // || '#' + e.target.getAttribute('id');
+        //  console.error(name + ':' + val + ' (' + type + ') , $('[id="'+name+'"]'));
+      //   console.error(type, val, $el);
           switch(type){
               case 'checkbox':
-                  $el.attr('checked', 'checked');
+
+                  var $el = $("input[type='checkbox'][name='"+name+"']");
+                  // Fallback to the ID when the name is not present (in the case of content editable).
+                  if($el.length == 0 ) {
+                    var $el = $("input[type='checkbox'][id='"+name+"']");
+                  }
+                  $el.attr('checked', 'checked').change();
+
+                // Special case for SC distractor event click.
+                var checkboxid = $el.attr( "id" );
+                if(checkboxid && checkboxid != 'undefined'){
+                  if(checkboxid.indexOf('_distractor') !== -1){
+                    // How stupid?
+                     $el.trigger('click');
+                     $el.trigger('change');
+                     $el.trigger('click');
+                     $el.val(1);
+
+                    //$('[name="'+name+'"]').val(1);
+                  }
+/*
+                  else {
+                    // if checked, most likely it should be 1.
+                    if($el.val() == 0){
+                      $el.val(1);
+                  }
+
+                }
+*/
+                }
+
                   break;
               case 'radio':
-                  $el.filter('[value="'+val+'"]').attr('checked', 'checked');
+                  $el.filter('[value="'+val+'"]').attr('checked', 'checked').change();
+                //  $el.trigger('click');
                   break;
               default:
-                  $el.val(val);
+
+                  if($el.is("textarea")){
+                      $el.text(val).change();
+
+                      var currentattrid = $el.attr('id');
+                      if(currentattrid.indexOf('qtype_drawing_textarea_id_') !== -1){
+                        var qidarr = currentattrid.split('_');
+                        var qid = qidarr[4];
+
+                        // reload iframe
+                        var iframedr = '#qtype_drawing_editor_'+qid;
+                        $(iframedr).attr('src', $(iframedr).attr('src'));
+                  } else {
+                    $el.val(val).change();
+                  }
+            } else {
+              if(type != 'undefined'){
+                var $el = $("input[type='"+type+"'][name='"+name+"']");
+                // Fallback to the ID when the name is not present (in the case of content editable).
+                if($el.length == 0 ) {
+                  var $el = $("input[type='"+type+"'][id='"+name+"']");
+                }
+              }
+              $el.val(val).change();
+            }
+
           }
 
 
