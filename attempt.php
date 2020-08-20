@@ -219,7 +219,7 @@ $params = array(
 $event = \mod_quiz\event\attempt_viewed::create($params);
 $event->add_record_snapshot('quiz_attempts', $attemptobj->get_attempt());
 $event->trigger();
-
+/*
 // Arrange for the navigation to be displayed in the first region on the page.
 $navbc = $attemptobj->get_navigation_panel($output, 'quiz_attempt_nav_panel', -1);
 $regions = $PAGE->blocks->get_regions();
@@ -229,6 +229,16 @@ $PAGE->blocks->add_fake_block($navbc, reset($regions));
 $title = get_string('attempt', 'quiz', $attemptobj->get_attempt_number());
 $PAGE->set_title($attemptobj->get_quiz_name());
 $PAGE->set_heading($course->fullname);
+*/
+
+// Arrange for the navigation to be displayed in the first region on the page.
+$navbc = $attemptobj->get_navigation_panel($output, 'quiz_attempt_nav_panel', $page);
+$regions = $PAGE->blocks->get_regions();
+$PAGE->blocks->add_fake_block($navbc, reset($regions));
+
+$headtags = $attemptobj->get_html_head_contributions($page);
+$PAGE->set_title($attemptobj->attempt_page_title($page));
+$PAGE->set_heading($attemptobj->get_course()->fullname);
 
 // A few final things.
 if ($attemptobj->is_last_page($page)) {
