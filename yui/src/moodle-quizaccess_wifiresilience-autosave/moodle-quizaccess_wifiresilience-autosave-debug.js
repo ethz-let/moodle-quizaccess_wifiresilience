@@ -512,6 +512,7 @@ M.quizaccess_wifiresilience.autosave = {
                 var qid = fullsepids[0];
                 var stemid = fullsepids[1];
                 var target_value = $('#ulorigin'+qid).find("[data-id='" + val + "']");
+
                 if(target_value && target_value.length){
                   var target_value_html = target_value.html();
                   if(target_value_html && target_value_html != 'undefined'){
@@ -545,7 +546,14 @@ M.quizaccess_wifiresilience.autosave = {
                   if($el.length == 0 ) {
                     var $el = $("input[type='checkbox'][id='"+name+"']");
                   }
-                  $el.attr('checked', 'checked').change();
+                  if(val == 0){
+                      $el.prop('checked', false).change();
+
+                  } else {
+                    $el.attr('checked', 'checked').change();
+
+                  }
+
 
                 // Special case for SC distractor event click.
                 var checkboxid = $el.attr( "id" );
@@ -574,6 +582,11 @@ M.quizaccess_wifiresilience.autosave = {
               case 'radio':
                   $el.filter('[value="'+val+'"]').attr('checked', 'checked').change();
                 //  $el.trigger('click');
+                $el.filter('[value="'+val+'"]').trigger('click');
+                $el.trigger('change');
+              //  $el.trigger('click');
+                /*$el.trigger('change');
+                $el.trigger('click');*/
                   break;
               default:
 
@@ -592,6 +605,17 @@ M.quizaccess_wifiresilience.autosave = {
                     $el.val(val).change();
                   }
             } else {
+
+              if($el.is("select")){
+              //  $el.val(val).attr('selected','selected');
+                //$el.val(val).prop('selected', true);
+              //  var eli = 'menu'+name;
+                $("[name='"+name+"'] option[value='"+val+"']").attr('selected','selected');
+//menu
+
+            //    console.error("XTYYYYY", name, val, $("[name='"+name+"'] option[value='"+val+"']"));
+              }
+
               if(type != 'undefined'){
                 var $el = $("input[type='"+type+"'][name='"+name+"']");
                 // Fallback to the ID when the name is not present (in the case of content editable).
