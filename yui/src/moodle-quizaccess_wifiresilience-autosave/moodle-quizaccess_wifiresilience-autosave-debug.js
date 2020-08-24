@@ -629,6 +629,9 @@ M.quizaccess_wifiresilience.autosave = {
           }
 
 
+
+
+
       }
       Y.log('[LOCALSTORAGE]: Exam Reloaded before Saving. '+reloaded_form_str, 'debug', '[ETHz-SW] Sync');
     },
@@ -704,6 +707,7 @@ M.quizaccess_wifiresilience.autosave = {
         editor.onKeyDown.add(this.editor_change_handler);
     },
     value_changed_drag: function(e) {
+      var name = e.drop.get('node').getData('selectname');
       Y.log('Detected a value change in DRAG question.', 'debug', '[ETHz-SW] Sync');
       this.start_save_timer_if_necessary();
       this.mark_question_changed_if_necessary(name);
@@ -826,6 +830,7 @@ M.quizaccess_wifiresilience.autosave = {
         // Fallback to the ID when the name is not present (in the case of content editable).
         name = name || '#' + e.target.getAttribute('id');
         Y.log('Detected a value change in element ' + name + '.', 'debug', '[ETHz-SW] Sync');
+
         this.start_save_timer_if_necessary();
         this.mark_question_changed_if_necessary(name);
     },
@@ -837,7 +842,9 @@ M.quizaccess_wifiresilience.autosave = {
     },
 
     mark_question_changed_if_necessary: function(elementname) {
+
         var slot = this.get_slot_from_id(elementname);
+
         if (slot) {
             this.set_question_state_string(slot, M.util.get_string('answerchanged', 'quizaccess_wifiresilience'));
             this.set_question_state_class(slot, 'answersaved');
@@ -849,10 +856,15 @@ M.quizaccess_wifiresilience.autosave = {
     },
 
     get_slot_from_id: function(elementname) {
-        var matches = elementname.match(/^#?q\d+:(\d+)_.*$/);
+      // Old Slot ids.
+     var matches = elementname.match(/^#?q\d+:(\d+)_.*$/);
+
         if (matches) {
             return matches[1];
         }
+
+        var momo =  $('input[name="'+elementname+'"]').closest("[id*=quizaccess_wifiresilience-attempt_page-]").attr("data-qslot");
+        return momo;
         return undefined;
     },
 
