@@ -707,10 +707,12 @@ M.quizaccess_wifiresilience.autosave = {
         editor.onKeyDown.add(this.editor_change_handler);
     },
     value_changed_drag: function(e) {
-      var name = e.drop.get('node').getData('selectname');
-      Y.log('Detected a value change in DRAG question.', 'debug', '[ETHz-SW] Sync');
-      this.start_save_timer_if_necessary();
-      this.mark_question_changed_if_necessary(name);
+      if(e.drop !== undefined){ // Its a drop.
+        var name = e.drop.get('node').getData('selectname');
+        Y.log('Detected a value change in DRAG question.', 'debug', '[ETHz-SW] Sync');
+        this.start_save_timer_if_necessary();
+        this.mark_question_changed_if_necessary(name);
+      }
     },
 
     connection_changed: function(e) {
