@@ -8,11 +8,11 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Version information for the quizaccess_wifiresilience plugin.
@@ -23,9 +23,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021012900;
-$plugin->requires = 2015041700;
+$plugin->version = 2021050300;
+$plugin->requires = 2020110900;
 $plugin->cron = 0;
 $plugin->component = 'quizaccess_wifiresilience';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '0.94 for Moodle 3.3+';
+$plugin->release = '0.95 for Moodle 3.10+';

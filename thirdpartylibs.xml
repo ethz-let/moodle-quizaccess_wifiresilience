@@ -1,11 +1,25 @@
 <?xml version="1.0"?>
 <libraries>
   <library>
+    <location>yui/src/localforage/js</location>
+    <name>localForage</name>
+    <license>Apache</license>
+    <version>1.7.3</version>
+    <licenseversion>2.0</licenseversion>
+  </library>
+  <library>
     <location>yui/src/jsencrypt/js</location>
     <name>JSEncrypt</name>
     <license>MIT</license>
     <version>2.1</version>
     <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>js/workbox/js</location>
+    <name>Workbox SW</name>
+    <license>Apache</license>
+    <version>1.0</version>
+    <licenseversion>2.0</licenseversion>
   </library>
   <library>
     <location>yui/src/sjcl/js</location>

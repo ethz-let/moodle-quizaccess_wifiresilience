@@ -1,0 +1,14 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-jsencrypt",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-jsencrypt": {
+            "jsfiles": [
+                "jsencrypt.js",
+                "package.js"
+            ]
+        }
+    },
+    "shifter": {
+        "lint": false
+    }
+}

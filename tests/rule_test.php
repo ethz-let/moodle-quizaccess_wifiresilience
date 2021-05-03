@@ -36,11 +36,18 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/wifiresilience/rule.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quizaccess_wifiresilience_rule_testcase extends basic_testcase {
+
+    /**
+     * Test is_compatible_behaviour
+     */
     public function test_is_compatible_behaviour() {
         $this->assertTrue(quizaccess_wifiresilience::is_compatible_behaviour('deferredfeedback'));
         $this->assertFalse(quizaccess_wifiresilience::is_compatible_behaviour('interactive'));
     }
 
+    /**
+     * Test wifiresilience_rule_creation
+     */
     public function test_wifiresilience_rule_creation() {
         $quiz = new stdClass();
         $quiz->preferredbehaviour = 'deferredfeedback';

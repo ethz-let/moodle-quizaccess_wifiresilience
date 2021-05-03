@@ -1,0 +1,14 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-sjcl",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-sjcl": {
+            "jsfiles": [
+                "sjcl.js",
+                "package.js"
+            ]
+        }
+    },
+    "shifter": {
+        "lint": false
+    }
+}

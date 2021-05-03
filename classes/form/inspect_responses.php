@@ -36,6 +36,9 @@ use \moodleform;
  */
 class inspect_responses extends moodleform {
 
+    /**
+     * Define the form.
+     */
     protected function definition() {
         $mform = $this->_form;
 

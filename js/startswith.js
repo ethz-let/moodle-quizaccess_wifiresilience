@@ -58,7 +58,7 @@
         var localforageInstance = this;
         var promise = new Promise(function (resolve, reject) {
             localforageInstance.ready().then(function () {
-                // Thanks https://hacks.mozilla.org/2014/06/breaking-the-borders-of-indexeddb/
+                // Thanks https://hacks.mozilla.org/2014/06/breaking-the-borders-of-indexeddb/.
                 var dbInfo = localforageInstance._dbInfo;
                 var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
 
@@ -66,8 +66,8 @@
 
                 var result = {};
                 var req = store.openCursor(keyRangeValue);
-                req.onsuccess = function () /*event*/{
-                    var cursor = req.result; // event.target.result;
+                req.onsuccess = function () {
+                    var cursor = req.result;
 
                     if (cursor) {
                         var value = cursor.value;
@@ -83,7 +83,7 @@
                     }
                 };
 
-                req.onerror = function () /*event*/{
+                req.onerror = function () {
                     reject(req.error);
                 };
             }).catch(reject);
@@ -96,7 +96,7 @@
         var localforageInstance = this;
         var promise = new Promise(function (resolve, reject) {
             localforageInstance.ready().then(function () {
-                // Thanks https://hacks.mozilla.org/2014/06/breaking-the-borders-of-indexeddb/
+                // Thanks https://hacks.mozilla.org/2014/06/breaking-the-borders-of-indexeddb/.
                 var dbInfo = localforageInstance._dbInfo;
                 var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
 
@@ -107,19 +107,19 @@
                 if (typeof store.getAllKeys === 'function') {
                     (function () {
                         var req = store.getAllKeys(keyRangeValue);
-                        req.onsuccess = function () /*event*/{
+                        req.onsuccess = function () {
                             resolve(req.result);
                         };
 
-                        req.onerror = function () /*event*/{
+                        req.onerror = function () {
                             reject(req.error);
                         };
                     })();
                 } else {
                     (function () {
                         var req = store.openCursor(keyRangeValue);
-                        req.onsuccess = function () /*event*/{
-                            var cursor = req.result; // event.target.result;
+                        req.onsuccess = function () {
+                            var cursor = req.result;
 
                             if (cursor) {
                                 result.push(cursor.key);
@@ -130,7 +130,7 @@
                             }
                         };
 
-                        req.onerror = function () /*event*/{
+                        req.onerror = function () {
                             reject(req.error);
                         };
                     })();
@@ -158,8 +158,7 @@
                             var item = rows.item(i);
                             var value = item.value;
 
-                            // Check to see if this is serialized content we need to
-                            // unpack.
+                            // Check to see if this is serialized content we need to unpack.
                             if (value) {
                                 value = serializer.deserialize(value);
                             }

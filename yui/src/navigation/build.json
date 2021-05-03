@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-navigation",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-navigation": {
+            "jsfiles": [
+                "navigation.js"
+            ]
+        }
+    }
+}

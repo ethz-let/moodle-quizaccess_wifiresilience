@@ -1,0 +1,16 @@
+{
+    "moodle-quizaccess_wifiresilience-autosave": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "event-valuechange",
+            "node-event-delegate",
+            "io-form",
+            "json",
+            "core_question_engine",
+            "mod_quiz",
+            "dd-delegate", "dd-drop-plugin", "dd-proxy", "dd-constrain", "selector-css3"
+        ]
+    }
+}

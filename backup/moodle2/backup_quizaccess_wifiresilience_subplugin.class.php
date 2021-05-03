@@ -22,32 +22,31 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/quiz/backup/moodle2/backup_mod_quiz_access_subplugin.class.php');
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Provides the information to backup the fault-tolerant mode quiz access plugin.
- *
- * If this plugin is requires, a single
- * <quizaccess_wifiresilience><enabled>1</enabled></quizaccess_wifiresilience> tag
- * will be added to the XML in the appropriate place. Otherwise nothing will be
- * added. This matches the DB structure.
  *
  * @copyright 2017 ETH Zurich (amr.hourani@let.ethz.ch)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_quizaccess_wifiresilience_subplugin extends backup_mod_quiz_access_subplugin {
 
+    /**
+     * Use this method to describe the XML structure required to store your
+     * sub-plugin's settings for a particular quiz, and how that data is stored
+     * in the database.
+     */
     protected function define_quiz_subplugin_structure() {
 
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
+
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
-        $subplugintablesettings = new backup_nested_element('quizaccess_wifiresilience',
-                null, array('enabled'));
+        $subplugintablesettings = new backup_nested_element('quizaccess_wifiresilience', null,
+                array('enabled', 'prechecks', 'techerrors', 'navdetails'));
 
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);

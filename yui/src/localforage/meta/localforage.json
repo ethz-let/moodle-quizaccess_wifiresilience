@@ -1,0 +1,15 @@
+{
+    "moodle-quizaccess_wifiresilience-localforage": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "event-valuechange",
+            "node-event-delegate",
+            "io-form",
+            "json",
+            "core_question_engine",
+            "mod_quiz"
+        ]
+    }
+}

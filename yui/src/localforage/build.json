@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-localforage",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-localforage": {
+            "jsfiles": [
+                "localforage.js"
+            ]
+        }
+    }
+}

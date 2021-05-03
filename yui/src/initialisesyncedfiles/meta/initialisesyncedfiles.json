@@ -1,0 +1,12 @@
+{
+    "moodle-quizaccess_wifiresilience-initialisesyncedfiles": {
+        "requires": [
+            "base",
+            "datatable",
+            "node",
+            "event",
+            "event-valuechange",
+            "node-event-delegate"
+        ]
+    }
+}

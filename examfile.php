@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,10 +17,9 @@
 /**
  * This script delegates file serving to individual plugins
  *
- * @package    core
- * @subpackage file
- * @copyright  2008 Petr Skoda (http://skodak.org)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   quizaccess_wifiresilience
+ * @copyright 2017 ETH Zurich (amr.hourani@let.ethz.ch)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // Disable moodle specific debug messages and any errors in output.
@@ -29,11 +27,10 @@ define('NO_DEBUG_DISPLAY', true);
 
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
+
 $relativepath = get_file_argument();
 $forcedownload = optional_param('forcedownload', 0, PARAM_BOOL);
 $preview = optional_param('preview', null, PARAM_ALPHANUM);
-// Offline means download the file from the repository and serve it, even if it was an external link.
-// The repository may have to export the file to an offline format.
 $offline = optional_param('offline', 0, PARAM_BOOL);
 $embed = optional_param('embed', 0, PARAM_BOOL);
 file_pluginfile($relativepath, $forcedownload, $preview, $offline, $embed);

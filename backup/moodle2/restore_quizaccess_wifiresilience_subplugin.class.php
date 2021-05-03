@@ -22,11 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-require_once($CFG->dirroot . '/mod/quiz/backup/moodle2/restore_mod_quiz_access_subplugin.class.php');
-
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/quiz/backup/moodle2/restore_mod_quiz_access_subplugin.class.php');
 
 /**
  * Provides the information to restore the fault-tolerant mode quiz access plugin.
@@ -41,6 +39,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class restore_quizaccess_wifiresilience_subplugin extends restore_mod_quiz_access_subplugin {
 
+    /**
+     * Use this method to describe the XML paths that store your sub-plugin's
+     * settings for a particular quiz.
+     */
     protected function define_quiz_subplugin_structure() {
 
         $paths = array();

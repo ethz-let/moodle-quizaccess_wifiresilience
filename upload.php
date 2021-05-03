@@ -38,6 +38,7 @@ require_login($course, false, $cm);
 require_capability('quizaccess/wifiresilience:uploadresponses', $context);
 
 $form = new \quizaccess_wifiresilience\form\upload_responses($PAGE->url);
+
 if ($form->is_cancelled()) {
     redirect($quizurl);
 
@@ -80,71 +81,85 @@ if ($form->is_cancelled()) {
 
         $originalpost = null;
         $originalrequest = null;
-        try {
-          // Some files are already encoded, so decode them just in case.
-          $original_content = $file->get_content();
-          $decoded_content = urldecode($original_content);
-          // Decode, compare to original. If it does differ, original is encoded.
-          // If it doesn't differ, original isn't encoded.
-          if($decoded_content == $original_content){
-            $data_res = $original_content; // or Decoded.. Doesnt matter here.
-            $OUTPUT->notification("Data File isnt URL-ENCODED. Use data as is.");
-          } else {
-            $data_res = $original_content;
-            $OUTPUT->notification("Data File is URL-ENCODED. Use URL-DECODED data.");
-          }
 
-            $data = json_decode($data_res);
+        try {
+            // Some files are already encoded, so decode them just in case.
+            $originalcontent = $file->get_content();
+            $decodedcontent = urldecode($originalcontent);
+
+            // Decode, compare to original. If it does differ, original is encoded.
+            // If it doesn't differ, original isn't encoded.
+            if ($decodedcontent == $originalcontent) {
+                $datares = $originalcontent;
+                $OUTPUT->notification(get_string('filenoturlencoded', 'quizaccess_wifiresilience'));
+            } else {
+                $datares = $originalcontent;
+                $OUTPUT->notification(get_string('fileurlencoded', 'quizaccess_wifiresilience'));
+            }
+
+            $data = json_decode($datares);
 
             if (!$data) {
                 if (function_exists('json_last_error_msg')) {
-                    throw new coding_exception("JSON Data Decode: ".json_last_error_msg());
+                    throw new coding_exception(
+                        get_string('filejsondecode', 'quizaccess_wifiresilience', json_last_error_msg()));
                 } else {
-                    throw new coding_exception('JSON error: ' . json_last_error());
+                    throw new coding_exception(
+                        get_string('filejsondecodeerror', 'quizaccess_wifiresilience', json_last_error()));
                 }
             }
             if (!isset($data->responses)) {
-                throw new coding_exception('This file does not appear to contain responses.');
+                throw new coding_exception(
+                    get_string('filenoresponses', 'quizaccess_wifiresilience'));
             }
 
             if (isset($data->iv) || isset($data->key)) {
-              if (!$privatekey) {
-                  throw new coding_exception('Got apparently encrypted responses, but there is no decryption key.');
-              }
+                if (!$privatekey) {
+                    throw new coding_exception(
+                        get_string('filenodecryptionkey', 'quizaccess_wifiresilience'));
+                }
 
-              $encryptedaeskey = base64_decode($data->key);
-              if (!$encryptedaeskey) {
-                  throw new coding_exception('Encrypted AES key not properly base-64 encoded.');
-              }
-              $encryptediv = base64_decode($data->iv);
-              if (!$encryptediv) {
-                  throw new coding_exception('Encrypted initial value not properly base-64 encoded.');
-              }
+                $encryptedaeskey = base64_decode($data->key);
+                if (!$encryptedaeskey) {
+                    throw new coding_exception(
+                        get_string('fileencryptedkeynobase64', 'quizaccess_wifiresilience'));
+                }
 
-              $aeskeystring = '';
-              if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
-                  throw new coding_exception('Could not decrypt the AES key. ' . openssl_error_string());
-              }
+                $encryptediv = base64_decode($data->iv);
+                if (!$encryptediv) {
+                    throw new coding_exception(
+                        get_string('fileencryptedinitvaluenobase64', 'quizaccess_wifiresilience'));
+                }
 
-              $ivstring = '';
-              if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
-                  throw new coding_exception('Could not decrypt the AES key. ' . openssl_error_string());
-              }
+                $aeskeystring = '';
+                if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
+                    throw new coding_exception(
+                        get_string('fileunabledecryptkey', 'quizaccess_wifiresilience', openssl_error_string()));
+                }
 
-              $aeskey = base64_decode($aeskeystring);
-              if (!$aeskey) {
-                  throw new coding_exception('AES key not properly base-64 encoded.');
-              }
-              $iv = base64_decode($ivstring);
-              if (!$iv) {
-                  throw new coding_exception('Initial value not properly base-64 encoded.');
-              }
+                $ivstring = '';
+                if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
+                    throw new coding_exception(
+                        get_string('fileunabledecryptkey', 'quizaccess_wifiresilience', openssl_error_string()));
+                }
 
-              $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
-              if (!$responses) {
-                  throw new coding_exception('Could not decrypt the responses. ' . openssl_error_string());
-              }
+                $aeskey = base64_decode($aeskeystring);
+                if (!$aeskey) {
+                    throw new coding_exception(
+                        get_string('filekeynobase64', 'quizaccess_wifiresilience'));
+                }
 
+                $iv = base64_decode($ivstring);
+                if (!$iv) {
+                    throw new coding_exception(
+                        get_string('fileinitvaluenobase64', 'quizaccess_wifiresilience'));
+                }
+
+                $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
+                if (!$responses) {
+                    throw new coding_exception(
+                        get_string('fileunabledecrypt', 'quizaccess_wifiresilience', openssl_error_string()));
+                }
             } else {
                 $responses = $data->responses;
             }
@@ -152,27 +167,29 @@ if ($form->is_cancelled()) {
             $postdata = array();
             parse_str($responses, $postdata);
 
-
-            if(isset($fromform->takeattemptfromjson)){
-              if (!isset($data->attemptid)) {
-                  throw new coding_exception('This file does not appear to non encrypted attempt ID (attemptid). You have selected to take attempt ID from non encryped JSON parameter, Please unselect the option and try again.');
-              }
-              $postdata['attempt'] = $data->attemptid;
+            if (isset($fromform->takeattemptfromjson)) {
+                if (!isset($data->attemptid)) {
+                    throw new coding_exception(
+                        get_string('filenoattemptidupload', 'quizaccess_wifiresilience'));
+                }
+                $postdata['attempt'] = $data->attemptid;
             }
 
             if (!isset($postdata['attempt'])) {
-               throw new coding_exception('The uploaded data did not include an attempt id.');
+                throw new coding_exception(
+                    get_string('filenoattemptid', 'quizaccess_wifiresilience'));
             }
 
-            echo html_writer::tag('textarea', s(print_r($postdata, true)), array('readonly' => 'readonly'));
+            echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
 
             // Load the attempt.
             $attemptobj = quiz_attempt::create($postdata['attempt']);
             if ($attemptobj->get_cmid() != $cmid) {
-                throw new coding_exception('The uploaded data does not belong to this quiz.');
+                throw new coding_exception(
+                    get_string('filewrongquiz', 'quizaccess_wifiresilience'));
             }
 
-            // Process the uploaded data. (We have to do weird fakery with $_POST && $_REQUEST.)
+            // Process the uploaded data. (We have to do weird fakery with $_POST && $_REQUEST).
             $timenow = time();
             $postdata['sesskey'] = sesskey();
             $originalpost = $_POST;
@@ -180,211 +197,242 @@ if ($form->is_cancelled()) {
             $originalrequest = $_REQUEST;
             $_REQUEST = $postdata;
 
-            // Process times correctly
+            // Process times correctly.
             if ($fromform->submissiontime) {
-                switch($fromform->submissiontime) {
-                  case 1:
-                      // From File last_change
-                      if(!isset($postdata['last_change']) || $postdata['last_change'] == '0' || !$postdata['last_change'] || $postdata['last_change'] == 'undefined'){
-                        $postdata['last_change'] = $timenow;
-                        $timenow = $timenow;
-                      } else {
-                        $date = new DateTime($postdata['last_change']);
-                        $timenow = $date->getTimestamp();
-                      }
-
-
-                      break;
-                  case 2:
-                      // Now
-                      $timenow = time();
-                      break;
-                  case 3:
-                      // Quiz Finishtime
-
-                      $duedate = 0;
-                      if($quiz->timelimit){
-                        $duedate = $attemptobj->timestart + $quiz->timelimit;
-                      }
-                      // if exceeded, put the time to be the due date (if set)
-                      if($duedate !=0 && $timenow > $duedate) {
-                        $timenow = $duedate;
-                      } else {
+                switch ($fromform->submissiontime) {
+                    /* From file last_change */
+                    case 1:
+                        if (!isset($postdata['last_change'])
+                            || $postdata['last_change'] == '0'
+                            || !$postdata['last_change']
+                            || $postdata['last_change'] == 'undefined') {
+                            $postdata['last_change'] = $timenow;
+                            $timenow = $timenow;
+                        } else {
+                            $date = new DateTime($postdata['last_change']);
+                            $timenow = $date->getTimestamp();
+                        }
+                        break;
+                    /* Now */
+                    case 2:
                         $timenow = time();
-                      }
-
-                      break;
-                  default:
-                      $timenow = time();
+                        break;
+                    /* Quiz Finishtime */
+                    case 3:
+                        $duedate = 0;
+                        if ($quiz->timelimit) {
+                            $duedate = $attemptobj->timestart + $quiz->timelimit;
+                        }
+                        if ($duedate != 0 && $timenow > $duedate) {
+                            $timenow = $duedate;
+                        } else {
+                            $timenow = time();
+                        }
+                        break;
+                    default:
+                        $timenow = time();
                 }
-                if(!isset($timenow)) $timenow = time();
+
+                if (!isset($timenow)) {
+                    $timenow = time();
+                }
             }
             if ($fromform->finishattempts) {
+
                 // Only if final submission has happened - otherwise now time for uploaded responses.
-                // Override $fromform->submissiontime
-                if (isset($fromform->usefinalsubmissiontime) && isset($postdata['final_submission_time']) && $postdata['final_submission_time'] != 0){
+                // Override $fromform->submissiontime.
+
+                if (isset($fromform->usefinalsubmissiontime)
+                && isset($postdata['final_submission_time'])
+                && $postdata['final_submission_time'] != 0) {
                     $timenow = $postdata['final_submission_time'];
                 }
 
+                if (isset($fromform->createasnewattempt) && isset($data->userid) ) {
 
-            if(isset($fromform->createasnewattempt) && isset($data->userid) ){
+                    $quizobj = quiz::create($quiz->id, $data->userid);
+                    // Start the attempt.
+                    $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+                    $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
-                  $quizobj = quiz::create($quiz->id, $data->userid);
-                  // Start the attempt.
-                  $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
-                  $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
-                //  $timenow = time();
+                    // Look for an existing attempt.
+                    $attempts = quiz_get_user_attempts($quizobj->get_quizid(), $data->userid, 'all', true);
+                    $lastattempt = end($attempts);
 
-                  // Look for an existing attempt.
-                  $attempts = quiz_get_user_attempts($quizobj->get_quizid(), $data->userid, 'all', true);
-                  $lastattempt = end($attempts);
-
-
-                  // Get number for the next or unfinished attempt.
-                  if ($lastattempt) {
-                      $attemptnumber = $lastattempt->attempt + 1;
-                  } else {
-                      $lastattempt = false;
-                      $attemptnumber = 1;
-                  }
-                  $currentattemptid = null;
-                //  $sql = $DB->get_records_sql('select id, value from {question_attempt_step_data} where name = ? and attemptstepid in (select id from {question_attempt_steps} where questionattemptid = (select id from {question_attempts} where questionusageid = ?) )', array('_order', 421));
-               //   print_r($sql);exit;
-                  $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $timenow, false, $data->userid);
-                  quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
-
-                  quiz_attempt_save_started($quizobj, $quba, $attempt);
-                  // Process some responses from the student.
-                  $attemptobj = quiz_attempt::create($attempt->id);
-
-                  $from = "[q";
-                  $to = ":";
-                  foreach($postdata as $key => $one) {
-                    if(strpos($key, ':1_') !== false){
-
-                      $firstpos = strpos($key, $from);
-                      $secondpos = strpos($key, $to);
-                      $qid = substr($key , $firstpos, $secondpos);
-                      break;
+                    // Get number for the next or unfinished attempt.
+                    if ($lastattempt) {
+                        $attemptnumber = $lastattempt->attempt + 1;
+                    } else {
+                        $lastattempt = false;
+                        $attemptnumber = 1;
                     }
-                  }
+                    $currentattemptid = null;
 
-                  foreach($postdata as $key => $one) {
-                      if(strpos($key, $qid) !== false){
-                        unset($postdata[$key]);
-                        $n = str_replace($qid,'q'.$attempt->uniqueid, $key);
-                        $postdata[$n] = $one;
-                      }
-                  }
+                    $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $timenow, false, $data->userid);
+                    quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
 
-                  $newslots = $pieces = explode(",", $postdata['slots']);
+                    quiz_attempt_save_started($quizobj, $quba, $attempt);
 
-                  foreach ($newslots as $slot) {
-                      $qa = $attemptobj->get_question_attempt($slot);
-                      foreach($postdata as $key => $one) {
-                          if(strpos($key, $slot.'_:sequencecheck') !== false){
-                            $postdata[$key] = $qa->get_sequence_check_count();
-                          }
-                      }
+                    // Process some responses from the student.
+                    $attemptobj = quiz_attempt::create($attempt->id);
 
-                  }
-                  
-                  // Now arrange question shuffle/order in the database to match original _order.
-                  $original_uniqueid = str_replace('q','',$qid);
-                  $original_uniqueid = $original_uniqueid * 1;
-                  
-                  // now we need to take the original unique id from database (in case of restore/backup).
-                  $original_attempt_rec = $DB->get_record('quiz_attempts', array('id'=>$postdata['attempt']));
-                  $original_uniqueid = $original_attempt_rec->uniqueid;
-                  
-                  echo '<hr>Original Unique ID: '.$original_uniqueid.' | Current Unique ID: '.$attempt->uniqueid. '<hr>';
-                 
-                  // fix suffle (_order) issue. New attempt will match old attempt in _order.
-                  $original_orders = $DB->get_records_sql('SELECT random() as rand, qasd.id, quba.id AS qubaid,  qa.id AS questionattemptid, qa.questionusageid, qa.slot, qa.questionid, qas.id AS attemptstepid, qas.sequencenumber, qas.userid, qasd.name, qasd.value FROM {question_usages} quba LEFT JOIN {question_attempts} qa ON qa.questionusageid = quba.id LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id WHERE quba.id = :v1 ORDER BY qa.slot, qas.sequencenumber', array('v1' => $original_uniqueid));
-                  $current_orders = $DB->get_records_sql('SELECT random() as rand, qasd.id, quba.id AS qubaid,  qa.id AS questionattemptid, qa.questionusageid, qa.slot, qa.questionid, qas.id AS attemptstepid, qas.sequencenumber, qas.userid, qasd.name, qasd.value FROM {question_usages} quba LEFT JOIN {question_attempts} qa ON qa.questionusageid = quba.id LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id WHERE quba.id = :v1 ORDER BY qa.slot, qas.sequencenumber', array('v1' => $attempt->uniqueid));
-                  print_r($original_orders);
-                  echo "<hr>";
-                  print_r($current_orders);
-                  if($original_orders){
-                  	$qids = array();
-                  	$choiceqids = array();
-                  	$stemqids = array();
-                  	foreach($original_orders as $org_ord){
-                  		if($org_ord->name == '_order'){
-                  			$qids[$org_ord->questionid] = $org_ord->value;
-                  		}
-                  		if($org_ord->name == '_choiceorder'){
-                  			$choiceqids[$org_ord->questionid] = $org_ord->value;
-                  		}
-                  		if($org_ord->name == '_stemorder'){
-                  			$stemqids[$org_ord->questionid] = $org_ord->value;
-                  		}
-                  		
-                  	}
-                  	echo "<hr>";
-                  	print_r($qids);
-                  	echo "<hr>";
-                  	print_r($choiceqids);
-                  	echo "<hr>";
-                  	
-                  		foreach($current_orders as $curr_ord){
-                  			
-                  			// Update all attempts steps userid for the current.
-                  			
-                  			$sql = 'update {question_attempt_steps} set userid = :v1 where questionattemptid = :v2';
-                  			$DB->execute($sql, array('v1' => $data->userid, 'v2' => $curr_ord->questionattemptid));
+                    $from = "[q";
+                    $to = ":";
 
-                  			// Now update records as per quesiton order
-                  			if($curr_ord->name == '_order'){
-                  				echo "_ORDER: Current quesiton id: $curr_ord->questionid<br>";
-                  				$sql = 'update {question_attempt_step_data} set value = :v1 where name = :v2 and attemptstepid = :v3';
-                  				
-                  				$DB->execute($sql, array('v1' => $qids[$curr_ord->questionid], 'v2' => '_order', 'v3' => $curr_ord->attemptstepid));
-                  				
-                  			}
-                  			// Now update records as per quesiton choiceorder
-                  			if($curr_ord->name == '_choiceorder'){
-                  				echo "CHOICE_ORDER: Current quesiton id: $curr_ord->questionid<br>";
-                  				$sql = 'update {question_attempt_step_data} set value = :v1 where name = :v2 and attemptstepid = :v3';
-                  				
-                  				$DB->execute($sql, array('v1' => $choiceqids[$curr_ord->questionid], 'v2' => '_choiceorder', 'v3' => $curr_ord->attemptstepid));
-                  				
-                  			}
-                  			// Now update records as per quesiton choiceorder
-                  			if($curr_ord->name == '_stemorder'){
-                  				echo "STEM_ORDER: Current quesiton id: $curr_ord->questionid<br>";
-                  				$sql = 'update {question_attempt_step_data} set value = :v1 where name = :v2 and attemptstepid = :v3';
-                  				
-                  				$DB->execute($sql, array('v1' => $stemqids[$curr_ord->questionid], 'v2' => '_stemorder', 'v3' => $curr_ord->attemptstepid));
-                  				
-                  			}
+                    foreach ($postdata as $key => $one) {
+                        if (strpos($key, ':1_') !== false) {
+                            $firstpos = strpos($key, $from);
+                            $secondpos = strpos($key, $to);
+                            $qid = substr($key , $firstpos, $secondpos);
+                            break;
+                        }
+                    }
 
-                  		}
+                    foreach ($postdata as $key => $one) {
+                        if (strpos($key, $qid) !== false) {
+                            unset($postdata[$key]);
+                            $n = str_replace($qid, 'q' . $attempt->uniqueid, $key);
+                            $postdata[$n] = $one;
+                        }
+                    }
 
-                  	
-                  	
-                  }
-                  
-                  
-                  
-                  $_POST = $postdata;
-                  //$attemptobj->process_submitted_actions($timenow, false);
-                  // Finish the attempt.
-                  $attemptobj = quiz_attempt::create($attempt->id);
+                    $newslots = $pieces = explode(",", $postdata['slots']);
 
+                    foreach ($newslots as $slot) {
+                        $qa = $attemptobj->get_question_attempt($slot);
+                        foreach ($postdata as $key => $one) {
+                            if (strpos($key, $slot . '_:sequencecheck') !== false) {
+                                $postdata[$key] = $qa->get_sequence_check_count();
+                            }
+                        }
+                    }
+
+                    // Now arrange question shuffle/order in the database to match original _order.
+                    $originaluniqueid = str_replace('q', '', $qid);
+                    $originaluniqueid = $originaluniqueid * 1;
+
+                    // Now we need to take the original unique id from database (in case of restore/backup).
+                    $originalattemptrec = $DB->get_record('quiz_attempts', array('id' => $postdata['attempt']));
+                    $originaluniqueid = $originalattemptrec->uniqueid;
+
+                    echo '<hr>Original Unique ID: ' . $originaluniqueid . ' | Current Unique ID: ' . $attempt->uniqueid . '<hr>';
+
+                    // Fix shuffle (_order) issue. New attempt will match old attempt in _order.
+                    $originalorders = $DB->get_records_sql(
+                        'SELECT random() as rand, ' .
+                        'qasd.id, quba.id AS qubaid, ' .
+                        'qa.id AS questionattemptid, ' .
+                        'qa.questionusageid, qa.slot, qa.questionid, ' .
+                        'qas.id AS attemptstepid, ' .
+                        'qas.sequencenumber, ' .
+                        'qas.userid, ' .
+                        'qasd.name, ' .
+                        'qasd.value ' .
+                        'FROM {question_usages} quba ' .
+                        'LEFT JOIN {question_attempts} qa ON qa.questionusageid = quba.id ' .
+                        'LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id ' .
+                        'LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id ' .
+                        'WHERE quba.id = :v1 ORDER BY qa.slot, qas.sequencenumber',
+                        array('v1' => $originaluniqueid));
+
+                    $currentorders = $DB->get_records_sql(
+                        'SELECT random() as rand, ' .
+                        'qasd.id, quba.id AS qubaid, ' .
+                        'qa.id AS questionattemptid, ' .
+                        'qa.questionusageid, qa.slot, qa.questionid, ' .
+                        'qas.id AS attemptstepid, ' .
+                        'qas.sequencenumber, ' .
+                        'qas.userid, ' .
+                        'qasd.name, ' .
+                        'qasd.value ' .
+                        'FROM {question_usages} quba ' .
+                        'LEFT JOIN {question_attempts} qa ON qa.questionusageid = quba.id ' .
+                        'LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id ' .
+                        'LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id ' .
+                        'WHERE quba.id = :v1 ORDER BY qa.slot, qas.sequencenumber',
+                        array('v1' => $attempt->uniqueid));
+
+                    var_export($originalorders, true);
+                    echo "<hr>";
+                    var_export($currentorders, true);
+
+                    if ($originalorders) {
+                        $qids = array();
+                        $choiceqids = array();
+                        $stemqids = array();
+
+                        foreach ($originalorders as $orgord) {
+                            if ($orgord->name == '_order') {
+                                $qids[$orgord->questionid] = $orgord->value;
+                            }
+                            if ($orgord->name == '_choiceorder') {
+                                $choiceqids[$orgord->questionid] = $orgord->value;
+                            }
+                            if ($orgord->name == '_stemorder') {
+                                $stemqids[$orgord->questionid] = $orgord->value;
+                            }
+                        }
+
+                        echo "<hr>";
+                        var_export($qids, true);
+                        echo "<hr>";
+                        var_export($choiceqids, true);
+                        echo "<hr>";
+
+                        foreach ($currentorders as $currord) {
+                            // Update all attempts steps userid for the current.
+                            $sql = 'update {question_attempt_steps} set userid = :v1 where questionattemptid = :v2';
+                            $DB->execute($sql, array('v1' => $data->userid, 'v2' => $currord->questionattemptid));
+
+                            // Now update records as per quesiton order.
+                            if ($currord->name == '_order') {
+                                echo "_ORDER: Current quesiton id: $currord->questionid<br>";
+                                $sql = 'update {question_attempt_step_data} set value = :v1 ' .
+                                    'where name = :v2 and attemptstepid = :v3';
+
+                                $DB->execute($sql, array(
+                                    'v1' => $qids[$currord->questionid],
+                                    'v2' => '_order',
+                                    'v3' => $currord->attemptstepid));
+                            }
+                            // Now update records as per quesiton choiceorder.
+                            if ($currord->name == '_choiceorder') {
+                                echo "CHOICE_ORDER: Current quesiton id: $currord->questionid<br>";
+                                $sql = 'update {question_attempt_step_data} set value = :v1 ' .
+                                    'where name = :v2 and attemptstepid = :v3';
+
+                                $DB->execute($sql, array(
+                                    'v1' => $choiceqids[$currord->questionid],
+                                    'v2' => '_choiceorder',
+                                    'v3' => $currord->attemptstepid));
+                            }
+                            // Now update records as per quesiton choiceorder.
+                            if ($currord->name == '_stemorder') {
+                                echo "STEM_ORDER: Current quesiton id: $currord->questionid<br>";
+                                $sql = 'update {question_attempt_step_data} set value = :v1 ' .
+                                    'where name = :v2 and attemptstepid = :v3';
+
+                                $DB->execute($sql, array(
+                                    'v1' => $stemqids[$currord->questionid],
+                                    'v2' => '_stemorder',
+                                    'v3' => $currord->attemptstepid));
+                            }
+                        }
+                    }
+
+                    $_POST = $postdata;
+
+                    // Finish the attempt.
+                    $attemptobj = quiz_attempt::create($attempt->id);
                 }
-
-                  $attemptobj->process_finish($timenow, true);
-
-
-
+                $attemptobj->process_finish($timenow, true);
             } else {
-
-                if(isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])){
-                  $timenow = $timenow - $postdata['real_offline_time'];
+                if (isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])) {
+                    $timenow = $timenow - $postdata['real_offline_time'];
                 }
                 $attemptobj->process_submitted_actions($timenow); // In progress.
             }
+
             $_POST = $originalpost;
             $originalpost = null;
             $_REQUEST = $originalrequest;
@@ -421,7 +469,6 @@ if ($form->is_cancelled()) {
     echo $OUTPUT->footer();
 
 } else {
-
     // Show the form.
     $title = get_string('uploadresponsesfor', 'quizaccess_wifiresilience',
             format_string($quiz->name, true, array('context' => $context)));

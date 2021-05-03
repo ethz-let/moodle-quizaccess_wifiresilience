@@ -1,6 +1,6 @@
-@quizaccess @quizaccess_wifiresilience
-Feature: Fault-tolerant mode backup and restore of quiz settings
-  In order to reuse quizzes using fault-tolerant mode
+@quizaccess @quizaccess_wifiresilience @quizaccess_wifiresilience_2
+Feature: Wifi Resilience Mode backup and restore of quiz settings
+  In order to reuse quizzes using Wifi Resilience Mode
   As a teacher
   I need be able to backup courses with and without that setting.
 
@@ -10,8 +10,8 @@ Feature: Fault-tolerant mode backup and restore of quiz settings
       | Course 1 | C1        | topics |
     And the following "activities" exist:
       | activity   | name                | course | idnumber | wifiresilience_enabled |
-      | quiz       | Quiz fault-tolerant | C1     | quiz1    | 1                   |
-      | quiz       | Quiz normal         | C1     | quiz2    | 0                   |
+      | quiz       | Quiz Wifiresilience | C1     | quiz1    | 1                      |
+      | quiz       | Quiz normal         | C1     | quiz2    | 0                      |
     And I log in as "admin"
 
   @javascript
@@ -20,10 +20,10 @@ Feature: Fault-tolerant mode backup and restore of quiz settings
       | Confirmation | Filename | test_backup.mbz |
     And I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Course 2 |
-    And I follow "Quiz fault-tolerant"
-    And I navigate to "Edit settings" node in "Quiz administration"
-    Then the field "Experimental fault-tolerant mode" matches value "Yes"
+    And I follow "Wifiresilience"
+    And I navigate to "Edit settings" in current page administration
+    Then the field "Wifi Resilience Mode" matches value "Yes"
     And I follow "Course 2"
     And I follow "Quiz normal"
-    And I navigate to "Edit settings" node in "Quiz administration"
-    And the field "Experimental fault-tolerant mode" matches value "No"
+    And I navigate to "Edit settings" in current page administration
+    And the field "Wifi Resilience Mode" matches value "No"

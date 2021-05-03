@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-download",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-download": {
+            "jsfiles": [
+                "download.js"
+            ]
+        }
+    }
+}

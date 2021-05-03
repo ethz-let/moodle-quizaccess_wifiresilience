@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-initialiseinspect",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-initialiseinspect": {
+            "jsfiles": [
+                "initialiseinspect.js"
+            ]
+        }
+    }
+}

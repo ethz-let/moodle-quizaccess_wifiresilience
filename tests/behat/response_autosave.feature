@@ -1,5 +1,5 @@
-@quizaccess @quizaccess_wifiresilience
-Feature: Fault-tolerant mode updates the question statuses are responses are changed and saved
+@quizaccess @quizaccess_wifiresilience @quizaccess_wifiresilience_6
+Feature: Wifiresilience mode updates the question statuses are responses are changed and saved
   In order to know what is going on during my attempt
   As a student
   I need to be able to see which responeses I have changed, and when they are saved.
@@ -18,33 +18,33 @@ Feature: Fault-tolerant mode updates the question statuses are responses are cha
       | contextlevel | reference | name           |
       | Course       | C1        | Test questions |
     And the following "questions" exist:
-      | questioncategory | qtype     | name       | questiontext    |
-      | Test questions   | truefalse | Question A | Answer me A |
+      | questioncategory | qtype     | name       | questiontext |
+      | Test questions   | truefalse | Question A | Answer me A  |
     And the following "activities" exist:
       | activity   | name                | course | idnumber | questionsperpage | wifiresilience_enabled |
-      | quiz       | Quiz fault-tolerant | C1     | quiz1    | 1                | 1                   |
-    And quiz "Quiz fault-tolerant" contains the following questions:
+      | quiz       | Quiz Wifiresilience | C1     | quiz1    | 1                | 1                      |
+    And quiz "Quiz Wifiresilience" contains the following questions:
       | Question A | 1 |
     And the quiz auto-save period is set to "2"
-    And I log in as "student"
-    And I follow "Course 1"
-    And I follow "Quiz fault-tolerant"
+    And I am on the "Quiz Wifiresilience" "mod_quiz > View" page logged in as "student"
 
   @javascript
   Scenario: When a response is saved, the question state changes to "Answer changed".
     When I press "Attempt quiz now"
-    And I click on "True" "radio" in the "#q1" "css_element"
+    And I wait "15" seconds
+    And I click on "True" "radio" in the "Answer me A" "question"
     Then the state of "Answer me A" question is shown as "Answer changed"
     And "#quiznavbutton1.answersaved" "css_element" should exist
     And I click on "Finish attempt ..." "link" in the "Quiz navigation" "block"
     And I should see "Answer changed" in the "1" "table_row"
     # Now successfully navigate away, or the following test will fail.
-    And I click on "Miscellaneous" "link" confirming the dialogue
+    And I click on "C1" "link" confirming the dialogue
 
   @javascript
   Scenario: When a response is changed, it is auto-saved & the status changes to "Answer saved"
     When I press "Attempt quiz now"
-    And I click on "True" "radio" in the "#q1" "css_element"
+    And I wait "15" seconds
+    And I click on "True" "radio" in the "Answer me A" "question"
     And I wait "3" seconds
     Then the state of "Answer me A" question is shown as "Answer saved"
     And "#quiznavbutton1.answersaved" "css_element" should exist

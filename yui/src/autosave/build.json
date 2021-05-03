@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-autosave",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-autosave": {
+            "jsfiles": [
+                "autosave.js"
+            ]
+        }
+    }
+}

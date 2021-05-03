@@ -28,7 +28,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('quizaccess_wifiresilience/defaultenabled',
             get_string('wifiresilienceenabled', 'quizaccess_wifiresilience'),
             get_string('wifiresilienceenabled_desc', 'quizaccess_wifiresilience'),
-            array('value' => 0)));
+            0));
 
     $settings->add(new admin_setting_configtextarea('quizaccess_wifiresilience/privatekey',
             get_string('privatekey', 'quizaccess_wifiresilience'),
@@ -39,38 +39,38 @@ if ($ADMIN->fulltree) {
             get_string('publickey_desc', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 6));
 
     $settings->add(new admin_setting_configtext('quizaccess_wifiresilience/wifitoken',
-              get_string('wifitoken', 'quizaccess_wifiresilience'),
-              get_string('wifitoken_help', 'quizaccess_wifiresilience'), ''));
+            get_string('wifitoken', 'quizaccess_wifiresilience'),
+            get_string('wifitoken_help', 'quizaccess_wifiresilience'), ''));
 
     $settings->add(new admin_setting_configcheckbox('quizaccess_wifiresilience/prechecks',
-                    get_string('prechecks', 'quizaccess_wifiresilience'),
-                    get_string('prechecks_help', 'quizaccess_wifiresilience'), 1));
+            get_string('prechecks', 'quizaccess_wifiresilience'),
+            get_string('prechecks_help', 'quizaccess_wifiresilience'), 1));
 
     $settings->add(new admin_setting_configcheckbox('quizaccess_wifiresilience/techerrors',
-                    get_string('techerrors', 'quizaccess_wifiresilience'),
-                    get_string('techerrors_help', 'quizaccess_wifiresilience'), 1));
+            get_string('techerrors', 'quizaccess_wifiresilience'),
+            get_string('techerrors_help', 'quizaccess_wifiresilience'), 1));
 
     $settings->add(new admin_setting_configcheckbox('quizaccess_wifiresilience/navdetails',
-                    get_string('navdetails', 'quizaccess_wifiresilience'),
-                    get_string('navdetails_help', 'quizaccess_wifiresilience'), 1));
+            get_string('navdetails', 'quizaccess_wifiresilience'),
+            get_string('navdetails_help', 'quizaccess_wifiresilience'), 1));
 
     $settings->add(new admin_setting_configtextarea('quizaccess_wifiresilience/watchxhr',
-                    get_string('watchxhr', 'quizaccess_wifiresilience'),
-                    get_string('watchxhr_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 25));
+            get_string('watchxhr', 'quizaccess_wifiresilience'),
+            get_string('watchxhr_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 25));
 
     $settings->add(new admin_setting_configtextarea('quizaccess_wifiresilience/fetchandlog',
-                    get_string('fetchandlog', 'quizaccess_wifiresilience'),
-                    get_string('fetchandlog_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 5));
+            get_string('fetchandlog', 'quizaccess_wifiresilience'),
+            get_string('fetchandlog_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 5));
 
     $settings->add(new admin_setting_configtextarea('quizaccess_wifiresilience/precachefiles',
-                    get_string('precachefiles', 'quizaccess_wifiresilience'),
-                    get_string('precachefiles_help', 'quizaccess_wifiresilience'),'', PARAM_RAW, 60, 5));
+            get_string('precachefiles', 'quizaccess_wifiresilience'),
+            get_string('precachefiles_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 5));
 
     $settings->add(new admin_setting_configtextarea('quizaccess_wifiresilience/excludelist',
-                    get_string('excludelist', 'quizaccess_wifiresilience'),
-                    get_string('excludelist_help', 'quizaccess_wifiresilience'),'', PARAM_RAW, 60, 5));
+            get_string('excludelist', 'quizaccess_wifiresilience'),
+            get_string('excludelist_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 5));
 
     $settings->add(new admin_setting_configtextarea('quizaccess_wifiresilience/extraroutes',
-                    get_string('extraroutes', 'quizaccess_wifiresilience'),
-                    get_string('extraroutes_help', 'quizaccess_wifiresilience'),'', PARAM_RAW, 60, 30));
+            get_string('extraroutes', 'quizaccess_wifiresilience'),
+            get_string('extraroutes_help', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 30));
 }

@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-initialiserule",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-initialiserule": {
+            "jsfiles": [
+                "initialiserule.js"
+            ]
+        }
+    }
+}

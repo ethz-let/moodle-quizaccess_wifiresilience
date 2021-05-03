@@ -24,14 +24,28 @@
  *  itemid   => The draftid - this can be used to add a list of files
  *              to a draft area in separate requests. If it is 0, a new draftid will be generated.
  *
- * @package    core_webservice
+ * @package    quizaccess_wifiresilience
  * @copyright  2011 Dongsheng Cai <dongsheng@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../../../config.php');
 
-function quizaccess_wifiresilience_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload = 1, array $options=array()) {
+/**
+ * Serves the file settings.
+ *
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - justsend the file
+ */
+function quizaccess_wifiresilience_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload = 1,
+    array $options=array()) {
+
     // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
@@ -42,35 +56,34 @@ function quizaccess_wifiresilience_pluginfile($course, $cm, $context, $filearea,
         return false;
     }
 
-    // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
+    // Make sure the user is logged in and has access to the module.
+    // Plugins that are not course modules should leave out the 'cm' part.
     require_login($course, true, $cm);
 
     // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
     $itemid = array_shift($args); // The first item in the $args array.
 
-    // Use the itemid to retrieve any relevant data records and perform any security checks to see if the
-    // user really does have access to the file in question.
+    /*
+    Use the itemid to retrieve any relevant data records and perform any security checks to see if the
+    user really does have access to the file in question.
+    */
 
     // Extract the filename / filepath from the $args array.
-    $filename = array_pop($args); // The last item in the $args array.
+    $filename = array_pop($args); // Case: The last item in the $args array.
     if (!$args) {
-        $filepath = '/'; // $args is empty => the path is '/'
+        $filepath = '/'; // Case: $args is empty => the path is '/'.
     } else {
-        $filepath = '/'.implode('/', $args).'/'; // $args contains elements of the filepath
+        $filepath = '/'.implode('/', $args).'/'; // Case: $args contains elements of the filepath.
     }
 
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
     $file = $fs->get_file($context->id, 'quizaccess_wifiresilience', $filearea, $itemid, $filepath, $filename);
 
-  //  $file->readfile() = base64_decode($file->readfile());
-
     if (!$file or $file->is_directory()) {
         send_file_not_found();
     }
 
-    // We can now send the file back to the browser
+    // We can now send the file back to the browser.
     send_stored_file($file, 0, 0, true, $options);
-
-
 }

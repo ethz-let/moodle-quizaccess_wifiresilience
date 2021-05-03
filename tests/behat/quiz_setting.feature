@@ -1,4 +1,4 @@
-@quizaccess @quizaccess_wifiresilience
+@quizaccess @quizaccess_wifiresilience @quizaccess_wifiresilience_5
 Feature: Fault-tolerant mode quiz setting
   In order to run quizzes with dodgy wifi
   As a teacher
@@ -21,51 +21,51 @@ Feature: Fault-tolerant mode quiz setting
   Scenario: Create a quiz with the setting on.
     When I turn editing mode on
     And I add a "Quiz" to section "0" and I fill the form with:
-      | Name                             | Quiz with fault-tolerant mode |
-      | Experimental fault-tolerant mode | Yes                           |
-    And I follow "Quiz with fault-tolerant mode"
-    And I navigate to "Edit settings" node in "Quiz administration"
+      | Name                 | Quiz Wifiresilience |
+      | Wifi Resilience Mode | Yes                 |
+    And I follow "Quiz Wifiresilience"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
-    Then the field "Experimental fault-tolerant mode" matches value "Yes"
+    Then the field "Wifi Resilience Mode" matches value "Yes"
 
   @javascript
   Scenario: Create a quiz with the setting off.
     When I turn editing mode on
     And I add a "Quiz" to section "0" and I fill the form with:
-      | Name                             | Quiz without fault-tolerant mode |
-      | Experimental fault-tolerant mode | No                               |
-    And I follow "Quiz without fault-tolerant mode"
-    And I navigate to "Edit settings" node in "Quiz administration"
+      | Name                 | Quiz Normal |
+      | Wifi Resilience Mode | No          |
+    And I follow "Quiz Normal"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
-    Then the field "Experimental fault-tolerant mode" matches value "No"
+    Then the field "Wifi Resilience Mode" matches value "No"
 
   @javascript
   Scenario: Change the setting for a quiz from off to on.
     Given the following "activities" exist:
       | activity   | name   | course | idnumber | wifiresilience_enabled |
-      | quiz       | Quiz 1 | C1     | quiz1    | 0                   |
+      | quiz       | Quiz 1 | C1     | quiz1    | 0                      |
     When I follow "Course 1"
     And I follow "Quiz 1"
-    And I navigate to "Edit settings" node in "Quiz administration"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
-    And I set the field "Experimental fault-tolerant mode" to "Yes"
+    And I set the field "Wifi Resilience Mode" to "Yes"
     And I press "Save and display"
-    And I navigate to "Edit settings" node in "Quiz administration"
-    Then the field "Experimental fault-tolerant mode" matches value "Yes"
+    And I navigate to "Edit settings" in current page administration
+    Then the field "Wifi Resilience Mode" matches value "Yes"
 
   @javascript
   Scenario: Change the setting for a quiz from on to off.
     Given the following "activities" exist:
       | activity   | name   | course | idnumber | wifiresilience_enabled |
-      | quiz       | Quiz 1 | C1     | quiz1    | 1                   |
+      | quiz       | Quiz 1 | C1     | quiz1    | 1                      |
     When I follow "Course 1"
     And I follow "Quiz 1"
-    And I navigate to "Edit settings" node in "Quiz administration"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
-    And I set the field "Experimental fault-tolerant mode" to "No"
+    And I set the field "Wifi Resilience Mode" to "No"
     And I press "Save and display"
-    And I navigate to "Edit settings" node in "Quiz administration"
-    Then the field "Experimental fault-tolerant mode" matches value "No"
+    And I navigate to "Edit settings" in current page administration
+    Then the field "Wifi Resilience Mode" matches value "No"
 
   @javascript
   Scenario: The experimental setting is disabled if you select an interactive behaviour.
@@ -73,4 +73,4 @@ Feature: Fault-tolerant mode quiz setting
     And I add a "Quiz" to section "0"
     And I expand all fieldsets
     And I set the field "How questions behave" to "Adaptive mode"
-    Then the "Experimental fault-tolerant mode" "field" should be disabled
+    Then the "Wifi Resilience Mode" "field" should be disabled

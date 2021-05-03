@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-isoffline",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-isoffline": {
+            "jsfiles": [
+                "isoffline.js"
+            ]
+        }
+    }
+}

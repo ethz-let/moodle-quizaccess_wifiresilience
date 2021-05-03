@@ -38,18 +38,25 @@ require_login($course, false, $cm);
 require_capability('quizaccess/wifiresilience:inspectresponses', $context);
 
 $form = new \quizaccess_wifiresilience\form\inspect_responses($PAGE->url);
+
 if ($form->is_cancelled()) {
     redirect($quizurl);
-
 } else if ($fromform = $form->get_data()) {
 
     // Process submission.
     $title = get_string('uploadinspection', 'quizaccess_wifiresilience',
-            format_string($quiz->name, true, array('context' => $context)));
+        format_string($quiz->name, true, array('context' => $context)));
+
     $PAGE->navbar->add($title);
     $PAGE->set_pagelayout('admin');
     $PAGE->set_title($title);
     $PAGE->set_heading($course->fullname);
+    $PAGE->requires->strings_for_js(array('downloadfile'), 'quizaccess_wifiresilience');
+    $PAGE->requires->yui_module(
+        'moodle-quizaccess_wifiresilience-initialiseinspect',
+        'M.quizaccess_wifiresilience.initialiseinspect.init',
+        array()
+    );
 
     $files = get_file_storage()->get_area_files(context_user::instance($USER->id)->id,
             'user', 'draft', $fromform->responsefiles, 'id');
@@ -65,22 +72,24 @@ if ($form->is_cancelled()) {
     echo $OUTPUT->heading($title);
 
     foreach ($files as $file) {
+
         if ($file->get_filepath() !== '/') {
-            continue; // Should not happen due to form validation.
+            continue;
         }
+
         if ($file->is_external_file()) {
-            continue; // Should not happen due to form validation.
+            continue;
         }
 
         if ($file->is_directory()) {
-            continue; // Not interesting.
+            continue;
         }
 
         echo $OUTPUT->heading(get_string('decryptingfile', 'quizaccess_wifiresilience', s($file->get_filename())), 3);
 
-
         $originalpost = null;
         $originalrequest = null;
+
         try {
             $data = json_decode($file->get_content());
 
@@ -91,123 +100,122 @@ if ($form->is_cancelled()) {
                     throw new coding_exception('JSON error: ' . json_last_error());
                 }
             }
+
             if (!isset($data->responses)) {
-                echo $OUTPUT->notification('This file does not appear to contain responses.', 'notifyfail');
-            }
-
-            if (isset($data->iv) || isset($data->key)) {
-                if (!$privatekey) {
-                    echo $OUTPUT->notification('Got apparently encrypted responses, but there is no decryption key.', 'notifyfail');
-                }
-
-                $encryptedaeskey = base64_decode($data->key);
-                if (!$encryptedaeskey) {
-                    echo $OUTPUT->notification('Encrypted AES key not properly base-64 encoded.', 'notifyfail');
-                }
-                $encryptediv = base64_decode($data->iv);
-                if (!$encryptediv) {
-                    echo $OUTPUT->notification('Encrypted initial value not properly base-64 encoded.', 'notifyfail');
-                }
-
-                $aeskeystring = '';
-                if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
-                    echo $OUTPUT->notification('Could not decrypt the AES key. ' . openssl_error_string(), 'notifyfail');
-                }
-
-                $ivstring = '';
-                if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
-                    echo $OUTPUT->notification('Could not decrypt the AES key. ' . openssl_error_string(), 'notifyfail');
-                }
-
-                $aeskey = base64_decode($aeskeystring);
-                if (!$aeskey) {
-                    echo $OUTPUT->notification('AES key not properly base-64 encoded.', 'notifyfail');
-                }
-                $iv = base64_decode($ivstring);
-                if (!$iv) {
-                    echo $OUTPUT->notification('Initial value not properly base-64 encoded.', 'notifyfail');
-                }
-
-                $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
-                if (!$responses) {
-                    echo $OUTPUT->notification('Could not decrypt the responses. ' . openssl_error_string(), 'notifyfail');
-                }
-
+                echo $OUTPUT->notification(get_string('filenoresponses', 'quizaccess_wifiresilience'), 'notifyfail');
             } else {
-                $responses = $data->responses;
+                if (isset($data->iv) || isset($data->key)) {
+
+                    if (!$privatekey) {
+                        echo $OUTPUT->notification(
+                            get_string('filenodecryptionkey', 'quizaccess_wifiresilience'), 'notifyfail');
+                    }
+
+                    $encryptedaeskey = base64_decode($data->key);
+                    if (!$encryptedaeskey) {
+                        echo $OUTPUT->notification(
+                            get_string('fileencryptedkeynobase64', 'quizaccess_wifiresilience'), 'notifyfail');
+                    }
+
+                    $encryptediv = base64_decode($data->iv);
+                    if (!$encryptediv) {
+                        echo $OUTPUT->notification(
+                            get_string('fileencryptedinitvaluenobase64', 'quizaccess_wifiresilience'), 'notifyfail');
+                    }
+
+                    $aeskeystring = '';
+                    if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
+                        echo $OUTPUT->notification(
+                            get_string('fileunabledecryptkey', 'quizaccess_wifiresilience', openssl_error_string()), 'notifyfail');
+                    }
+
+                    $ivstring = '';
+                    if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
+                        echo $OUTPUT->notification(
+                            get_string('fileunabledecryptkey', 'quizaccess_wifiresilience', openssl_error_string()), 'notifyfail');
+                    }
+
+                    $aeskey = base64_decode($aeskeystring);
+                    if (!$aeskey) {
+                        echo $OUTPUT->notification(
+                            get_string('filekeynobase64', 'quizaccess_wifiresilience'), 'notifyfail');
+                    }
+
+                    $iv = base64_decode($ivstring);
+                    if (!$iv) {
+                        echo $OUTPUT->notification(
+                            get_string('fileinitvaluenobase64', 'quizaccess_wifiresilience'), 'notifyfail');
+                    }
+
+                    $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
+                    if (!$responses) {
+                        echo $OUTPUT->notification(
+                            get_string('fileunabledecrypt', 'quizaccess_wifiresilience', openssl_error_string()), 'notifyfail');
+                    }
+                } else {
+                    $responses = $data->responses;
+
+                    // Get original before encryption work.
+                    $encodeddata = $data;
+                    $encodeddata->responses = $responses;
+                    $encodeddataback = json_encode($encodeddata);
+
+                    $encodeddatawithoutkey = $encodeddata;
+
+                    $encodeddatawithoutkey->iv = '';
+                    unset($encodeddatawithoutkey->iv);
+
+                    $encodeddatawithoutkey->key = '';
+                    unset($encodeddatawithoutkey->key);
+
+                    $encodeddatabackwithoutkey = json_encode($encodeddatawithoutkey);
+
+                    $postdata = array();
+                    parse_str($responses, $postdata);
+
+                    if (!isset($postdata['attempt'])) {
+                        echo html_writer::tag('div', get_string('filenoattemptid', 'quizaccess_wifiresilience'),
+                            array('class' => 'alert alert-error'));
+                    }
+
+                    echo get_string('filewithkeyandiv', 'quizaccess_wifiresilience');
+                    echo html_writer::tag('textarea', $encodeddataback,
+                        array('id' => 'quizaccess_wifiresilience_dectypted_file_output_json', 'class' => 'inspectresponse'));
+                    echo html_writer::tag('div', '',
+                        array('id' => 'quizaccess_wifiresilience_dectypted_file_output_json_link'));
+
+                    echo get_string('filewithoutkeyandiv', 'quizaccess_wifiresilience');
+                    echo html_writer::tag('textarea', $encodeddatabackwithoutkey,
+                        array('id' => 'quizaccess_wifiresilience_dectypted_file_output_json_nokey', 'class' => 'inspectresponse'));
+                    echo html_writer::tag('div', '',
+                        array('id' => 'quizaccess_wifiresilience_dectypted_file_output_json_nokey_link'));
+
+                    echo get_string('filearraystyle', 'quizaccess_wifiresilience');
+                    echo html_writer::tag('textarea', s(var_export($postdata, true)),
+                        array('id' => 'quizaccess_wifiresilience_dectypted_file_output_array', 'class' => 'inspectresponse'));
+                    echo html_writer::tag('div', '',
+                        array('id' => 'quizaccess_wifiresilience_dectypted_file_output_array_link'));
+
+                    // Process the uploaded data. (We have to do weird fakery with $_POST && $_REQUEST).
+
+                    $timenow = time();
+                    $postdata['sesskey'] = sesskey();
+                    $originalpost = $_POST;
+                    $_POST = $postdata;
+                    $originalrequest = $_REQUEST;
+                    $_REQUEST = $postdata;
+                    $_POST = $originalpost;
+                    $originalpost = null;
+                    $_REQUEST = $originalrequest;
+                    $originalrequest = null;
+
+                    // Display a success message.
+                    echo $OUTPUT->notification(get_string('inspectionprocessedsuccessfully', 'quizaccess_wifiresilience'),
+                        'notifysuccess');
+                }
             }
-            // get original before encryption work..
-            $encoded_data = $data;
-            $encoded_data->responses = $responses;
-            $encoded_data_back = json_encode($encoded_data);
-
-            $encoded_data_withoutkey = $encoded_data;
-
-            $encoded_data_withoutkey->iv = '';
-            unset($encoded_data_withoutkey->iv);
-
-            $encoded_data_withoutkey->key = '';
-            unset($encoded_data_withoutkey->key);
-
-            $encoded_data_back_without_key = json_encode($encoded_data_withoutkey);
-
-
-            $postdata = array();
-            parse_str($responses, $postdata);
-
-
-            if (!isset($postdata['attempt'])) {
-                echo '<div class="alert alert-error">The uploaded data did not include an attempt id.</div>';
-            }
-
-            echo "<br /><h3>Original Style (With KEY and IV)</h3>";
-            echo '<textarea id="quizaccess_wifiresilience_dectypted_file_output_json" width="100%" height="auto" style="width:100%;max-width:100%;min-height:300px;height:auto;">' . $encoded_data_back . '</textarea>';
-            echo '<div id="quizaccess_wifiresilience_dectypted_file_output_json_link"></div><br />';
-
-            echo "<br /><h3>Original Style (Without KEY or IV) - Good to Use on other moodle instances or when Public and Private keys are Damaged.</h3>";
-            echo '<textarea id="quizaccess_wifiresilience_dectypted_file_output_json_nokey" width="100%" height="auto" style="width:100%;max-width:100%;min-height:300px;height:auto;">' . $encoded_data_back_without_key . '</textarea>';
-            echo '<div id="quizaccess_wifiresilience_dectypted_file_output_json_nokey_link"></div><br />';
-
-            echo "<h3>Array Style</h3>";
-            echo '<textarea id="quizaccess_wifiresilience_dectypted_file_output_array" width="100%" height="auto" style="width:100%;max-width:100%;min-height:300px;height:auto;">' . s(print_r($postdata, true)) . '</textarea>';
-            echo '<div id="quizaccess_wifiresilience_dectypted_file_output_array_link"></div><br />';
-
-
-            // Process the uploaded data. (We have to do weird fakery with $_POST && $_REQUEST.)
-            $timenow = time();
-            $postdata['sesskey'] = sesskey();
-            $originalpost = $_POST;
-            $_POST = $postdata;
-            $originalrequest = $_REQUEST;
-            $_REQUEST = $postdata;
-            $_POST = $originalpost;
-            $originalpost = null;
-            $_REQUEST = $originalrequest;
-            $originalrequest = null;
-
-            // Display a success message.
-            echo $OUTPUT->notification(get_string('inspectionprocessedsuccessfully', 'quizaccess_wifiresilience'),'notifysuccess');
-            echo '<script>
-            function download_emergency_file_wifi_exam(whicharea){
-              // create links
-              var mydiv = document.getElementById(whicharea);
-              var aTag = document.createElement("a");
-              aTag.innerHTML = "Download as a file";
-              which_textarea = whicharea.replace("_link","");
-
-              var blob = new Blob([document.getElementById(which_textarea).value], {type: "octet/stream"});
-              var url = window.URL.createObjectURL(blob);
-
-              aTag.href = url;
-              aTag.download = which_textarea + ".inspect";
-              mydiv.appendChild(aTag);
-            }
-            download_emergency_file_wifi_exam("quizaccess_wifiresilience_dectypted_file_output_json_link");
-            download_emergency_file_wifi_exam("quizaccess_wifiresilience_dectypted_file_output_json_nokey_link");
-            download_emergency_file_wifi_exam("quizaccess_wifiresilience_dectypted_file_output_array_link");
-            </script>';
-
         } catch (Exception $e) {
+
             if ($originalpost !== null) {
                 $_POST = $originalpost;
                 $originalpost = null;
@@ -216,6 +224,7 @@ if ($form->is_cancelled()) {
                 $_REQUEST = $originalrequest;
                 $originalrequest = null;
             }
+
             echo $OUTPUT->box_start();
             echo $OUTPUT->heading(get_string('uploadfailed', 'quizaccess_wifiresilience'), 4);
             echo $OUTPUT->notification($e->getMessage());
@@ -244,7 +253,8 @@ if ($form->is_cancelled()) {
 
     echo $OUTPUT->header();
     echo $OUTPUT->heading($title);
-    echo $OUTPUT->box(get_string('inspectingfiledesc', 'quizaccess_wifiresilience'),array('class' => 'alert alert-warning'));
+    echo $OUTPUT->box(get_string('inspectingfiledesc', 'quizaccess_wifiresilience'),
+        array('class' => 'alert alert-warning'));
     $form->display();
     echo $OUTPUT->footer();
 }

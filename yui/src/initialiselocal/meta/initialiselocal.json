@@ -1,0 +1,13 @@
+{
+    "moodle-quizaccess_wifiresilience-initialiselocal": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "event-valuechange",
+            "node-event-delegate",
+            "io-form",
+            "json"
+        ]
+    }
+}

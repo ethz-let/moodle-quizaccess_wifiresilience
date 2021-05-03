@@ -1,0 +1,14 @@
+{
+    "moodle-quizaccess_wifiresilience-download": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "node-event-delegate",
+            "json",
+            "io-form",
+            "moodle-quizaccess_wifiresilience-jsencrypt",
+            "moodle-quizaccess_wifiresilience-sjcl"
+        ]
+    }
+}

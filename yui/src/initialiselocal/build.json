@@ -1,0 +1,10 @@
+{
+    "name": "moodle-quizaccess_wifiresilience-initialiselocal",
+    "builds": {
+        "moodle-quizaccess_wifiresilience-initialiselocal": {
+            "jsfiles": [
+                "initialiselocal.js"
+            ]
+        }
+    }
+}

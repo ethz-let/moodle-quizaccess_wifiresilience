@@ -37,7 +37,7 @@ M.mod_quiz.init_review_form = function(Y) {
 
 M.mod_quiz.init_comment_popup = function(Y) {
     // Add a close button to the window.
-    var closebutton = Y.Node.create('<input type="button" />');
+    var closebutton = Y.Node.create('<input type="button" class="btn btn-secondary" />');
     closebutton.set('value', M.util.get_string('cancel', 'moodle'));
     Y.one('#id_submitbutton').ancestor().append(closebutton);
     Y.on('click', function() { window.close() }, closebutton);
@@ -54,14 +54,16 @@ M.mod_quiz.timer = {
     // Is this a quiz preview?
     preview: 0,
 
-    // original start time.
+    // Original start time.
     start_time: 0,
 
     // This records the id of the timeout that updates the clock periodically,
     // so we can cancel.
     timeoutid: null,
-    timer_offline_counter: 0,
 
+    // Threshold for updating time remaining, in milliseconds.
+    threshold: 3000,
+    timer_offline_counter: 0,
 
     /**
      * @param Y the YUI object
@@ -70,37 +72,35 @@ M.mod_quiz.timer = {
      */
     init: function(Y, start, preview) {
 
-        var page_loaded_time =  M.pageloadstarttime.getTime();
-        M.mod_quiz.timer.Y = Y;
+        var page_loaded_time = M.pageloadstarttime.getTime();
         var attemptid = Y.one('input[name=attempt]').get('value');
 
-        // for reload on offline - with time comenstation
-        var registered_end_time = sessionStorage.getItem('ethz-secondsleft-'+attemptid);
-        if(registered_end_time != null && registered_end_time != 'undefined'){
-          if(Number(registered_end_time) != start){ // time has changed!
-            start = Number(registered_end_time);
-          }
+        // For reload on offline - with time compensation.
+        var registered_end_time = sessionStorage.getItem('wifiresilience-secondsleft-' + attemptid);
+
+        if (registered_end_time != null && registered_end_time != 'undefined') {
+            // Time has changed.
+            if (Number(registered_end_time) != start) {
+                start = Number(registered_end_time);
+            }
         }
 
-        M.mod_quiz.timer.endtime = page_loaded_time + start * 1000; /*M.pageloadstarttime.getTime()*/
-        // 400 ms is for fadeout of jquery overlay.
-
+        M.mod_quiz.timer.Y = Y;
+        M.mod_quiz.timer.endtime = page_loaded_time + start * 1000;
         M.mod_quiz.timer.preview = preview;
-		    M.mod_quiz.timer.start_time = start;
-		    M.mod_quiz.timer.process_offline_refresh_attempt_time(attemptid);
-        $(window).on("load", function() {
-          exam_extra_page_load_time = 500 + (new Date().getTime()) - page_loaded_time;
-          M.mod_quiz.timer.endtime += exam_extra_page_load_time;
-          M.mod_quiz.timer.update(); // keep it for attempt.php onload at bottom of attempt.php
-          Y.one('#quiz-timer').setStyle('display', 'block');
-          Y.log('Added extra time to compensate for page load & waiting, milliseconds: [' + exam_extra_page_load_time + ']', 'debug', '[ETHz-SW] Timer');
-        //  alert(extra_page_load_time);
+        M.mod_quiz.timer.start_time = start;
+
+        M.mod_quiz.timer.process_offline_refresh_attempt_time(attemptid);
+
+        $(window).on('load', function() {
+            exam_extra_page_load_time = 500 + (new Date().getTime()) - page_loaded_time;
+            M.mod_quiz.timer.endtime += exam_extra_page_load_time;
+            M.mod_quiz.timer.update();
+            Y.one('#quiz-timer-wrapper').setStyle('display', 'flex');
+            Y.log('Added extra time to compensate for page load & waiting, milliseconds: [' + exam_extra_page_load_time + ']', 'debug', '[Wifiresilience-SW] Timer');
         });
-        M.mod_quiz.timer.timer_offline_counter = 0;
-
-
-
     },
+
     /**
      * Stop the timer, if it is running.
      */
@@ -113,25 +113,22 @@ M.mod_quiz.timer = {
      * check if user refreshed while offline.
      */
     process_offline_refresh_attempt_time: function(attemptid) {
-    		// Check SessionStorage browser support
-    		if(typeof(Storage) !== "undefined") {
-          var last_calculated_end_time = sessionStorage.getItem('ethz-offline-'+attemptid);
-          if(last_calculated_end_time && last_calculated_end_time != null && last_calculated_end_time != 'undefined'){
-            M.mod_quiz.timer.endtime += Number(last_calculated_end_time);
-            Y.log('Exam page got refreshed while in offline mode while actively attempting (same session). New Exam End Time: ' + M.mod_quiz.timer.endtime, 'debug', '[ETHz-SW] Timer');
-    			} else {
-    				Y.log('There is no record for any effective offline time. Exam Start Time - as per moodle timer - is: [' + M.mod_quiz.timer.endtime+ ']', 'debug', '[ETHz-SW] Timer');
-    			}
-          /*
-          var last_session_attempt_page = sessionStorage.getItem('ethz-offline-lastpage-'+attemptid);
-          if(last_session_attempt_page && last_session_attempt_page != null && last_session_attempt_page != 'undefined'){
-             M.quizaccess_wifiresilience.navigation.navigate_to_page(+Number(last_session_attempt_page));
-          } else {
-             M.quizaccess_wifiresilience.navigation.navigate_to_page(+0);
-          }
-          */
-    		} else {
-          Y.log('Session Storage not supported. Exam Start Time - as per moodle timer - is: [' + M.mod_quiz.timer.endtime+ ']', 'debug', '[ETHz-SW] Timer');
+
+        // Check SessionStorage browser support.
+        if(typeof(Storage) !== "undefined") {
+
+            var last_calculated_end_time = sessionStorage.getItem('wifiresilience-offline-' + attemptid);
+            if(last_calculated_end_time && last_calculated_end_time != null && last_calculated_end_time != 'undefined'){
+                M.mod_quiz.timer.endtime += Number(last_calculated_end_time);
+                Y.log('Exam page got refreshed while in offline mode while actively attempting (same session). New Exam End Time: ' +
+                    M.mod_quiz.timer.endtime, 'debug', '[Wifiresilience-SW] Timer');
+            } else {
+                Y.log('There is no record for any effective offline time. Exam Start Time - as per moodle timer - is: [' +
+                    M.mod_quiz.timer.endtime + ']', 'debug', '[Wifiresilience-SW] Timer');
+            }
+        } else {
+            Y.log('Session Storage not supported. Exam Start Time - as per moodle timer - is: [' +
+                M.mod_quiz.timer.endtime + ']', 'debug', '[Wifiresilience-SW] Timer');
         }
     },
     /**
@@ -144,91 +141,45 @@ M.mod_quiz.timer = {
             return num;
         }
     },
+
     // Function to update the clock with the current time left, and submit the quiz if necessary.
     update: function() {
-
         var Y = M.mod_quiz.timer.Y;
 
-      //  M.mod_quiz.timer.endtime +=   1000 * M.quizaccess_wifiresilience.autosave.last_disconnection_time;
-        M.mod_quiz.timer.endtime +=   1000 * M.quizaccess_wifiresilience.autosave.last_real_disconnection_time;
+        M.mod_quiz.timer.endtime += 1000 * M.quizaccess_wifiresilience.autosave.last_real_disconnection_time;
 
-        var whatsnowtime = new Date().getTime();
-        var secondsleft = Math.floor((M.mod_quiz.timer.endtime - whatsnowtime)/1000);
+        var secondsleft = Math.floor((M.mod_quiz.timer.endtime - new Date().getTime()) / 1000);
 
-        // If time has expired, set the hidden form field that says time has expired and submit
-        if (secondsleft <= 0) {
+        // If time has expired, set the hidden form field that says time has expired and submit.
+        if (secondsleft < 0) {
             M.mod_quiz.timer.stop(null);
             Y.one('#quiz-time-left').setContent(M.util.get_string('timesup', 'quiz'));
             var input = Y.one('input[name=timeup]');
             input.set('value', 1);
             var form = input.ancestor('form');
-
             if (form.one('input[name=finishattempt]')) {
                 form.one('input[name=finishattempt]').set('value', 0);
             }
             M.core_formchangechecker.set_form_submitted();
-            //    form.submit();
-          //   Y.Event.simulate(document.body, "click", { shiftKey: true })
+            M.quizaccess_wifiresilience.navigation.navigate_to_page(-1);
 
-          M.quizaccess_wifiresilience.navigation.navigate_to_page(-1);
-          // Hide Question Navigation buttons.. Its auto submission!
-          $(".qn_buttons").hide();
+            $(".qn_buttons").hide();
+            $(".qn_buttons").hide();
+            $("#quizaccess_wifiresilience-attempt_page--1 h2").hide();
+            $("#quizaccess_wifiresilience-attempt_page--1 h3").hide();
+            $(".quizsummaryofattempt").hide();
+            $('#quizaccess_wifiresilience_returntoattempt').hide();
+            $("input[name=next]").hide();
+            $("input[name=previous]").hide();
+            $("[id^=quizaccess_wifiresilience-attempt_page-]").addClass('quizaccess_wifiresilience_disallow_edit');
+            $("#quizaccess_wifiresilience-attempt_page--1").removeClass('quizaccess_wifiresilience_disallow_edit');
 
-          // hide back to attempt and headings..
-          //$(".submitbtns .controls").hide();
-
-          $(".qn_buttons").hide();
-
-
-          $("#quizaccess_wifiresilience-attempt_page--1 h2").hide();
-          $("#quizaccess_wifiresilience-attempt_page--1 h3").hide();
-          // Hide Summary Page.. Its auto submission!
-          $(".quizsummaryofattempt").hide();
-
-          // Hide return to attempt in summary page button
-          $('#quizaccess_wifiresilience_returntoattempt').hide();
-
-          // Hide return to attempt in summary page div
-          //$('.wifi_must_be_submitted_btn').hide();
-
-
-          // hide next and previous buttons
-          $("input[name=next]").hide();
-          $("input[name=previous]").hide();
-          // In case someone manages to get to questions, disable editing
-          $("[id^=quizaccess_wifiresilience-attempt_page-]").addClass('quizaccess_wifiresilience_disallow_edit');
-          // Override the above for summary page
-          $("#quizaccess_wifiresilience-attempt_page--1").removeClass('quizaccess_wifiresilience_disallow_edit');
-
-          $("#responseform").on('submit', function (evt) {
+            $("#responseform").on('submit', function (evt) {
                 evt.preventDefault();
-                // do some stuff
                 M.quizaccess_wifiresilience.autosave.submit_and_finish(evt);
-          });
+            });
 
-
-        $( '#responseform' ).trigger('submit', M.quizaccess_wifiresilience.autosave);
-
-            // Perform an action...
-
-
-
-
-
-
-
-
-    //      Y.on('submit', M.quizaccess_wifiresilience.autosave.submit_and_finish, '#responseform');
-    //      form.simulate("submit", M.quizaccess_wifiresilience.autosave.submit_and_finish);
-        //  $("#quizaccess_wifiresilience_overlay").show();
-      //    form.simulate("submit", M.quizaccess_wifiresilience.autosave.submit_and_finish);
-
-
-        //  M.quizaccess_wifiresilience.autosave.submit_and_finish(M.quizaccess_wifiresilience.autosave);
-          //.on('click', this.submit_and_finish_clicked, this);
-      //    alert("WWWwe are done here!");
-
-
+            $("#responseform").trigger('submit', M.quizaccess_wifiresilience.autosave);
             return;
         }
 
@@ -238,23 +189,31 @@ M.mod_quiz.timer = {
                     .removeClass('timeleft' + (secondsleft + 1))
                     .addClass('timeleft' + secondsleft);
         }
+
         // Update the time display.
-        var hours = Math.floor(secondsleft/3600);
-        secondsleft -= hours*3600;
-        var minutes = Math.floor(secondsleft/60);
-        secondsleft -= minutes*60;
+        var hours = Math.floor(secondsleft / 3600);
+        secondsleft -= hours * 3600;
+        var minutes = Math.floor(secondsleft / 60);
+        secondsleft -= minutes * 60;
         var seconds = secondsleft;
         Y.one('#quiz-time-left').setContent(hours + ':' +
                 M.mod_quiz.timer.two_digit(minutes) + ':' +
                 M.mod_quiz.timer.two_digit(seconds));
 
-        /*
-        // Offline time counter :-)
-        if(M.quizaccess_wifiresilience.autosave.connected == false){
-          M.mod_quiz.timer.timer_offline_counter += 100;
-        }*/
         // Arrange for this method to be called again soon.
         M.mod_quiz.timer.timeoutid = setTimeout(M.mod_quiz.timer.update, 100);
+    },
+
+    // Allow the end time of the quiz to be updated.
+    updateEndTime: function(timeleft) {
+        var newtimeleft = new Date().getTime() + timeleft * 1000;
+
+        // Only update if change is greater than the threshold, so the
+        // time doesn't bounce around unnecessarily.
+        if (Math.abs(newtimeleft - M.mod_quiz.timer.endtime) > M.mod_quiz.timer.threshold) {
+            M.mod_quiz.timer.endtime = newtimeleft;
+            M.mod_quiz.timer.update();
+        }
     }
 };
 
@@ -304,9 +263,9 @@ M.mod_quiz.nav.init = function(Y) {
                 pageno = 0;
             }
 
-            var questionidmatch = this.get('href').match(/#q(\d+)/);
+            var questionidmatch = this.get('href').match(/#question-(\d+)-(\d+)/);
             if (questionidmatch) {
-                form.set('action', form.get('action') + '#q' + questionidmatch[1]);
+                form.set('action', form.get('action') + questionidmatch[0]);
             }
 
             nav_to_page(pageno);
@@ -398,6 +357,6 @@ M.mod_quiz.secure_window = {
             } else {
                 window.location.href = url;
             }
-        }, delay*1000);
+        }, delay * 1000);
     }
 };

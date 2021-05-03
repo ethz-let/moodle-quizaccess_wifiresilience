@@ -40,11 +40,11 @@ if ($USER->id != $currentuserid) {
 }
 
 $PAGE->requires->js_init_code('
-            if (window.parent.M && window.parent.M.quizaccess_wifiresilience && window.parent.M.quizaccess_wifiresilience.autosave) {
+            if (window.parent.M && window.parent.M.quizaccess_wifiresilience
+                && window.parent.M.quizaccess_wifiresilience.autosave) {
                 window.parent.M.quizaccess_wifiresilience.autosave.restore_session_complete(
                         document.getElementById("sesskey").value);
-            }
-        ');
+            }');
 
 echo $OUTPUT->header();
 echo $OUTPUT->notification(get_string('loginokagain', 'quizaccess_wifiresilience'), 'notifysuccess');
