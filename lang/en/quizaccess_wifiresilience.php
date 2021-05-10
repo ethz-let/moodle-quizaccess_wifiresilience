@@ -257,7 +257,7 @@ $string['rule4start'] = '<br>4. <font color=grey>[Wifiresilience-SW] Current ava
 $string['rule4success'] = '<br>4. <font color=green>[Wifiresilience-SW] Browser Storage already uses {$a->usedbytes} of {$a->grantedbytes}</font>';
 $string['rule4fail'] = '<br>4. <font color=red>[Wifiresilience-SW] Browser Storage (webkitTemporaryStorage) can not be calculated.</font>';
 $string['rule4error'] = '<br>4. <font color=red>[Wifiresilience-SW] Browser Storage can not be calculated.</font>';
-$string['rule5start'] = '<br>5. <font color=grey>[Wifiresilience-SW] Requesting Extra Storage Quota is Unknown (less than available available storage).</font>';
+$string['rule5start'] = '<br>5. <font color=grey>[Wifiresilience-SW] Requesting Extra Storage Quota is Unknown (less than available storage).</font>';
 $string['rule5success'] = '<br>5. <font color=green>[Wifiresilience-SW] Requesting Extra Storage Quota (1GB) is Successful.</font>';
 $string['rule5fail'] = '<br>5. <font color=red>[Wifiresilience-SW] Requesting Extra Storage Quota (1GB) has Failed. webkitPersistentStorage not supported.</font>';
 $string['rule5error'] = '<br>5. <font color=red>[Wifiresilience-SW] Requesting Extra Storage Quota (1GB) has Failed.</font>';
