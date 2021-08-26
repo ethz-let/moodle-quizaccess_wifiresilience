@@ -499,9 +499,8 @@ M.quizaccess_wifiresilience.autosave = {
                         var currentattrid = $el.attr('id');
                         if (currentattrid.indexOf('qtype_drawing_textarea_id_') !== -1) {
                             var qidarr = currentattrid.split('_');
-                            var qid = qidarr[4];
                             // Reload iframe.
-                            var iframedr = '#qtype_drawing_editor_' + qid;
+                            var iframedr = '#qtype_drawing_editor_' + qidarr[4] + "_" + qidarr[5] + "_" + qidarr[6] + "_" + "uniqueuattemptid";
                             $(iframedr).attr('src', $(iframedr).attr('src'));
                         } else {
                             $el.val(val).change();
