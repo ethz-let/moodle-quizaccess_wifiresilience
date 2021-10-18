@@ -270,7 +270,9 @@ $regions = $PAGE->blocks->get_regions();
 
 $PAGE->blocks->add_fake_block($navbc, reset($regions));
 
-$headtags = $attemptobj->get_html_head_contributions($page);
+if ($page >= 0) {
+    $headtags = $attemptobj->get_html_head_contributions($page);
+}
 $PAGE->set_title($attemptobj->attempt_page_title($page));
 $PAGE->set_heading($attemptobj->get_course()->fullname);
 
