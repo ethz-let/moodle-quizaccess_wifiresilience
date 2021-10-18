@@ -358,10 +358,16 @@ M.quizaccess_wifiresilience.navigation = {
         } else {
             Y.one(this.SELECTORS.QUIZ_FORM).removeClass('quizaccess_wifiresilience_hidden');
         }
-        if (pageno == 0) {
+        if (pageno == 0 || pageno == -1) {
             Y.one(this.SELECTORS.PREVIOUS_BUTTON).hide();
-        }else{
+        } else {
             Y.one(this.SELECTORS.PREVIOUS_BUTTON).show();
+        }
+
+        if (pageno == -1) {
+            Y.one(this.SELECTORS.NEXT_BUTTON).hide();
+        } else {
+            Y.one(this.SELECTORS.NEXT_BUTTON).show();
         }
 
         Y.one(this.SELECTORS.PAGE_DIV_ROOT + pageno).removeClass('quizaccess_wifiresilience_hidden');
