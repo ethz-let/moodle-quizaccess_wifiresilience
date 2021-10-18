@@ -138,8 +138,10 @@ M.quizaccess_wifiresilience.navigation = {
         Y.delegate('click', this.nav_button_click, this.SELECTORS.SUMMARY_TABLE, this.SELECTORS.SUMMARY_TABLE_LINK, this);
 
         // We need to remove the standard 'Finish attempt...' click hander before we add our own.
-        Y.one(this.SELECTORS.FINISH_LINK).detach('click');
-        Y.one(this.SELECTORS.FINISH_LINK).on('click', this.finish_attempt_click, this);
+        if (Y.one(this.SELECTORS.FINISH_LINK)) {
+            Y.one(this.SELECTORS.FINISH_LINK).detach('click');
+            Y.one(this.SELECTORS.FINISH_LINK).on('click', this.finish_attempt_click, this);
+        }
         Y.one(this.SELECTORS.NEXT_BUTTON).on('click', this.next_button_click, this);
         Y.one(this.SELECTORS.PREVIOUS_BUTTON).on('click', this.previous_button_click, this);
         Y.one(this.SELECTORS.SUMMARY_PAGE_BUTTON).on('click', this.summary_button_click, this);
