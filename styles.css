@@ -319,4 +319,8 @@ textarea.inspectresponse {
 #page-exam-synced-files #datatable table {
     width: 100%;
 }
+
+#page-mod-quiz-attempt .submitbtns {
+    text-align: center !important;
+}
 /* stylelint-enable declaration-no-important  */
