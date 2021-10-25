@@ -34,6 +34,10 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 $attemptid = required_param('attempt', PARAM_INT);
 $page = optional_param('page', null, PARAM_INT);
 
+if ($page == -1) {
+    $page = 0;
+}
+
 // Create the attempt object.
 $attemptobj = quiz_attempt::create($attemptid);
 
