@@ -42,7 +42,7 @@ if ($quizid == 0 || !$quizid) {
     die;
 }
 
-$wifisettings = $DB->get_record('quizaccess_wifiresilience', array('quizid' => $quizid));
+$wifisettings = get_config('quizaccess_wifiresilience');
 
 $rev = md5('offline.html');
 $precahcedfilesstr =

@@ -134,7 +134,7 @@ if (!$autosaveperiod) {
 
 $userid = '-u' . $USER->id;
 
-$wifisettings = $DB->get_record('quizaccess_wifiresilience', array('quizid' => $attemptobj->get_quizid()));
+$wifisettings = get_config('quizaccess_wifiresilience');
 
 $displaytecherrors = 0;
 $displaynavdetails = 0;

@@ -322,5 +322,6 @@ textarea.inspectresponse {
 
 #page-mod-quiz-attempt .submitbtns {
     text-align: center !important;
+    display: block;
 }
 /* stylelint-enable declaration-no-important  */

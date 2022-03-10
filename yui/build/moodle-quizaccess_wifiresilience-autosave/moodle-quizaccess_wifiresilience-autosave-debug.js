@@ -121,6 +121,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @private
           */
          AUTOSAVE_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/sync.php',
+         TIMER_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/time.php',
 
          /**
           * Prefix for the localStorage key.
@@ -389,6 +390,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
      
              // Try to get questions status in localstorage.
              M.quizaccess_wifiresilience.localforage.try_to_get_question_states();
+             setInterval(this.sweep_for_timer_changes, this.delay + 5000);
      
              var examviewportmaxwidth = $(window).width();
              var quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
@@ -568,6 +570,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @param {Number} repeatcount The number of attempts made so far.
           */
          init_tinymce: function(repeatcount) {
+             
              if (typeof tinyMCE === 'undefined') {
                  if (repeatcount > 0) {
                      Y.later(this.TINYMCE_DETECTION_DELAY, this, this.init_tinymce, [repeatcount - 1]);
@@ -580,6 +583,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              Y.log('Found TinyMCE.', 'debug', '[Wifiresilience-SW] Sync');
              this.editor_change_handler = Y.bind(this.editor_changed, this);
              tinyMCE.onAddEditor.add(Y.bind(this.init_tinymce_editor, this));
+             
          },
      
          /**
@@ -791,7 +795,64 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.set_question_state_class(slot, state);
              }, this);
          },
+         sweep_for_timer_changes: function(){
+
+             Y.log('** Intensive Timer changes checks.',
+                         'debug', '[Wifiresilience-SW] Sync');
+             
+            // M.quizaccess_wifiresilience.autosave.request_timer_checks();
+             Y.io(M.quizaccess_wifiresilience.autosave.TIMER_HANDLER, {
+                 method: 'POST',
+                 form: {
+                     id: M.quizaccess_wifiresilience.autosave.form
+                 },
+                 on: {
+                     success: M.quizaccess_wifiresilience.autosave.timer_submit_done,
+                 },
+                 context: M.quizaccess_wifiresilience.autosave,
+                 timeout: M.quizaccess_wifiresilience.autosave.SAVE_TIMEOUT_FULL_SUBMISSION,
+                 sync: false
+             });
+         },
+         timer_submit_done: function(transactionid, response) {
+             var result;
+             try {
+                 result = Y.JSON.parse(response.responseText);
+             } catch (e) {
+                 return;
+             }
+             if (result.result === 'lostsession') {
+                 Y.log('Session loss detected. Re-Login required', 'debug', '[Wifiresilience-SW] Sync');
+                 return;
+             }
      
+             if (result.result !== 'OK') {
+                 if (result.error) {
+                     var sync_errors = result.error + ' (Code: ' + result.errorcode + ') Info: ' + result.debuginfo;
+                     Y.log('Error: ' + sync_errors, 'debug', '[Wifiresilience-SW] Sync');
+                 }
+                 return;
+             }
+             // Is there a change happened to quiz end time? If so, then compensate it.
+     
+             var original_end_time = Y.one('#original_end_time').get('value');
+             if (!isNaN(result.timerstartvalue) && M.mod_quiz.timer.endtime && original_end_time != result.timelimit) {
+                 var addexloadingtime = 0;
+                 if (exam_extra_page_load_time && exam_extra_page_load_time != 'undefined') {
+                     addexloadingtime = exam_extra_page_load_time;
+                 }
+                 Y.log('Page load comepnsation autosave (exam end): ' + addexloadingtime, 'debug', '[Wifiresilience-SW] Sync');
+                 var t = new Date().getTime();
+                 M.mod_quiz.timer.endtime = exam_extra_page_load_time + t + result.timerstartvalue * 1000;
+                 Y.log('Exam End Time checks on server: SUCCESS. Exam End Time: ' +
+                     result.timerstartvalue, 'debug', '[Wifiresilience-SW] Sync');
+             } else {
+                 Y.log('Exam End Time checks on server: Original Exam End Time: ' +
+                     original_end_time + ' & Last Server Check End Time: ' +
+                     result.timelimit + '. No Need to Compensate or Update Quiz Timer.' , 'debug', '[Wifiresilience-SW] Sync');
+             }
+         },
+         
          start_save_timer_if_necessary: function() {
              this.dirty = true;
      
@@ -803,7 +864,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
      
              this.exam_localstorage_saving_status_str();
-     
+             
              if (this.delay_timer || this.save_transaction) {
                  return;
              }
