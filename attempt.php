@@ -8,27 +8,26 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Wifi-Resilient quiz mode, replacement attempt.php page.
  *
- * @package   quizaccess_wifiresilience
+ * @package quizaccess_wifiresilience
  * @copyright 2017 ETH Zurich (amr.hourani@let.ethz.ch)
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // In case compression is not enabled on server, maybe try to compress it locally?
-
 @ini_set("zlib.output_compression", "On");
 @header('Service-Worker-Allowed: /');
 
-require_once(__DIR__ . '/../../../../config.php');
-require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+require_once (__DIR__ . '/../../../../config.php');
+require_once ($CFG->dirroot . '/mod/quiz/locallib.php');
 
 // Get submitted parameters.
 $attemptid = required_param('attempt', PARAM_INT);
@@ -107,8 +106,7 @@ $PAGE->set_pagetype('mod-quiz-attempt');
 $output = $PAGE->get_renderer('mod_quiz');
 $messages = $accessmanager->prevent_access();
 if (!$attemptobj->is_preview_user() && $messages) {
-    print_error('attempterror', 'quiz', $attemptobj->view_url(),
-                    $output->access_messages($messages));
+    print_error('attempterror', 'quiz', $attemptobj->view_url(), $output->access_messages($messages));
 }
 if ($accessmanager->is_preflight_check_required($attemptobj->get_attemptid())) {
     redirect($attemptobj->start_attempt_url(null, $page));
@@ -169,104 +167,57 @@ if ($timeleft !== false) {
     $timerstartvalue = 0;
 }
 
-$examstoragekeyname = 'Wifiresilience-crs' . $courseid . '-cm' . $cmid . '-id' .
-    $attemptobj->get_quizid() . $userid . '-a' . $attemptid;
+$examstoragekeyname = 'Wifiresilience-crs' . $courseid . '-cm' . $cmid . '-id' . $attemptobj->get_quizid() . $userid . '-a' .
+     $attemptid;
 
 $emergencysavefilename = $examstoragekeyname . '-d197001010000.eth';
 
 $cleanexamname = addslashes(format_string($attemptobj->get_quiz_name()));
 
 $PAGE->requires->strings_for_js(
-    array(
-        'answerchanged', 'savetheresponses', 'submitting',
-        'submitfailed', 'submitfailedmessage', 'submitfaileddownloadmessage',
-        'lastsaved', 'lastsavedtotheserver', 'lastsavedtothiscomputer',
-        'savingdots', 'submitallandfinishtryagain', 'savingtryagaindots',
-        'savefailed', 'logindialogueheader', 'changesmadereallygoaway',
-        'loadingstep1', 'loadingstep2', 'loadingstep4',
-        'loadingstep5', 'loadingstep6', 'loadingstep7',
-        'loadingstep8', 'loadingstep10', 'currentissue',
-        'localstorage'
-    ),
-    'quizaccess_wifiresilience');
+                                array('answerchanged', 'savetheresponses', 'submitting', 'submitfailed', 'submitfailedmessage',
+                                    'submitfaileddownloadmessage', 'lastsaved', 'lastsavedtotheserver', 'lastsavedtothiscomputer',
+                                    'savingdots', 'submitallandfinishtryagain', 'savingtryagaindots', 'savefailed',
+                                    'logindialogueheader', 'changesmadereallygoaway', 'loadingstep1', 'loadingstep2', 'loadingstep4',
+                                    'loadingstep5', 'loadingstep6', 'loadingstep7', 'loadingstep8', 'loadingstep10', 'currentissue',
+                                    'localstorage'), 'quizaccess_wifiresilience');
 $PAGE->requires->strings_for_js(array('submitallandfinish', 'confirmclose'), 'quiz');
 $PAGE->requires->string_for_js('flagged', 'question');
 $PAGE->requires->string_for_js('confirmation', 'admin');
 
-$PAGE->requires->yui_module(
-    'moodle-quizaccess_wifiresilience-localforage',
-    'M.quizaccess_wifiresilience.localforage.init',
-    array($examstoragekeyname));
+$PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-localforage', 'M.quizaccess_wifiresilience.localforage.init',
+                            array($examstoragekeyname));
 
-$PAGE->requires->yui_module(
-    'moodle-quizaccess_wifiresilience-autosave',
-    'M.quizaccess_wifiresilience.autosave.init',
-    array(
-        $autosaveperiod,
-        $examstoragekeyname,
-        $courseid,
-        $cmid,
-        $displaytecherrors,
-        $displaynavdetails,
-        $attemptobj->get_uniqueid()
-    )
-);
+$PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-autosave', 'M.quizaccess_wifiresilience.autosave.init',
+                            array($autosaveperiod, $examstoragekeyname, $courseid, $cmid, $displaytecherrors, $displaynavdetails,
+                                $attemptobj->get_uniqueid()));
 
-$PAGE->requires->yui_module(
-    'moodle-quizaccess_wifiresilience-navigation',
-    'M.quizaccess_wifiresilience.navigation.init',
-    array($page));
+$PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-navigation', 'M.quizaccess_wifiresilience.navigation.init',
+                            array($page));
 
-$PAGE->requires->yui_module(
-    'moodle-quizaccess_wifiresilience-download',
-    'M.quizaccess_wifiresilience.download.init',
-    array(
-        $emergencysavefilename,
-        get_config('quizaccess_wifiresilience', 'publickey')
-    )
-);
+$PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-download', 'M.quizaccess_wifiresilience.download.init',
+                            array($emergencysavefilename, get_config('quizaccess_wifiresilience', 'publickey')));
 
-$PAGE->requires->yui_module(
-    'moodle-quizaccess_wifiresilience-isoffline',
-    'M.quizaccess_wifiresilience.isoffline.init',
-    array());
+$PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-isoffline', 'M.quizaccess_wifiresilience.isoffline.init', array());
 
-
-$PAGE->requires->yui_module(
-    'moodle-quizaccess_wifiresilience-initialiseattempt',
-    'M.quizaccess_wifiresilience.initialiseattempt.init',
-    array(
-        $cleanexamname,
-        $examstoragekeyname,
-        $page,
-        $fetchandlogconfig,
-        trim($wifisettings->fetchandlog)
-    )
-);
+$PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-initialiseattempt',
+                            'M.quizaccess_wifiresilience.initialiseattempt.init',
+                            array($cleanexamname, $examstoragekeyname, $page, $fetchandlogconfig, trim($wifisettings->fetchandlog)));
 
 if ($watchlistconfig == 1) {
 
     $watchlist = preg_replace('#\s+#', ',', trim($wifisettings->watchxhr));
 
-    $PAGE->requires->yui_module(
-        'moodle-quizaccess_wifiresilience-watching',
-        'M.quizaccess_wifiresilience.watching.init',
-        array($watchlist));
+    $PAGE->requires->yui_module('moodle-quizaccess_wifiresilience-watching', 'M.quizaccess_wifiresilience.watching.init',
+                                array($watchlist));
 }
 
 // Log this page view.
-$params = array(
-    'objectid' => $attemptid,
-    'relateduserid' => $attemptobj->get_userid(),
-    'courseid' => $attemptobj->get_courseid(),
+$params = array('objectid' => $attemptid, 'relateduserid' => $attemptobj->get_userid(), 'courseid' => $attemptobj->get_courseid(),
     'context' => context_module::instance($cmid),
-    'other' => array(
-        'quizid' => $attemptobj->get_quizid()
-    )
-);
-$event = \mod_quiz\event\attempt_viewed::create($params);
-$event->add_record_snapshot('quiz_attempts', $attemptobj->get_attempt());
-$event->trigger();
+    'other' => array('quizid' => $attemptobj->get_quizid()));
+// Log this page view.
+$attemptobj->fire_attempt_viewed_event();
 
 // Arrange for the navigation to be displayed in the first region on the page.
 $navbc = $attemptobj->get_navigation_panel($output, 'quiz_attempt_nav_panel', $page);
@@ -299,21 +250,16 @@ if ($page == 0 || !$page) {
 $form = '';
 
 $form .= html_writer::start_tag('form',
-                array(
-                    'action' => $attemptobj->processattempt_url(), 'method' => 'post',
-                    'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
-                    'id' => 'responseform'
-                ));
+                                array('action' => $attemptobj->processattempt_url(), 'method' => 'post',
+                                    'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8', 'id' => 'responseform'));
 
 $form .= html_writer::start_tag('div');
 
 // Print all the questions on every page.
 $numpages = $attemptobj->get_num_pages();
 for ($i = 0; $i < $numpages; $i++) {
-    $form .= html_writer::start_div(
-                'xquiz-loading-hide',
-                array('id' => 'quizaccess_wifiresilience-attempt_page-' . $i, 'data-qslot' => $i + 1)
-            );
+    $form .= html_writer::start_div('xquiz-loading-hide',
+                                    array('id' => 'quizaccess_wifiresilience-attempt_page-' . $i, 'data-qslot' => $i + 1));
 
     foreach ($attemptobj->get_slots($i) as $slot) {
         $form .= $attemptobj->render_question($slot, false, $output, $attemptobj->attempt_url($slot, $page));
@@ -322,27 +268,15 @@ for ($i = 0; $i < $numpages; $i++) {
 }
 
 $form .= html_writer::start_tag('div',
-            array(
-                'class' => 'submitbtns wifi_previous_next_btn'
-            ));
+                                array('class' => 'submitbtns wifi_previous_next_btn'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'submit',
-                'name' => 'previous',
-                'value' => get_string('navigateprevious', 'quiz'),
-                'class' => 'mod_quiz-prev-nav btn btn-secondary',
-                'id' => 'quizaccess_wifiresilience-prev_btn'
-            ));
+                                array('type' => 'submit', 'name' => 'previous', 'value' => get_string('navigateprevious', 'quiz'),
+                                    'class' => 'mod_quiz-prev-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-prev_btn'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'submit',
-                'name' => 'next',
-                'value' => get_string('navigatenext', 'quiz'),
-                'class' => 'mod_quiz-next-nav btn btn-secondary',
-                'id' => 'quizaccess_wifiresilience-next_btn'
-            ));
+                                array('type' => 'submit', 'name' => 'next', 'value' => get_string('navigatenext', 'quiz'),
+                                    'class' => 'mod_quiz-next-nav btn btn-secondary', 'id' => 'quizaccess_wifiresilience-next_btn'));
 
 $form .= html_writer::end_tag('div');
 
@@ -356,97 +290,47 @@ if ($endtime === false) {
 // Some hidden fields to track what is going on.
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'attempt',
-                'value' => $attemptobj->get_attemptid()
-            ));
+                                array('type' => 'hidden', 'name' => 'attempt', 'value' => $attemptobj->get_attemptid()));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'thispage',
-                'value' => $page,
-                'id' => 'followingpage'
-            ));
+                                array('type' => 'hidden', 'name' => 'thispage', 'value' => $page, 'id' => 'followingpage'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'previouspage',
-                'value' => $previouspage
-            ));
+                                array('type' => 'hidden', 'name' => 'previouspage', 'value' => $previouspage));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'nextpage',
-                'value' => $nextpage
-            ));
+                                array('type' => 'hidden', 'name' => 'nextpage', 'value' => $nextpage));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'timeup',
-                'value' => '0',
-                'id' => 'timeup'
-            ));
+                                array('type' => 'hidden', 'name' => 'timeup', 'value' => '0', 'id' => 'timeup'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'sesskey',
-                'value' => sesskey()
-            ));
+                                array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'name' => 'scrollpos',
-                'value' => '',
-                'id' => 'scrollpos'
-            ));
+                                array('type' => 'hidden', 'name' => 'scrollpos', 'value' => '', 'id' => 'scrollpos'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'value' => $USER->id,
-                'id' => 'quiz-userid'
-            ));
+                                array('type' => 'hidden', 'value' => $USER->id, 'id' => 'quiz-userid'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'value' => $endtime,
-                'id' => 'original_end_time'
-            ));
+                                array('type' => 'hidden', 'value' => $endtime, 'id' => 'original_end_time'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'value' => '1',
-                'id' => 'quizaccess_wifiresilience_hidden_cxn_status',
-                'name' => 'quizaccess_wifiresilience_cxn_status'
-            ));
+                                array('type' => 'hidden', 'value' => '1', 'id' => 'quizaccess_wifiresilience_hidden_cxn_status',
+                                    'name' => 'quizaccess_wifiresilience_cxn_status'));
 
 $form .= html_writer::empty_tag('input',
-            array(
-                'type' => 'hidden',
-                'value' => '1',
-                'id' => 'quizaccess_wifiresilience_hidden_livewatch_status',
-                'name' => 'quizaccess_wifiresilience_livewatch_status'
-            ));
+                                array('type' => 'hidden', 'value' => '1',
+                                    'id' => 'quizaccess_wifiresilience_hidden_livewatch_status',
+                                    'name' => 'quizaccess_wifiresilience_livewatch_status'));
 
 // Add a hidden field with questionids. Do this at the end of the form, so
 // if you navigate before the form has finished loading, it does not wipe all
 // the student's answers.
 
 $form .= html_writer::empty_tag('input',
-    array(
-        'type' => 'hidden',
-        'name' => 'slots',
-        'value' => implode(',', $attemptobj->get_slots())
-    ));
+                                array('type' => 'hidden', 'name' => 'slots', 'value' => implode(',', $attemptobj->get_slots())));
 
 // Summary page. Code from mod_quiz_renderer::summary_page.
 
@@ -456,7 +340,9 @@ $summary .= $output->heading(format_string($attemptobj->get_quiz_name()));
 $summary .= $output->heading(get_string('summaryofattempt', 'quiz'), 3);
 $summary .= $output->summary_table($attemptobj, $attemptobj->get_display_options(false));
 
-/******* NOW CONTROL OVERRIDE******/
+/**
+ * ***** NOW CONTROL OVERRIDE*****
+ */
 
 $controls = '';
 
@@ -465,41 +351,31 @@ $controls = '';
 if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
 
     $button = '
-    <form action="' . new moodle_url($attemptobj->attempt_url(null, $attemptobj->get_currentpage())) . '">
-    <input type="submit" id="quizaccess_wifiresilience_returntoattempt" value="' .
-    get_string('returnattempt', 'quiz') . '" class="btn btn-secondary">
+    <form action="' .
+         new moodle_url($attemptobj->attempt_url(null, $attemptobj->get_currentpage())) . '">
+    <input type="submit" id="quizaccess_wifiresilience_returntoattempt" value="' . get_string('returnattempt', 'quiz') . '" class="btn btn-secondary">
     <input type="hidden" name="attempt" value="' . $attemptobj->get_attemptid() . '" />
     <input type="hidden" name="cmid" value="' . $attemptobj->get_cmid() . '" />
     <input type="hidden" name="sesskey" value="' . sesskey() . '" />
     </form>
     ';
 
-    $controls .= $output->container($output->container(
-            $button,
-            'controls',
-            'wifi_return_to_attempt_div'),
-            'submitbtns mdl-align wifi_return_to_attempt_btn');
+    $controls .= $output->container(
+                                    $output->container($button, 'controls', 'wifi_return_to_attempt_div'),
+                                    'submitbtns mdl-align wifi_return_to_attempt_btn');
 }
 
 // Finish attempt button.
 
-$options = array(
-    'attempt' => $attemptobj->get_attemptid(),
-    'finishattempt' => 1,
-    'timeup' => 0,
-    'slots' => '',
-    'sesskey' => sesskey(),
-);
+$options = array('attempt' => $attemptobj->get_attemptid(), 'finishattempt' => 1, 'timeup' => 0, 'slots' => '',
+    'sesskey' => sesskey());
 
-$button = new single_button(
-                new moodle_url($attemptobj->processattempt_url(), $options),
-                get_string('submitallandfinish', 'quiz'));
+$button = new single_button(new moodle_url($attemptobj->processattempt_url(), $options), get_string('submitallandfinish', 'quiz'));
 $button->id = 'quizaccess_wifiresilience_timer_autosubmit_form'; // Responseform.
 
 if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
-    $button->add_action(new confirm_action(
-                get_string('confirmclose', 'quiz'), null,
-                get_string('submitallandfinish', 'quiz')));
+    $button->add_action(
+                        new confirm_action(get_string('confirmclose', 'quiz'), null, get_string('submitallandfinish', 'quiz')));
 }
 
 $duedate = $attemptobj->get_due_date();
@@ -512,21 +388,23 @@ if ($attemptobj->get_state() == quiz_attempt::OVERDUE) {
 }
 
 $thebutton = preg_replace('/<input type="submit"\s(.+?)>/is',
-                '<input type="submit" id="wifi_exam_submission_finish" class="btn btn-secondary" value="' .
-                get_string('submitallandfinish', 'quiz') . '">', $output->render($button));
+                        '<input type="submit" id="wifi_exam_submission_finish" class="btn btn-secondary" value="' .
+                             get_string('submitallandfinish', 'quiz') . '">', $output->render($button));
 $thebutton = preg_replace('/<button type="submit"\s(.+?)>(.+?)<\/button>/is',
-                '<input type="submit" id="wifi_exam_submission_finish" class="btn btn-secondary" value="$2">', $thebutton);
+                        '<input type="submit" id="wifi_exam_submission_finish" class="btn btn-secondary" value="$2">', $thebutton);
 
-$controls .= $output->container($message . $output->container(
-                $thebutton, 'controls'), 'submitbtns mdl-align wifi_must_be_submitted_btn');
+$controls .= $output->container(
+                                $message . $output->container($thebutton, 'controls'),
+                                'submitbtns mdl-align wifi_must_be_submitted_btn');
 
-/******* END  CONTROL OVERRIDE******/
+/**
+ * ***** END CONTROL OVERRIDE*****
+ */
 
 $controls = preg_replace('~<div id="quiz-timer".*?</div>~', '', $controls);
 $controls = str_replace('<form method="post" action="' . $CFG->wwwroot . '/mod/quiz/processattempt.php"',
-                '<form method="post" action="' . $CFG->wwwroot .
-                '/mod/quiz/processattempt.php" id="quizaccess_wifiresilience_timer_autosubmit_form"',
-                $controls);
+                        '<form method="post" action="' . $CFG->wwwroot .
+                             '/mod/quiz/processattempt.php" id="quizaccess_wifiresilience_timer_autosubmit_form"', $controls);
 
 $summary .= $controls;
 $summary .= html_writer::end_div('');
