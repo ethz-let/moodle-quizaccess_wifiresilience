@@ -213,10 +213,6 @@ if ($watchlistconfig == 1) {
 }
 
 // Log this page view.
-$params = array('objectid' => $attemptid, 'relateduserid' => $attemptobj->get_userid(), 'courseid' => $attemptobj->get_courseid(),
-    'context' => context_module::instance($cmid),
-    'other' => array('quizid' => $attemptobj->get_quizid()));
-// Log this page view.
 $attemptobj->fire_attempt_viewed_event();
 
 // Arrange for the navigation to be displayed in the first region on the page.
