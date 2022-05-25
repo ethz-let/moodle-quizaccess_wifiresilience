@@ -25,7 +25,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->cron = 0;
 $plugin->component = 'quizaccess_wifiresilience';
-$plugin->version = 2022040600;
-$plugin->requires = 2020052000; // Moodle >=3.9.
+$plugin->version = 2022040601;
+$plugin->requires = 2021051707; // Moodle >=3.11+.
+
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4 for Moodle 3.9+ (Transitional)';
+$plugin->release = '4 possible from Moodle 3.11 (Transitional)';
