@@ -65,7 +65,7 @@ M.quizaccess_wifiresilience.isoffline = {
             M.util.get_string('savetheresponses', 'quizaccess_wifiresilience') +
             '"><div></div></a></div>');
 
-        var mod_quiz_navblock_title = document.querySelector('#mod_quiz_navblock_title');
+        var mod_quiz_navblock_title = document.querySelector('#mod_quiz_navblock');
 
         mod_quiz_navblock_title.addEventListener("dblclick", function(e) {
             if (M.quizaccess_wifiresilience.autosave.sync_string_errors
