@@ -61,13 +61,6 @@ class upload_responses extends moodleform {
 
         $mform->addHelpButton('createasnewattempt', 'createasnewattempt', 'quizaccess_wifiresilience');
 
-        $mform->disabledIf('usefinalsubmissiontime', 'finishattempts', 'eq', 0);
-
-        $mform->addElement('checkbox', 'usefinalsubmissiontime',
-                get_string('usefinalsubmissiontime', 'quizaccess_wifiresilience'), '');
-
-        $mform->addHelpButton('usefinalsubmissiontime', 'usefinalsubmissiontime', 'quizaccess_wifiresilience');
-
         $mform->disabledIf('countrealofflinetime', 'finishattempts', 'eq', 1);
 
         $mform->addElement('checkbox', 'countrealofflinetime',
