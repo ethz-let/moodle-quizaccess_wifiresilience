@@ -167,6 +167,7 @@ if ($form->is_cancelled()) {
             $postdata = array();
             parse_str($responses, $postdata);
 
+
             if (isset($fromform->takeattemptfromjson)) {
                 if (!isset($data->attemptid)) {
                     throw new coding_exception(
@@ -290,7 +291,7 @@ if ($form->is_cancelled()) {
                                         break;
                                     }
                                 }
-
+/*
                                 foreach ($postdata as $key => $one) {
                                     if (strpos($key, $qid) !== false) {
                                         unset($postdata[$key]);
@@ -308,14 +309,28 @@ if ($form->is_cancelled()) {
 
                                     }
                                 }
+*/
+                                foreach ($postdata as $key => $one) {
+                                    if (strpos($key, $qid) !== false) {
+                                        unset($postdata[$key]);
+                                        $n = str_replace($qid, 'q' . $attempt->uniqueid, $key);
+                                        $postdata[$n] = $one;
+                                    }
+                                }
+                                echo "<textarea id='postprocessed' style='display:none'>";
+                                print_r($postdata);
+                                echo "</textarea>";
+
                                 $_POST = $postdata;
+                                $_REQUEST = $postdata;
 
                                 $attemptobj = quiz_attempt::create($attempt->id);
 
                             }
 
                             if ($fromform->finishattempts) {
-                                $attemptobj->process_attempt($timenow, true, 0, 0); // Finish is ticked.
+                              //  $attemptobj->process_attempt($timenow, true, 0, 0); // Finish is ticked.
+                                $attemptobj->process_finish($timenow, true);
                             } else {
                                 if (isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])) {
                                     $timenow = $timenow - $postdata['real_offline_time'];
