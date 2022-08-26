@@ -182,7 +182,6 @@ if ($form->is_cancelled()) {
             }
 
             echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
-            //$postdata['attempt'] = 98;
             // Load the attempt.
             $attemptobj = quiz_attempt::create($postdata['attempt']);
             if ($attemptobj->get_cmid() != $cmid) {
@@ -268,7 +267,19 @@ if ($form->is_cancelled()) {
                                 $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
                                 // Create the new attempt and initialize the question sessions
-                                $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $timenow, $ispreviewuser, $userid);
+
+                                $starttime = $attemptobj->timestart;
+                                $endtime = $attemptobj->timefinish;
+
+                                if(!$endtime || $endtime == 0) {
+                                    if ($quiz->timelimit) {
+                                        $endtime = $attemptobj->timestart + $quiz->timelimit;
+                                    } else {
+                                        $endtime = time();
+                                    }
+                                }
+
+                                $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $starttime, $ispreviewuser, $userid);
 
                                 // Force 'build on last' to avoid messy shuffling issues.
                                 $attempt = quiz_start_attempt_built_on_last($quba, $attempt, $lastattempt);
@@ -329,8 +340,7 @@ if ($form->is_cancelled()) {
                             }
 
                             if ($fromform->finishattempts) {
-                              //  $attemptobj->process_attempt($timenow, true, 0, 0); // Finish is ticked.
-                                $attemptobj->process_finish($timenow, true);
+                                $attemptobj->process_finish($endtime, true);
                             } else {
                                 if (isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])) {
                                     $timenow = $timenow - $postdata['real_offline_time'];
