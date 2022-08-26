@@ -343,7 +343,7 @@ if ($form->is_cancelled()) {
                                 $attemptobj->process_finish($endtime, true);
                             } else {
                                 if (isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])) {
-                                    $timenow = $timenow - $postdata['real_offline_time'];
+                                    $timenow = time() - $postdata['real_offline_time'];
                                 }
                                 $attemptobj->process_attempt($timenow, false, 0, 0); // In progress.
                             }
