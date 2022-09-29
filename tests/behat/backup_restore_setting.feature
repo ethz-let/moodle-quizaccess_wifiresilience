@@ -21,9 +21,9 @@ Feature: Wifi Resilience Mode backup and restore of quiz settings
     And I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Course 2 |
     And I follow "Wifiresilience"
-    And I navigate to "Edit settings" in current page administration
+    And I navigate to "Settings" in current page administration
     Then the field "Wifi Resilience Mode" matches value "Yes"
     And I follow "Course 2"
     And I follow "Quiz normal"
-    And I navigate to "Edit settings" in current page administration
+    And I navigate to "Settings" in current page administration
     And the field "Wifi Resilience Mode" matches value "No"
