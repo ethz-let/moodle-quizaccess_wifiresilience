@@ -33,7 +33,7 @@ Feature: Wifiresilience mode navigation without page reloads for a quiz in seque
 
   @javascript
   Scenario: Start a quiz attempt in sequential mode, and verify we see only page 1.
-    When I press "Attempt quiz now"
+    When I press "Attempt quiz"
     And I wait "15" seconds
     Then I should see "Answer me A"
     And I should not see "Answer me B"
@@ -47,7 +47,7 @@ Feature: Wifiresilience mode navigation without page reloads for a quiz in seque
 
   @javascript
   Scenario: Clicking on a nav button has no effect.
-    When I press "Attempt quiz now"
+    When I press "Attempt quiz"
     And I wait "15" seconds
     And I click on "#quiznavbutton2" "css_element"
     Then I should see "Answer me A"
@@ -62,7 +62,7 @@ Feature: Wifiresilience mode navigation without page reloads for a quiz in seque
 
   @javascript
   Scenario: Start a quiz attempt and verify that next works.
-    When I press "Attempt quiz now"
+    When I press "Attempt quiz"
     And I wait "15" seconds
     And I start watching to see if a new page loads
     And I press "Next"
@@ -81,7 +81,7 @@ Feature: Wifiresilience mode navigation without page reloads for a quiz in seque
 
   @javascript
   Scenario: Start a quiz attempt in sequential mode and verify that switching to the summary works.
-    When I press "Attempt quiz now"
+    When I press "Attempt quiz"
     And I wait "15" seconds
     And I start watching to see if a new page loads
     And I click on "Finish attempt ..." "link" in the "Quiz navigation" "block"
@@ -99,7 +99,7 @@ Feature: Wifiresilience mode navigation without page reloads for a quiz in seque
 
   @javascript
   Scenario: Start a quiz attempt and verify that switching back from the summary works.
-    When I press "Attempt quiz now"
+    When I press "Attempt quiz"
     And I wait "15" seconds
     And I start watching to see if a new page loads
     And I click on "Finish attempt ..." "link" in the "Quiz navigation" "block"
