@@ -26,7 +26,7 @@ Feature: Wifiresilience mode warns if you try to leave with unsaved respones.
     And quiz "Quiz Wifiresilience" contains the following questions:
       | Question A | 1 |
     And I am on the "Quiz Wifiresilience" "mod_quiz > View" page logged in as "student"
-    And I press "Attempt quiz now"
+    And I press "Attempt quiz"
     And I wait "15" seconds
 
   @javascript
