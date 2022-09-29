@@ -26,15 +26,13 @@ Feature: Wifiresilience mode can restore a working session if the use gets logge
     And quiz "Quiz Wifiresilience" contains the following questions:
       | Question A | 1 |
     And the quiz auto-save period is set to "2"
-    And I log in as "student"
-    And I follow "Course 1"
-    And I follow "Quiz Wifiresilience"
-    And I press "Attempt quiz now"
-    And I wait "15" seconds
 
   @javascript
   Scenario: User logs out and logs in again elsewhere, we handle it.
-    When I simulate losing the session by changing sesskey
+    When I am on the "Quiz Wifiresilience" "mod_quiz > View" page logged in as "student"
+    And I press "Attempt quiz"
+    And I wait "15" seconds
+    And  I simulate losing the session by changing sesskey
     And I click on "True" "radio" in the "Answer me A" "question"
     And I wait "4" seconds
     Then I should not see "Save failed."
