@@ -25,10 +25,8 @@ Feature: wifi-resilience mode submit only leaves if the submit works
       | quiz     | Quiz Wifiresilience | C1     | quiz1    | 1                | 1                      |
     And quiz "Quiz Wifiresilience" contains the following questions:
       | Question A | 1 |
-    And I log in as "student"
-    And I follow "Course 1"
-    And I follow "Quiz Wifiresilience"
-    And I press "Attempt quiz now"
+    And I am on the "Quiz Wifiresilience" "mod_quiz > View" page logged in as "student"
+    And I press "Attempt quiz"
     And I wait "15" seconds
     And I click on "True" "radio" in the "Answer me A" "question"
     And I click on "Finish attempt ..." "link" in the "Quiz navigation" "block"
