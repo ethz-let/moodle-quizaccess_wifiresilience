@@ -340,6 +340,9 @@ if ($form->is_cancelled()) {
                             }
 
                             if ($fromform->finishattempts) {
+                                if(!$endtime) {
+                                    $endtime = time();
+                                }
                                 $attemptobj->process_finish($endtime, true);
                             } else {
                                 if (isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])) {
