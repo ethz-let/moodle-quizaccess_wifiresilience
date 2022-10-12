@@ -268,8 +268,8 @@ if ($form->is_cancelled()) {
 
                                 // Create the new attempt and initialize the question sessions
 
-                                $starttime = $attemptobj->timestart;
-                                $endtime = $attemptobj->timefinish;
+                                $starttime = $lastattempt->timestart;
+                                $endtime = $lastattempt->timefinish;
 
                                 if(!$endtime || $endtime == 0) {
                                     if ($quiz->timelimit) {
@@ -278,6 +278,9 @@ if ($form->is_cancelled()) {
                                         $endtime = time();
                                     }
                                 }
+                                if(!$starttime || $starttime == 0) {
+                                     $starttime = time();
+                                 }
 
                                 $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $starttime, $ispreviewuser, $userid);
 
