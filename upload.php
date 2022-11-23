@@ -221,7 +221,7 @@ if ($form->is_cancelled()) {
                     case 3:
                         $duedate = 0;
                         if ($quiz->timelimit) {
-                            $duedate = $attemptobj->timestart + $quiz->timelimit;
+                            $duedate = $starttime + $quiz->timelimit;
                         }
                         if ($duedate != 0 && $timenow > $duedate) {
                             $timenow = $duedate;
@@ -270,17 +270,16 @@ if ($form->is_cancelled()) {
 
                                 $starttime = $lastattempt->timestart;
                                 $endtime = $lastattempt->timefinish;
-
+                                if(!$starttime || $starttime == 0) {
+                                     $starttime = time();
+                                 }
                                 if(!$endtime || $endtime == 0) {
                                     if ($quiz->timelimit) {
-                                        $endtime = $attemptobj->timestart + $quiz->timelimit;
+                                        $endtime = $starttime + $quiz->timelimit;
                                     } else {
                                         $endtime = time();
                                     }
                                 }
-                                if(!$starttime || $starttime == 0) {
-                                     $starttime = time();
-                                 }
 
                                 $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, $starttime, $ispreviewuser, $userid);
 
