@@ -120,7 +120,12 @@ question_engine::initialise_js();
 
 // Dirty hack to play with the quiz timer :-).
 $jsmodule = quiz_get_js_module();
-$jsmodule['fullpath'] = '/mod/quiz/accessrule/wifiresilience/js/module.js';
+if ($CFG->version <= 2021053099 ) {
+    $jslinkmodule = 'module.311.js';
+} else {
+    $jslinkmodule = 'module.js';
+}
+$jsmodule['fullpath'] = '/mod/quiz/accessrule/wifiresilience/js/'.$jslinkmodule;
 
 $PAGE->requires->js_module($jsmodule);
 
@@ -443,7 +448,7 @@ $overlaytags = '
 </style>';
 
 $old = array('\/mod\/quiz\/module.js', '<body');
-$new = array('\/mod\/quiz\/accessrule\/wifiresilience\/js\/module.js', $overlaytags . '<body');
+$new = array('\/mod\/quiz\/accessrule\/wifiresilience\/js\/'.$jslinkmodule, $overlaytags . '<body');
 
 $html = str_replace($old, $new, $html);
 
