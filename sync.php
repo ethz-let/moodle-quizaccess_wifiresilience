@@ -105,8 +105,8 @@ if ($finishattempt) {
 }
 
 $transaction->allow_commit();
-$accessmanager = $attemptobj->get_quizobj()->get_access_manager(time());
-$endtime = $accessmanager->get_end_time($attemptobj);
+$endtime = $attemptobj->get_quizobj()->get_access_manager(time())->get_end_time($attemptobj->get_attempt());
+
 
 if ($endtime === false) {
     $endtime = 0;
