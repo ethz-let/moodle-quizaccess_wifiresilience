@@ -281,8 +281,8 @@ $form .= html_writer::empty_tag('input',
 
 $form .= html_writer::end_tag('div');
 
-$accessmanager = $attemptobj->get_quizobj()->get_access_manager(time());
-$endtime = $accessmanager->get_end_time($attemptobj->get_attempt());
+$endtime = $attemptobj->get_quizobj()->get_access_manager(time())->get_end_time($attemptobj->get_attempt());
+
 
 if ($endtime === false) {
     $endtime = 0;
