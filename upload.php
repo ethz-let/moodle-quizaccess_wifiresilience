@@ -26,7 +26,7 @@ require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
-$cmid = optional_param('id', 0, PARAM_INT);
+$cmid = optional_param('id', null, PARAM_INT);
 $cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -183,7 +183,7 @@ if ($form->is_cancelled()) {
 
             echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
             // Load the attempt.
-            $attemptobj = quiz_attempt::create($postdata['attempt']);
+            $attemptobj = quiz_create_attempt_handling_errors($postdata['attempt'], $cmid);
             if ($attemptobj->get_cmid() != $cmid) {
                 throw new coding_exception(
                                 get_string('filewrongquiz', 'quizaccess_wifiresilience'));
@@ -336,8 +336,7 @@ if ($form->is_cancelled()) {
 
                                 $_POST = $postdata;
                                 $_REQUEST = $postdata;
-
-                                $attemptobj = quiz_attempt::create($attempt->id);
+                                $attemptobj = quiz_create_attempt_handling_errors($attempt->id, $cmid);
 
                             }
 
