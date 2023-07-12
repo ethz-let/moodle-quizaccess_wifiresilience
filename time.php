@@ -33,9 +33,10 @@ $timenow = time();
 
 // Get submitted parameters.
 $attemptid = required_param('attempt',  PARAM_INT);
+$cmid = optional_param('cmid', null, PARAM_INT);
 
 $transaction = $DB->start_delegated_transaction();
-$attemptobj = quiz_attempt::create($attemptid);
+$attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Check login.
 if (!isloggedin() || !confirm_sesskey()) {
