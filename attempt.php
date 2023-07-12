@@ -32,13 +32,14 @@ require_once ($CFG->dirroot . '/mod/quiz/locallib.php');
 // Get submitted parameters.
 $attemptid = required_param('attempt', PARAM_INT);
 $page = optional_param('page', null, PARAM_INT);
+$cmid = optional_param('cmid', null, PARAM_INT);
 
 if ($page == -1) {
     $page = 0;
 }
 
 // Create the attempt object.
-$attemptobj = quiz_attempt::create($attemptid);
+$attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Fix the page number if necessary.
 if ($page === null) {
@@ -292,7 +293,8 @@ if ($endtime === false) {
 
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'attempt', 'value' => $attemptobj->get_attemptid()));
-
+$form .= html_writer::empty_tag('input',
+                                array('type' => 'hidden', 'name' => 'cmid', 'value' => $cmid));
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'thispage', 'value' => $page, 'id' => 'followingpage'));
 
