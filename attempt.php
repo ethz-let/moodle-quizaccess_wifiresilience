@@ -39,6 +39,7 @@ if ($page == -1) {
 }
 
 // Create the attempt object.
+//$attemptobj = quiz_attempt::create($attemptid);
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Fix the page number if necessary.
@@ -293,8 +294,13 @@ if ($endtime === false) {
 
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'attempt', 'value' => $attemptobj->get_attemptid()));
+
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'cmid', 'value' => $cmid));
+
+$form .= html_writer::empty_tag('input',
+                                array('type' => 'hidden', 'id' => 'actualstarttimeinput' , 'name' => 'actualstarttimeinput', 'value' => 0));
+
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'thispage', 'value' => $page, 'id' => 'followingpage'));
 
@@ -359,6 +365,7 @@ if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
     <input type="submit" id="quizaccess_wifiresilience_returntoattempt" value="' . get_string('returnattempt', 'quiz') . '" class="btn btn-secondary">
     <input type="hidden" name="attempt" value="' . $attemptobj->get_attemptid() . '" />
     <input type="hidden" name="cmid" value="' . $attemptobj->get_cmid() . '" />
+    <input type="hidden" id="actualstarttimeinput" name="actualstarttimeinput" value="9000"/>
     <input type="hidden" name="sesskey" value="' . sesskey() . '" />
     </form>
     ';

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This script processes ajax timer equests during the quiz.
+ * This script processes ajax start timer adjustment during the quiz.
  *
  * @package   quizaccess_wifiresilience
  * @copyright 2017 ETH Zurich (amr.hourani@let.ethz.ch)
@@ -27,17 +27,13 @@ define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
-// Remember the current time as the time any responses were submitted.
-// (so as to make sure students don't get penalized for slow processing on this page).
-$timenow = time();
-
 // Get submitted parameters.
+$timestarted = required_param('actualstarttimeinput',  PARAM_INT);
 $attemptid = required_param('attempt',  PARAM_INT);
 $cmid = optional_param('cmid', null, PARAM_INT);
 
+$timeqstarted = round($timestarted / 1000);
 
-
-$transaction = $DB->start_delegated_transaction();
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 //$attemptobj = quiz_attempt::create($attemptid);
 //$attemptobj = quiz_create_attempt_handling_errors($attemptid, null);
@@ -59,7 +55,6 @@ if ($attemptobj->get_userid() != $USER->id) {
 if (!$attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/quiz:attempt');
 }
-$options = $attemptobj->get_display_options(false);
 
 // If the attempt is already closed, send them to the review page.
 if ($attemptobj->is_finished()) {
@@ -67,29 +62,19 @@ if ($attemptobj->is_finished()) {
             'attemptalreadyclosed', null, $attemptobj->review_url());
 }
 
-$endtime = $attemptobj->get_quizobj()->get_access_manager(time())->get_end_time($attemptobj->get_attempt());
+$originalrec = $DB->get_record('quiz_attempts', ['id' => $attemptid]);
+$timerreference = new stdClass();
+$timerreference->id = $attemptid;
+$timerreference->timestart = $originalrec->timestart + $timeqstarted;
+$adjuststarttime = $DB->update_record('quiz_attempts', $timerreference);
 
-if ($endtime === false) {
-    $endtime = 0;
-}
-
-$timeleft = $attemptobj->get_time_left_display(time());
-
-if ($timeleft !== false) {
-    $ispreview = $attemptobj->is_preview();
-    $timerstartvalue = $timeleft;
-    if (!$ispreview) {
-        /*
-        Make sure the timer starts just above zero. If $timeleft was <= 0, then
-        this will just have the effect of causing the quiz to be submitted immediately.
-        */
-        $timerstartvalue = max($timerstartvalue, 1);
-    }
-} else {
-    $timerstartvalue = 0;
-}
 $result = array();
-$result['result'] = 'OK';
-$result['timerstartvalue'] = $timerstartvalue;
-$result['timelimit'] = $endtime;
+if($adjuststarttime) {
+  $result['result'] = 'OK';
+  $result['originalstarttime'] = $originalrec->timestart;
+  $result['updatedstarttime'] = $timerreference->timestart;
+  $result['timediff'] = $timeqstarted;
+} else {
+  $result['result'] = 'FAIL';
+}
 echo json_encode($result);

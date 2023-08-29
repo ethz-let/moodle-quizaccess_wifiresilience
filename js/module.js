@@ -95,7 +95,9 @@ M.mod_quiz.timer = {
         M.mod_quiz.timer.process_offline_refresh_attempt_time(attemptid);
 
         $(window).on('load', function() {
-            exam_extra_page_load_time = 500 + (new Date().getTime()) - page_loaded_time;
+          //  exam_extra_page_load_time = 500 + (new Date().getTime()) - page_loaded_time;
+            var actualstarttimeinput = Y.one('#actualstarttimeinput');
+            exam_extra_page_load_time = actualstarttimeinput.get('value');
             M.mod_quiz.timer.endtime += exam_extra_page_load_time;
             M.mod_quiz.timer.update();
             Y.one('#quiz-timer-wrapper').setStyle('display', 'flex');

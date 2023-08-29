@@ -38,7 +38,6 @@ M.quizaccess_wifiresilience.initialiseattempt = {
      * @param {String} keyname the key, which will be saved in indexedDb
      */
     init: function(cleanexamname, examstoragekeyname, page, fetchandlogconfig, fetchandlog) {
-
         quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
         var examviewportmaxwidth = $(window).width();
         if (!examviewportmaxwidth || examviewportmaxwidth == 0 || examviewportmaxwidth == 'undefined') {
@@ -86,13 +85,14 @@ M.quizaccess_wifiresilience.initialiseattempt = {
             // To be sure, sure.. save per question! For future, not now.. Enable in ROUND-2
             // M.quizaccess_wifiresilience.localforage.save_html_per_question();
 
+
             if (typeof(M.quizaccess_wifiresilience.navigation) != "undefined") {
                 // Only if Timer auto submit enabled.
-                if (M.mod_quiz.timer.endtime && M.mod_quiz.timer.endtime != 0 && M.mod_quiz.timer.endtime != "undefined") {
-                    wifiresilience_window_load_time = (new Date().getTime()) - M.pageloadstarttime.getTime() + 12000;
+              //  wifiresilience_window_load_time = 0;
+                if (M.mod_quiz.timer.endtime != "undefined") {
+                    wifiresilience_window_load_time = (new Date().getTime()) - M.pageloadstarttime.getTime() + 10000;
                 }
             }
-
             if (typeof(M.quizaccess_wifiresilience.navigation) != "undefined") {
                 setTimeout( function() {
                     Y.all(M.quizaccess_wifiresilience.navigation.SELECTORS.ALL_PAGE_DIVS).addClass(
@@ -107,8 +107,20 @@ M.quizaccess_wifiresilience.initialiseattempt = {
 
                     $("#quizaccess_wifiresilience_overlay").fadeOut();
                 }  , 10000 );
-            } else {
 
+                var actualstarttimeinput = Y.one('#actualstarttimeinput');
+                actualstarttimeinput.set('value', wifiresilience_window_load_time);
+                Y.io(M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/adjuststarttime.php', {
+                    method: 'POST',
+                    form: {
+                        id: M.quizaccess_wifiresilience.autosave.form
+                    },
+                    context: M.quizaccess_wifiresilience.autosave,
+                    timeout: 30000,
+                    sync: false
+                });
+
+            } else {
                 $("#quizaccess_wifiresilience_overlay").fadeOut();
             }
         });

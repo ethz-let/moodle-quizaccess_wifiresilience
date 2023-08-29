@@ -33,13 +33,15 @@ $timenow = time();
 
 // Get submitted parameters.
 $attemptid = required_param('attempt',  PARAM_INT);
-$cmid = optional_param('cmid', null, PARAM_INT);
 $thispage  = optional_param('thispage', 0, PARAM_INT);
 $finishattempt = optional_param('finishattempt', false, PARAM_BOOL);
 $finalsubmissiontime = optional_param('final_submission_time', 0, PARAM_INT);
+$cmid = optional_param('cmid', null, PARAM_INT);
 
 $transaction = $DB->start_delegated_transaction();
+//$attemptobj = quiz_attempt::create($attemptid);
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
+
 
 // Check login.
 if (!isloggedin() || !confirm_sesskey()) {
@@ -106,6 +108,8 @@ if ($finishattempt) {
 }
 
 $transaction->allow_commit();
+
+
 $endtime = $attemptobj->get_quizobj()->get_access_manager(time())->get_end_time($attemptobj->get_attempt());
 
 

@@ -14,19 +14,19 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
     //
     // You should have received a copy of the GNU General Public License
     // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     /**
      * Auto-save functionality for during quiz attempts.
      *
      * @module moodle-quizaccess_wifiresilience-autosave
      */
-    
+
     /**
      * Auto-save functionality for during quiz attempts.
      *
      * @class M.quizaccess_wifiresilience.autosave
      */
-    
+
      M.quizaccess_wifiresilience = M.quizaccess_wifiresilience || {};
      M.quizaccess_wifiresilience.autosave = {
          /**
@@ -38,7 +38,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @private
           */
          TINYMCE_DETECTION_DELAY: 1000,
-     
+
          /**
           * The number of times to try redetecting TinyMCE.
           *
@@ -48,7 +48,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @private
           */
          TINYMCE_DETECTION_REPEATS: 10,
-     
+
          /**
           * The delay (in milliseconds) between checking hidden input fields.
           *
@@ -58,7 +58,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @private
           */
          WATCH_HIDDEN_DELAY: 1000,
-     
+
          /**
           * Time-out used whe ajax requests. Defaults to 30 seconds.
           *
@@ -80,7 +80,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @private
           */
          SAVE_TIMEOUT_FULL_SUBMISSION:  120000,
-     
+
          /**
           * The selectors used throughout this class.
           *
@@ -191,14 +191,14 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @default null
           */
          form: null,
-     
+
          connected: null,
          livewatch: null,
          serviceworker_supported: null,
-     
+
          // When last offline has happened.
          offline_happened_on: 0,
-     
+
          // When last REAL offline has happened.
          real_offline_happened_on: 0,
          /**
@@ -209,7 +209,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @default false
           */
          dirty: false,
-     
+
          /**
           * Timer object for the delay between form modifaction and the save starting.
           *
@@ -220,7 +220,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           */
          delay_timer: null,
          usageid: null,
-     
+
          /**
           * Y.io transaction for the save ajax request.
           *
@@ -230,7 +230,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @private
           */
          save_transaction: null,
-     
+
          /**
           * Time when we last tried to do a save.
           *
@@ -270,7 +270,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @default {}
           */
          hidden_field_values: {},
-     
+
          /**
           * The key used to store the results of this attempt in local storage.
           *
@@ -281,7 +281,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           */
          local_storage_key: null,
          sync_string_errors: '',
-     
+
          /**
           * A copy of the data in local storage.
           *
@@ -301,7 +301,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              attemptid: null,
              responses: ''
          },
-     
+
          /**
           * Initialise the autosave code.
           *
@@ -315,10 +315,10 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  Y.log('No response form found. Why did you try to set up autosave?', 'debug', '[Wifiresilience-SW] Sync');
                  return;
              }
-     
+
              quizaccess_wifiresilience_progress_step = 5;
              $("#quizaccess_wifiresilience_result").html(M.util.get_string('loadingstep5', 'quizaccess_wifiresilience'));
-     
+
              this.connected = true;
              this.livewatch = true;
              this.total_offline_time = 0;
@@ -326,7 +326,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.display_tech_errors = display_tech_errors;
              this.display_nav_details = display_nav_details;
              this.sync_string_errors = '';
-     
+
              this.attemptid = Y.one(this.SELECTORS.ATTEMPT_ID_INPUT).get('value');
              this.usageid = usageid;
              // Try to get real offline time from SessionStorage for people who are refreshing the attempt.
@@ -339,94 +339,94 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.last_real_disconnection_time = 0;
              M.quizaccess_wifiresilience.autosave.offline_happened_on = 0;
              M.quizaccess_wifiresilience.autosave.real_offline_happened_on = 0;
-     
+
              M.core_question_engine.init_form(Y, this.SELECTORS.QUIZ_FORM);
              Y.on('submit', M.mod_quiz.timer.stop, this.SELECTORS.QUIZ_FORM);
              // I don't know why it is window.onbeforeunload, not Y.on(...).
              // I copied this from formchangechecker and am not brave enough to change it.
              window.onbeforeunload = Y.bind(this.warn_if_unsaved_data, this);
-     
+
              this.delay = delay * 1000;
              this.local_storage_key = keyname;
              this.courseid = courseid;
              this.cmid = cmid;
              this.userid = Y.one('#quiz-userid').get('value');
-     
+
              // ACHTUNG!!! This is a Promise (IndexedDB uses only promises).
              // It will return undefined intially, so will fallback into localStorage.
              // We will still save a copy in IndexedDB just in case and for future use.
              storeddata = M.quizaccess_wifiresilience.localforage.get_status_records();
-     
+
              this.form.delegate('valuechange', this.value_changed, this.SELECTORS.VALUE_CHANGE_ELEMENTS, this);
              this.form.delegate('change',      this.value_changed, this.SELECTORS.CHANGE_ELEMENTS,       this);
-     
+
              var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
-     
+
              submitAndFinishButton.detach('click');
              submitAndFinishButton.on('click', this.submit_and_finish_clicked, this);
-     
+
              // Special Case for qtype ddmatch.
              Y.DD.DDM.on("drag:drophit", this.value_changed_drag,    this);
              Y.DD.DDM.on("drag:dropmiss", this.value_changed_drag,      this);
-     
+
              this.create_status_messages();
              // Start watching other things.
              this.init_tinymce(this.TINYMCE_DETECTION_REPEATS);
-     
+
              this.save_hidden_field_values();
              this.watch_hidden_fields();
-     
+
              // Optimise responsiveness of textareas.
              $("textarea").attr("autocomplete", false);
              $("textarea").attr("autocorrect", false);
              $("textarea").attr("autocapitalize", false);
              $("textarea").attr("spellcheck", false);
-     
+
              if ('serviceWorker' in navigator) {
                  this.serviceworker_supported = 1;
              } else {
                  this.serviceworker_supported = 0;
              }
-     
+
              // Try to get questions status in localstorage.
              M.quizaccess_wifiresilience.localforage.try_to_get_question_states();
              setInterval(this.sweep_for_timer_changes, this.delay + 5000);
-     
+
              var examviewportmaxwidth = $(window).width();
              var quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
              quizaccess_wifiresilience_progress.animate({
                  width: examviewportmaxwidth * 5 / 10 + "px"
              });
          },
-     
+
          try_to_use_locally_saved_responses: function() {
-     
+
              var prefill = this.locally_stored_data.responses;
              var alreadyusedparams = [];
-     
+
              var hashParams = prefill.split('&');
              var reloaded_form_str = 'Loading (From localStorage)\n';
-     
+
              for (var i = 0; i < hashParams.length; i++) {
                  var p = hashParams[i].split('=');
-     
+
                  var name = decodeURIComponent(p[0]);
                  var val = decodeURIComponent(p[1]);
-     
+
                  if (name == 'sesskey') { // Not interested!
                      continue;
                  }
-     
+
                  var $el = $('[name="' + name + '"]');
-     
+
                  // Fallback to the ID when the name is not present (in the case of content editable).
                  if ($el.length == 0 ) {
                      $el = $('[id="' + name + '"]');
                  }
-     
+
                  if ($el.length > 1 && alreadyusedparams.indexOf(name) > -1) {
                      var $eltemp = $('[name="' + name + '"]')[1];
-     
+
                      // Fallback to the ID when the name is not present (in the case of content editable).
                      if ($eltemp.length == 0 ) {
                          $eltemp = $('[id="' + name + '"]')[1];
@@ -438,9 +438,9 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                      var type = $el.attr('type');
                  }
                  alreadyusedparams.push(name);
-     
+
                  // Get all targets and all origins.
-     
+
                  if (name.indexOf('_sub') !== -1) {
                      // Check if they actually have ultarget.
                      if ($('ul[name^="' + name + '"]').length) {
@@ -451,7 +451,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                              var qid = fullsepids[0];
                              var stemid = fullsepids[1];
                              var target_value = $('#ulorigin' + qid).find("[data-id='" + val + "']");
-     
+
                              if (target_value && target_value.length) {
                                  var target_value_html = target_value.html();
                                  if (target_value_html && target_value_html != 'undefined') {
@@ -465,7 +465,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                          }
                      }
                  }
-     
+
                  switch(type) {
                      case 'checkbox':
                          var $el = $("input[type='checkbox'][name='" + name + "']");
@@ -478,7 +478,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                          } else {
                              $el.attr('checked', 'checked').change();
                          }
-     
+
                          // Special case for SC distractor event click.
                          var checkboxid = $el.attr( "id" );
                          if (checkboxid && checkboxid != 'undefined') {
@@ -499,7 +499,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                      default:
                          if ($el.is("textarea")) {
                              $el.text(val).change();
-     
+
                              var currentattrid = $el.attr('id');
                              if (currentattrid.indexOf('qtype_drawing_textarea_id_') !== -1) {
                                  var qidarr = currentattrid.split('_');
@@ -513,7 +513,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                              if ($el.is("select")) {
                                  $("[name='" + name + "'] option[value='" + val + "']").attr('selected','selected');
                              }
-     
+
                              if (type != 'undefined') {
                                  var $el = $("input[type='" + type + "'][name='" + name + "']");
                                  // Fallback to the ID when the name is not present (in the case of content editable).
@@ -527,7 +527,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              }
              Y.log('[LOCALSTORAGE]: Exam Reloaded before Saving. ' + reloaded_form_str, 'debug', '[Wifiresilience-SW] Sync');
          },
-     
+
          save_hidden_field_values: function() {
              this.form.all(this.SELECTORS.HIDDEN_INPUTS).each(function(hidden) {
                  var name  = hidden.get('name');
@@ -537,12 +537,12 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.hidden_field_values[name] = hidden.get('value');
              }, this);
          },
-     
+
          watch_hidden_fields: function() {
              this.detect_hidden_field_changes();
              Y.later(this.WATCH_HIDDEN_DELAY, this, this.watch_hidden_fields);
          },
-     
+
          detect_hidden_field_changes: function() {
              this.form.all(this.SELECTORS.HIDDEN_INPUTS).each(function(hidden) {
                  var name  = hidden.get('name'),
@@ -556,7 +556,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  }
              }, this);
          },
-     
+
          /**
           * Initialise watching of TinyMCE specifically.
           *
@@ -570,7 +570,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           * @param {Number} repeatcount The number of attempts made so far.
           */
          init_tinymce: function(repeatcount) {
-             
+
              if (typeof tinyMCE === 'undefined') {
                  if (repeatcount > 0) {
                      Y.later(this.TINYMCE_DETECTION_DELAY, this, this.init_tinymce, [repeatcount - 1]);
@@ -579,13 +579,13 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  }
                  return;
              }
-     
+
              Y.log('Found TinyMCE.', 'debug', '[Wifiresilience-SW] Sync');
              this.editor_change_handler = Y.bind(this.editor_changed, this);
              tinyMCE.onAddEditor.add(Y.bind(this.init_tinymce_editor, this));
-             
+
          },
-     
+
          /**
           * Initialise watching of a specific TinyMCE editor.
           *
@@ -608,10 +608,10 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.mark_question_changed_if_necessary(name);
              }
          },
-     
+
          connection_changed: function(e) {
              Y.log('Detected change in Connection Status to ' + this.connected, 'debug', '[Wifiresilience-SW] Timer');
-     
+
              // Calculate the time we got connected.
              var total_seconds_missing = 0;
              if (this.offline_happened_on != 0) {
@@ -622,13 +622,13 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.offline_happened_on = 0;
                  this.last_disconnection_time = 0;
              }
-     
+
              if (this.connected) {
                  // Reset seconds of offline.
                  this.offline_happened_on = 0;
                  // Update end time.
                  // Because its not real, then dont stop the timer.
-     
+
                  this.last_disconnection_time = 0;
                  if (total_seconds_missing != 0) {
                      Y.log('Total disconnection seconds (will not be compensated because the user is able ' +
@@ -639,11 +639,11 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.offline_happened_on = new Date().getTime();
              }
          },
-     
+
          real_connection_icon_status: function(status) {
-     
+
              Y.log('Is Exam Server up and running?! ' + status, 'debug', '[Wifiresilience-SW] Server Status');
-     
+
              var el = document.querySelector('#quizaccess_wifiresilience_connection');
              // Verify actual internet is offline first!
              var cxn_hidden = document.querySelector('#quizaccess_wifiresilience_hidden_cxn_status');
@@ -672,25 +672,25 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
          },
          livewatch_connection_changed: function(e) {
              Y.log('Detected Livewatch: ' + this.livewatch, 'debug', '[Wifiresilience-SW] Timer');
-     
+
              if (this.livewatch) {
                  // Calculate the time we got connected.
                  var total_real_seconds_missing = 0;
-     
+
                  if (this.real_offline_happened_on != 0) {
                      total_real_seconds_missing = Math.floor((new Date().getTime() - this.real_offline_happened_on) / 1000);
                      this.real_offline_time += total_real_seconds_missing;
                      this.last_real_disconnection_time = total_real_seconds_missing;
                  }
-     
+
                  // Reset seconds of offline.
                  this.real_offline_happened_on = 0;
                  // Update end time.
                  M.mod_quiz.timer.update(e);
-     
+
                  this.last_real_disconnection_time = 0;
                  this.real_connection_icon_status(true);
-     
+
                  Y.log('Total REAL missing seconds which got compensated:[' + total_real_seconds_missing + '] Seconds',
                      'debug', '[Wifiresilience-SW] Timer');
              } else {
@@ -702,11 +702,11 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
          },
          value_changed: function(e) {
              var name = e.target.getAttribute('name');
-     
+
              if (name === 'thispage' || name === 'scrollpos' || (name && name.match(/_:flagged$/))) {
                  return; // Not interesting.
              }
-     
+
              // For connection, go to connection_changed.
              if (name === 'quizaccess_wifiresilience_cxn_status') {
                  this.connection_changed(e);
@@ -717,49 +717,49 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.livewatch_connection_changed(e);
                  return;
              }
-     
+
              // Fallback to the ID when the name is not present (in the case of content editable).
              name = name || '#' + e.target.getAttribute('id');
              Y.log('Detected a value change in element ' + name + '.', 'debug', '[Wifiresilience-SW] Sync');
-     
+
              this.start_save_timer_if_necessary();
              this.mark_question_changed_if_necessary(name);
          },
-     
+
          editor_changed: function(editor) {
              Y.log('Detected a value change in editor ' + editor.id + '.', 'debug', '[Wifiresilience-SW] Sync');
              this.start_save_timer_if_necessary();
              this.mark_question_changed_if_necessary(editor.id);
          },
-     
+
          mark_question_changed_if_necessary: function(elementname) {
-     
+
              var slot = this.get_slot_from_id(elementname);
-     
+
              if (slot) {
                  this.set_question_state_string(slot, M.util.get_string('answerchanged', 'quizaccess_wifiresilience'));
                  this.set_question_state_class(slot, 'answersaved');
-     
+
                  // OK, this should trigger change in indexedDB in case of offline reload.
                  M.quizaccess_wifiresilience.localforage.update_question_state_class(slot, 'answersaved');
                  M.quizaccess_wifiresilience.localforage.update_question_state_string(
                      slot, M.util.get_string('answerchanged', 'quizaccess_wifiresilience'));
              }
          },
-     
+
          get_slot_from_id: function(elementname) {
              // Old Slot ids.
              var matches = elementname.match(/^#?q\d+:(\d+)_.*$/);
-     
+
              if (matches) {
                  return matches[1];
              }
-     
+
              var momo = $('input[name="' + elementname + '"]').closest("[id*=quizaccess_wifiresilience-attempt_page-]").attr("data-qslot");
              return momo;
              return undefined;
          },
-     
+
          set_question_state_string: function(slot, newstate) {
              Y.log('State of question ' + slot + ' changed to ' + newstate + '.', 'debug', '[Wifiresilience-SW] Sync');
              // If 3.6 or less.
@@ -776,20 +776,20 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              }
              Y.one(this.SELECTORS.NAV_BUTTON + slot).set('title', Y.Escape.html(newstate));
          },
-     
+
          update_question_state_strings: function(statestrings) {
              Y.Object.each(statestrings, function(state, slot) {
                  this.set_question_state_string(slot, state);
              }, this);
          },
-     
+
          set_question_state_class: function(slot, newstate) {
              Y.log('State of question ' + slot + ' changed to ' + newstate + '.', 'debug', '[Wifiresilience-SW] Sync');
              var navButton = Y.one(this.SELECTORS.NAV_BUTTON + slot);
              navButton.set('className', navButton.get('className').replace(
                      /^qnbutton \w+\b/, 'qnbutton ' + Y.Escape.html(newstate)));
          },
-     
+
          update_question_state_classes: function(stateclasses) {
              Y.Object.each(stateclasses, function(state, slot) {
                  this.set_question_state_class(slot, state);
@@ -799,7 +799,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
 
              Y.log('** Intensive Timer changes checks.',
                          'debug', '[Wifiresilience-SW] Sync');
-             
+
             // M.quizaccess_wifiresilience.autosave.request_timer_checks();
              Y.io(M.quizaccess_wifiresilience.autosave.TIMER_HANDLER, {
                  method: 'POST',
@@ -825,7 +825,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  Y.log('Session loss detected. Re-Login required', 'debug', '[Wifiresilience-SW] Sync');
                  return;
              }
-     
+
              if (result.result !== 'OK') {
                  if (result.error) {
                      var sync_errors = result.error + ' (Code: ' + result.errorcode + ') Info: ' + result.debuginfo;
@@ -834,7 +834,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  return;
              }
              // Is there a change happened to quiz end time? If so, then compensate it.
-     
+
              var original_end_time = Y.one('#original_end_time').get('value');
              if (!isNaN(result.timerstartvalue) && M.mod_quiz.timer.endtime && original_end_time != result.timelimit) {
                  var addexloadingtime = 0;
@@ -843,7 +843,8 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  }
                  Y.log('Page load comepnsation autosave (exam end): ' + addexloadingtime, 'debug', '[Wifiresilience-SW] Sync');
                  var t = new Date().getTime();
-                 M.mod_quiz.timer.endtime = exam_extra_page_load_time + t + result.timerstartvalue * 1000;
+                 // M.mod_quiz.timer.endtime = exam_extra_page_load_time + t + result.timerstartvalue * 1000;
+                 M.mod_quiz.timer.endtime = t + result.timerstartvalue * 1000;
                  Y.log('Exam End Time checks on server: SUCCESS. Exam End Time: ' +
                      result.timerstartvalue, 'debug', '[Wifiresilience-SW] Sync');
              } else {
@@ -852,33 +853,33 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                      result.timelimit + '. No Need to Compensate or Update Quiz Timer.' , 'debug', '[Wifiresilience-SW] Sync');
              }
          },
-         
+
          start_save_timer_if_necessary: function() {
              this.dirty = true;
-     
+
              this.locally_stored_data.last_change = new Date();
              this.locally_stored_data.responses = Y.IO.stringify(this.form); // Original.
-     
+
              var stringified_data = Y.JSON.stringify(this.locally_stored_data);
              // IndexedDB or WebSQL.
              M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
-     
+
              this.exam_localstorage_saving_status_str();
-             
+
              if (this.delay_timer || this.save_transaction) {
                  return;
              }
              Y.log('Changes worth syncing? Yes.. Flag Syncing to run after: ' + this.delay + ' milliseconds.',
                  'debug', '[Wifiresilience-SW] Sync');
-     
+
              this.start_save_timer();
          },
-     
+
          start_save_timer: function() {
              this.cancel_delay();
              this.delay_timer = Y.later(this.delay, this, this.save_changes);
          },
-     
+
          cancel_delay: function() {
              if (this.delay_timer && this.delay_timer !== true) {
                  this.delay_timer.cancel();
@@ -900,32 +901,32 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
          save_changes: function() {
              this.cancel_delay();
              this.dirty = false;
-     
+
              // Save form elements - make sure to re-read the form.
              this.locally_stored_data.responses = Y.IO.stringify(this.form);
              var stringified_data = Y.JSON.stringify(this.locally_stored_data);
              M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
-     
+
              Y.log('Saving Exam Elements Status in indexedDB.',
                  'debug', '[Wifiresilience-SW] Sync');
              // Save the encrypted file too?
              M.quizaccess_wifiresilience.localforage.save_attempt_records_encrypted();
              Y.log('Saving Exam Encrypted Emergency File in indexedDB.',
                  'debug', '[Wifiresilience-SW] Sync');
-     
+
              if (this.is_time_nearly_over()) {
                  Y.log('No more saving, time is nearly over.',
                      'debug', '[Wifiresilience-SW] Sync');
                  this.stop_autosaving();
                  return;
              }
-     
+
              Y.log('Start Syncing with Exam Server.',
                  'debug', '[Wifiresilience-SW] Sync');
              if (typeof tinyMCE !== 'undefined') {
                  tinyMCE.triggerSave();
              }
-     
+
              this.save_transaction = Y.io(this.AUTOSAVE_HANDLER, {
                  method: 'POST',
                  form: {
@@ -944,7 +945,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  Y.one(this.SELECTORS.SAVING_NOTICE).setStyle('display', 'block');
              }
          },
-     
+
          save_done: function(transactionid, response) {
              var result;
              try {
@@ -960,7 +961,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.try_to_restore_session();
                  return;
              }
-     
+
              if (result.result !== 'OK') {
                  if (result.error) {
                      var sync_errors = result.error + ' (Code: ' + result.errorcode + ') Info: ' + result.debuginfo;
@@ -973,9 +974,9 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.sync_string_errors = '';
              this.last_successful_server_save_timestamp = new Date();
              this.save_transaction = null;
-     
+
              // Is there a change happened to quiz end time? If so, then compensate it.
-     
+
              var original_end_time = Y.one('#original_end_time').get('value');
              if (!isNaN(result.timerstartvalue) && M.mod_quiz.timer.endtime && original_end_time != result.timelimit) {
                  var addexloadingtime = 0;
@@ -984,7 +985,8 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  }
                  Y.log('Page load comepnsation autosave (exam end): ' + addexloadingtime, 'debug', '[Wifiresilience-SW] Sync');
                  var t = new Date().getTime();
-                 M.mod_quiz.timer.endtime = exam_extra_page_load_time + t + result.timerstartvalue * 1000;
+                 // M.mod_quiz.timer.endtime = exam_extra_page_load_time + t + result.timerstartvalue * 1000;
+                 M.mod_quiz.timer.endtime = t + result.timerstartvalue * 1000;
                  Y.log('Exam End Time checks on server: SUCCESS. Exam End Time: ' +
                      result.timerstartvalue, 'debug', '[Wifiresilience-SW] Sync');
              } else {
@@ -996,54 +998,54 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.update_status_for_successful_save();
              this.update_question_state_classes(result.questionstates);
              this.update_question_state_strings(result.questionstatestrs);
-     
+
              Y.log('[SUCCESSFUL] Full Sync to server completed.', 'debug', '[Wifiresilience-SW] Sync');
-     
+
              this.real_connection_icon_status(true);
-     
+
              // Save questions status in localstorage.
              M.quizaccess_wifiresilience.localforage.save_question_state_classes(result.questionstates);
              M.quizaccess_wifiresilience.localforage.save_question_state_strings(result.questionstatestrs);
-     
+
              if (this.dirty) {
                  Y.log('Dirty after syncing. Need to re-sync again.', 'debug', '[Wifiresilience-SW] Sync');
                  this.start_save_timer();
              }
          },
-     
+
          save_failed: function() {
              this.real_connection_icon_status(false);
              Y.log('Syncing with Exam Server: failed. Plan B: Local Storage.', 'debug', '[Wifiresilience-SW] Sync');
              this.save_transaction = null;
              this.update_status_for_failed_save();
              this.save_start_time = null;
-     
+
              // We want to retry soon.
              this.dirty = true;
              this.start_save_timer();
          },
-     
+
          is_time_nearly_over: function() {
              calculated_delay = new Date().getTime() + 2 * this.delay;
              time_nearly_over = M.mod_quiz.timer && M.mod_quiz.timer.endtime && calculated_delay > M.mod_quiz.timer.endtime;
          },
-     
+
          stop_autosaving: function() {
              this.cancel_delay();
              this.delay_timer = true;
-     
+
              if (this.save_transaction) {
                  this.save_transaction.abort();
              }
          },
-     
+
          /**
           * A beforeunload handler, to warn if the user tries to quit with unsaved data.
           *
           * @param {EventFacade} e The triggering event
           */
          warn_if_unsaved_data: function(e) {
-     
+
              // For timer on reload when offline.
              var sessionstorage_attempt_key = 'wifiresilience-secondsleft-' + this.attemptid;
              if (!navigator.onLine) {
@@ -1052,30 +1054,30 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              } else {
                  sessionStorage.removeItem(sessionstorage_attempt_key);
              }
-     
+
              if (!this.dirty && !this.save_transaction) {
                  return;
              }
-     
+
              // How about we try to save again (to server) just in case and with no delay.
              this.save_changes();
-     
+
              // OK, what if Service Worker is disabled or not active? Say SEB < 2.2.
              // Then download a copy of last answers.
              if (this.serviceworker_supported == 0) {
                  // Now do that sourceforge style automatic download..
                  var data = {responses: Y.IO.stringify(M.quizaccess_wifiresilience.download.form)};
-     
+
                  if (M.quizaccess_wifiresilience.download.publicKey) {
                      data = M.quizaccess_wifiresilience.download.encryptResponses(data);
                  }
-     
+
                  var blob = new Blob([Y.JSON.stringify(data)], {type: "octet/stream"});
                  var url = window.URL.createObjectURL(blob);
                  $("#mod_quiz_navblock").append(
                      '<iframe id="wifi_unload_download_iframe" width="1" height="1" frameborder="0" src="' + url + '"></iframe>');
              }
-     
+
              // Try to set real offline time from SessionStorage for people who are refreshing the attempt.
              if (typeof(Storage) !== "undefined") {
                  sessionStorage.setItem('wifiresilience-offline-' + this.attemptid, this.real_offline_time);
@@ -1086,7 +1088,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              e.returnValue = M.util.get_string('changesmadereallygoaway', 'quizaccess_wifiresilience');
              return e.returnValue;
          },
-     
+
          /**
           * Handle a click on the submit and finish button. That is, show a confirm dialogue.
           *
@@ -1094,7 +1096,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           */
          submit_and_finish_clicked: function(e) {
              e.halt(true);
-     
+
              var confirmationDialogue = new M.core.confirm({
                  id: 'submit-confirmation',
                  width: '300px',
@@ -1107,12 +1109,12 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  yesLabel: M.util.get_string('submitallandfinish', 'quiz'),
                  question: M.util.get_string('confirmclose', 'quiz')
              });
-     
+
              // The dialogue was submitted with a positive value indication.
              confirmationDialogue.on('complete-yes', this.submit_and_finish, this);
              confirmationDialogue.render().show();
          },
-     
+
          /**
           * Handle the submit and finish button in the confirm dialogue being pressed.
           *
@@ -1121,15 +1123,15 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
          submit_and_finish: function(e) {
              e.preventDefault();
              e.stopPropagation();
-     
+
              // Preserve time for submission
              // Todo: substract total offline time (qtype fileresponse, complie code etc).
              if (this.final_submission_time == 0) {
                  this.final_submission_time = Math.round(new Date().getTime() / 1000) - this.real_offline_time;
              }
-     
+
              this.stop_autosaving();
-     
+
              var submitButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
              this.get_submit_progress(submitButton.ancestor('.controls')).show();
              submitButton.ancestor('.singlebutton').hide();
@@ -1137,16 +1139,16 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              submitButton.ancestor('.controls').removeClass('quiz-save-failed');
              failureMessage.header.hide();
              failureMessage.message.hide();
-     
+
              this.form.append('<input name="finishattempt" value="1">');
              this.form.append('<input type="hidden" name="final_submission_time" value="' + this.final_submission_time + '">');
-     
+
              Y.log('Trying to do final submission to the server.. Brace! Brace! Brace! :-)', 'debug', '[Wifiresilience-SW] Sync');
-     
+
              if (typeof tinyMCE !== 'undefined') {
                  tinyMCE.triggerSave();
              }
-     
+
              this.save_transaction = Y.io(this.AUTOSAVE_HANDLER, {
                  method: 'POST',
                  form: {
@@ -1162,7 +1164,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              });
              this.save_start_time = new Date();
          },
-     
+
          submit_done: function(transactionid, response) {
              var result;
              try {
@@ -1173,7 +1175,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.submit_failed(transactionid, response);
                  return;
              }
-     
+
              if (result.result !== 'OK') {
                  this.submit_failed(transactionid, response);
                  return;
@@ -1184,40 +1186,40 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.save_transaction = null;
              this.dirty = false;
              // Try to delete the local data records via promises :).
-     
+
              Y.log('Deleting local records after successful exam..', 'debug',
                  '[Wifiresilience-SW] Sync');
              M.quizaccess_wifiresilience.localforage.delete_records_after_successful_submission();
-     
+
              // Go to Exam Review URL.
              window.location.replace(result.reviewurl);
          },
-     
+
          submit_failed: function(transactionid = null, response = null) {
              this.real_connection_icon_status(false);
              Y.log('Final Submit failed. Emergency! Emergency! Emergency! [Offering to Download Responses..]', 'debug',
                  '[Wifiresilience-SW] Sync');
              this.save_transaction = null;
-     
+
              // Re-display the submit button.
              this.form.one(this.SELECTORS.FINISH_ATTEMPT_INPUT).remove();
              var submitButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
              var submitProgress = this.get_submit_progress(submitButton.ancestor('.controls'));
              submitButton.ancestor('.singlebutton').show();
              submitProgress.hide();
-     
+
              // And show the failure message.
              var failureMessage = this.get_submit_failed_message(submitButton.ancestor('.controls'));
              submitButton.ancestor('.controls').addClass('quiz-save-failed');
              failureMessage.header.show();
              failureMessage.message.show();
-     
+
              this.update_status_for_failed_save();
-     
+
              // Change the label of submit again to "try again".
              var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
              submitAndFinishButton.set('value',M.util.get_string('submitallandfinishtryagain', 'quizaccess_wifiresilience'));
-     
+
              function response_is_json_string(str) {
                  try {
                      JSON.parse(str);
@@ -1226,7 +1228,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  }
                  return true;
              }
-     
+
              if (response) {
                  if (response_is_json_string(response.responseText)) { // Moodle validation issues.
                      error_results = Y.JSON.parse(response.responseText);
@@ -1242,7 +1244,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              }
              var d = new Date();
              var whenhappened = d.toUTCString();
-     
+
              if (this.display_tech_errors == 1) {
                  $(".submit-failed-message").append("<div id=\"wifi_debug_exam_error_details\"><hr><font color='red'>" +
                  whenhappened +
@@ -1259,72 +1261,72 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  '<iframe id="wifi_automatic_download_iframe" width="1" height="1" frameborder="0" src="' +
                  url + '"></iframe>');
          },
-     
+
          get_submit_progress: function(controlsDiv) {
              var submitProgress = controlsDiv.one('.submit-progress');
              if (submitProgress) {
                  // Already created. Return it.
                  return submitProgress;
              }
-     
+
              // Needs to be created.
              submitProgress = controlsDiv.appendChild('<div class="submit-progress">');
              M.util.add_spinner(Y, submitProgress).show();
              submitProgress.append(M.util.get_string('submitting', 'quizaccess_wifiresilience'));
              return submitProgress;
          },
-     
+
          get_submit_failed_message: function(controlsDiv) {
              var failedHeader = controlsDiv.one('.submit-failed-header');
              if (failedHeader) {
                  // Already created. Return it.
                  return {header: failedHeader, message: controlsDiv.one('.submit-failed-message')};
              }
-     
+
              // Needs to be created.
              controlsDiv.insert('<div class="submit-failed-header">', 0);
              failedHeader = controlsDiv.one('.submit-failed-header');
              failedHeader.append('<h4>' + M.util.get_string('submitfailed', 'quizaccess_wifiresilience') + '</h4>');
              failedHeader.append('<p>' + M.util.get_string('submitfailedmessage', 'quizaccess_wifiresilience') + '</p>');
-     
+
              var downloadLink = '<a href="#" class="response-download-link btn button" style="margin-top:40px;">' +
                      M.util.get_string('savetheresponses', 'quizaccess_wifiresilience') + '</a>';
              var failedMessage = controlsDiv.appendChild('<div class="submit-failed-message">');
              failedMessage.append(
                  '<p>' + M.util.get_string('submitfaileddownloadmessage', 'quizaccess_wifiresilience', downloadLink) + '</p>');
-     
+
              return {header: failedHeader, message: failedMessage};
          },
-     
+
          create_status_messages: function() {
-     
+
              var last_saved_msg_str = '';
              var saving_dots_str = '';
-     
+
              if (this.display_nav_details == 1) {
                  last_saved_msg_str = M.util.get_string('lastsaved', 'quizaccess_wifiresilience', '<span id="quiz-last-saved"></span>');
                  saving_dots_str = M.util.get_string('savingdots', 'quizaccess_wifiresilience');
              }
-     
+
              Y.one('#mod_quiz_navblock .content').append('<div id="quiz-save-status">' +
                      '<div id="quiz-last-saved-message">' + last_saved_msg_str + '</div>' +
                      '<div id="quiz-saving">' + saving_dots_str + '</div>' +
                      '<div class="quiz-save-failed" style="display:none!important"></div>' +
                      '</div>');
-     
+
              this.save_start_time = new Date();
              this.update_status_for_successful_save();
              this.save_start_time = null;
          },
-     
+
          exam_saving_time_pad: function(number) {
              return number < 10 ? '0' + number : number;
          },
          exam_localstorage_saving_status_str: function() {
-     
+
              var latest_localstorage_timing = new Date(this.locally_stored_data.last_change);
              if (this.display_nav_details == 1) {
-     
+
                  Y.one(this.SELECTORS.LAST_SAVED_TIME).setHTML(this.exam_saving_time_pad(this.last_successful_save.getHours()) +
                          ':' + this.exam_saving_time_pad(this.last_successful_save.getMinutes()) +
                          ':' + this.exam_saving_time_pad(this.last_successful_save.getSeconds()) +
@@ -1334,9 +1336,9 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                          ':' + this.exam_saving_time_pad(latest_localstorage_timing.getSeconds()));
              }
          },
-     
+
          update_status_for_successful_save: function() {
-     
+
              function pad(number) {
                  return number < 10 ? '0' + number : number;
              }
@@ -1344,33 +1346,33 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.last_successful_save = new Date(wifi_current_time);
              this.last_successful_server_save_timestamp = new Date(wifi_current_time);
              this.exam_localstorage_saving_status_str();
-     
+
              Y.one(this.SELECTORS.SAVING_NOTICE).setStyle('display', 'none');
              Y.one(this.SELECTORS.SAVING_NOTICE).setHTML(M.util.get_string('savingdots', 'quizaccess_wifiresilience'));
              Y.one(this.SELECTORS.SAVE_FAILED_NOTICE).hide();
-     
+
              this.locally_stored_data.last_save = this.last_successful_server_save_timestamp;
-     
+
              var stringified_data = Y.JSON.stringify(this.locally_stored_data);
              // IndexedDB or WebSQL.
              M.quizaccess_wifiresilience.localforage.save_status_records(stringified_data);
-     
+
              this.save_start_time = null;
          },
-     
+
          update_status_for_failed_save: function() {
              if (this.display_nav_details == 1) {
                  Y.one(this.SELECTORS.LAST_SAVED_MESSAGE).setHTML(
                      M.util.get_string('lastsavedtotheserver', 'quizaccess_wifiresilience',
                      Y.one(this.SELECTORS.LAST_SAVED_TIME).get('outerHTML')));
                  Y.one(this.SELECTORS.SAVING_NOTICE).setStyle('display', 'none');
-     
+
                  Y.one(this.SELECTORS.SAVING_NOTICE).setHTML(
                      M.util.get_string('savingtryagaindots', 'quizaccess_wifiresilience') + '<div></div>');
                  Y.one(this.SELECTORS.SAVE_FAILED_NOTICE).show();
              }
          },
-     
+
          try_to_restore_session: function() {
              this.loginDialogue = new M.core.notification.info({
                  id: 'quiz-relogin-dialogue',
@@ -1380,7 +1382,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  visible: false,
                  draggable: false
              });
-     
+
              this.loginDialogue.setStdModContent(Y.WidgetStdMod.HEADER,
                      '<h1 id="moodle-quiz-relogin-dialogue-header-text">' +
                      M.util.get_string('logindialogueheader', 'quizaccess_wifiresilience') +
@@ -1388,11 +1390,11 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.loginDialogue.setStdModContent(Y.WidgetStdMod.BODY,
                      '<iframe src="' + this.RELOGIN_SCRIPT + '?userid=' +
                      Y.one('#quiz-userid').get('value') + '">', Y.WidgetStdMod.REPLACE);
-     
+
              // The dialogue was submitted with a positive value indication.
              this.loginDialogue.render().show();
          },
-     
+
          restore_session_complete: function(sesskey) {
              Y.all('input[name=sesskey]').set('value', sesskey);
              if (this.loginDialogue) {
@@ -1402,8 +1404,8 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.save_changes();
          }
      };
-    
-    
+
+
     }, '@VERSION@', {
         "requires": [
             "base",
@@ -1418,4 +1420,3 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
             'dd-delegate', 'dd-drop-plugin', 'dd-proxy', 'dd-constrain', 'selector-css3'
         ]
     });
-    

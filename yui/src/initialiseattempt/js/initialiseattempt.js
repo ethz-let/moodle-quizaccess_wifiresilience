@@ -1,3 +1,5 @@
+YUI.add('moodle-quizaccess_wifiresilience-initialiseattempt', function (Y, NAME) {
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -36,7 +38,6 @@ M.quizaccess_wifiresilience.initialiseattempt = {
      * @param {String} keyname the key, which will be saved in indexedDb
      */
     init: function(cleanexamname, examstoragekeyname, page, fetchandlogconfig, fetchandlog) {
-
         quizaccess_wifiresilience_progress = $(".quizaccess_wifiresilience_progress .quizaccess_wifiresilience_bar");
         var examviewportmaxwidth = $(window).width();
         if (!examviewportmaxwidth || examviewportmaxwidth == 0 || examviewportmaxwidth == 'undefined') {
@@ -67,30 +68,31 @@ M.quizaccess_wifiresilience.initialiseattempt = {
                 width: "100%"
             });
 
-            // What if forced to go to summary page to force sumbission after leaving the quiz and coming back?.
+            // What if forced to go to summary page to force sumbission after leaving the quiz and coming back?
             if (typeof(M.quizaccess_wifiresilience.navigation) != "undefined") {
 
-                /*
-                log in SESSION_STORAGE the original start time, so if refresh happens while offline, we still know
-                How long we got before the end of the exam instead of loading caches original exam length.
-                We will match the original start time with the recorded one in storage. (Match will happen in module.js)
-                Check SessionStorage browser support
-                */
+                // log in SESSION_STORAGE the original start time, so if refresh happens while offline, we still know
+                // How long we got before the end of the exam instead of loading caches original exam length.
+                // We will match the original start time with the recorded one in storage. (Match will happen in module.js)
+                // Check SessionStorage browser support
+
                 if (typeof(Storage) !== "undefined") {
                     var sessionstorage_exam_key = examstoragekeyname;
                     localStorage.setItem('current_exam', sessionstorage_exam_key);
                 }
             }
 
-            // To be sure, sure.. save per question! For future, not now.. Enable in ROUND-2.
+            // To be sure, sure.. save per question! For future, not now.. Enable in ROUND-2
+            // M.quizaccess_wifiresilience.localforage.save_html_per_question();
+
 
             if (typeof(M.quizaccess_wifiresilience.navigation) != "undefined") {
                 // Only if Timer auto submit enabled.
-                if (M.mod_quiz.timer.endtime && M.mod_quiz.timer.endtime != 0 && M.mod_quiz.timer.endtime != "undefined") {
-                    wifiresilience_window_load_time = (new Date().getTime()) - M.pageloadstarttime.getTime() + 12000;
+              //  wifiresilience_window_load_time = 0;
+                if (M.mod_quiz.timer.endtime != "undefined") {
+                    wifiresilience_window_load_time = (new Date().getTime()) - M.pageloadstarttime.getTime() + 10000;
                 }
             }
-
             if (typeof(M.quizaccess_wifiresilience.navigation) != "undefined") {
                 setTimeout( function() {
                     Y.all(M.quizaccess_wifiresilience.navigation.SELECTORS.ALL_PAGE_DIVS).addClass(
@@ -102,13 +104,23 @@ M.quizaccess_wifiresilience.initialiseattempt = {
                     Y.one(M.quizaccess_wifiresilience.navigation.SELECTORS.PAGE_DIV_ROOT + page).removeClass(
                         "quizaccess_wifiresilience_hidden"
                     );
-                    var pageloadduration = new Date().getTime() - M.pageloadstarttime.getTime();
-                    M.mod_quiz.timer.endtime += pageloadduration;
+
                     $("#quizaccess_wifiresilience_overlay").fadeOut();
                 }  , 10000 );
+
+                var actualstarttimeinput = Y.one('#actualstarttimeinput');
+                actualstarttimeinput.set('value', wifiresilience_window_load_time);
+                Y.io(M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/adjuststarttime.php', {
+                    method: 'POST',
+                    form: {
+                        id: M.quizaccess_wifiresilience.autosave.form
+                    },
+                    context: M.quizaccess_wifiresilience.autosave,
+                    timeout: 30000,
+                    sync: false
+                });
+
             } else {
-                var pageloadduration = new Date().getTime() - M.pageloadstarttime.getTime();
-                M.mod_quiz.timer.endtime += pageloadduration;
                 $("#quizaccess_wifiresilience_overlay").fadeOut();
             }
         });
@@ -169,3 +181,17 @@ M.quizaccess_wifiresilience.initialiseattempt = {
         }
     }
 };
+
+}, '@VERSION@', {
+    "requires": [
+        "base",
+        "node",
+        "event",
+        "event-valuechange",
+        "node-event-delegate",
+        "io-form",
+        "json",
+        "core_question_engine",
+        "mod_quiz"
+    ]
+});

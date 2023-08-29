@@ -183,6 +183,7 @@ if ($form->is_cancelled()) {
 
             echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
             // Load the attempt.
+          //  $attemptobj = quiz_attempt::create($postdata['attempt']);
             $attemptobj = quiz_create_attempt_handling_errors($postdata['attempt'], $cmid);
             if ($attemptobj->get_cmid() != $cmid) {
                 throw new coding_exception(
@@ -336,7 +337,10 @@ if ($form->is_cancelled()) {
 
                                 $_POST = $postdata;
                                 $_REQUEST = $postdata;
+
+                              //  $attemptobj = quiz_attempt::create($attempt->id);
                                 $attemptobj = quiz_create_attempt_handling_errors($attempt->id, $cmid);
+
 
                             }
 
