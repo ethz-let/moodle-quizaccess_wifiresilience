@@ -24,7 +24,6 @@
 
 require_once(__DIR__ . '/../../../../config.php');
 require_once("$CFG->dirroot/repository/lib.php");
-require_once("$CFG->dirroot/user/files_form.php");
 require_once("$CFG->dirroot/repository/lib.php");
 require_once("$CFG->dirroot/mod/quiz/locallib.php");
 
