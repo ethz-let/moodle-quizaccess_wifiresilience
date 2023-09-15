@@ -98,7 +98,7 @@ M.mod_quiz.timer = {
           //  exam_extra_page_load_time = 500 + (new Date().getTime()) - page_loaded_time;
             var actualstarttimeinput = Y.one('#actualstarttimeinput');
             exam_extra_page_load_time = actualstarttimeinput.get('value');
-            M.mod_quiz.timer.endtime += exam_extra_page_load_time;
+            M.mod_quiz.timer.endtime += Number(exam_extra_page_load_time);
             M.mod_quiz.timer.update();
             Y.one('#quiz-timer-wrapper').setStyle('display', 'flex');
             Y.log('Added extra time to compensate for page load & waiting, milliseconds: [' + exam_extra_page_load_time + ']', 'debug', '[Wifiresilience-SW] Timer');
