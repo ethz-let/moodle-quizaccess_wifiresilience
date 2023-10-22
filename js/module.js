@@ -94,7 +94,7 @@ M.mod_quiz.timer = {
         M.mod_quiz.timer.start_time = start;
         M.mod_quiz.timer.process_offline_refresh_attempt_time(attemptid);
 
-        $(window).on('load', function() {
+        window.addEventListener('load', function() {
           //  exam_extra_page_load_time = 500 + (new Date().getTime()) - page_loaded_time;
             var actualstarttimeinput = Y.one('#actualstarttimeinput');
             exam_extra_page_load_time = actualstarttimeinput.get('value');
