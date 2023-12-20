@@ -79,7 +79,7 @@ if ($attemptobj->get_userid() != $USER->id) {
         throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
     }
 }
-
+$PAGE->activityheader->disable();
 // Check capabilities and block settings.
 if (!$attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/quiz:attempt');
