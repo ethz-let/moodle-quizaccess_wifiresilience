@@ -57,6 +57,7 @@ if ($attemptobj->get_navigation_method() == QUIZ_NAVMETHOD_SEQ && $page < $attem
 $pageurl = $attemptobj->attempt_url(null, $page);
 $PAGE->set_url(quizaccess_wifiresilience::ATTEMPT_URL, $pageurl->params());
 
+
 $course = $attemptobj->get_course();
 if (!$course) {
     print_error('invalidcourse');
@@ -79,7 +80,7 @@ if ($attemptobj->get_userid() != $USER->id) {
         throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
     }
 }
-
+$PAGE->activityheader->disable();
 // Check capabilities and block settings.
 if (!$attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/quiz:attempt');
@@ -406,6 +407,27 @@ $thebutton = preg_replace('/<button type="submit"\s(.+?)>(.+?)<\/button>/is',
 $controls .= $output->container(
                                 $message . $output->container($thebutton, 'controls'),
                                 'submitbtns mdl-align wifi_must_be_submitted_btn');
+$controls .= $output->container('
+                                <div class="container controls wifi_submit_er_div">
+                                <h4>'.get_string('emergencyfileoptions', 'quizaccess_wifiresilience').'</h4>
+                                 <div class="row">
+
+                                   <div class="col-md" style="display:none">
+                                   <div class="card">
+
+  <div class="card-body">
+                                     ' . $output->container('<input type="submit" id="wifi_submit_erfile_btn" class="btn btn-secondary" value="SEND_ER_FILE_TXT"><div id="wifi_er_file_info_div"></div>', '').'
+                                   </div></div>
+                                   </div>
+                                   <div class="col-md">
+                                   <div class="card">
+  <div class="card-body" style="margin-bottom:10px"><a href="#" class="response-download-link btn btn-secondary">'.
+          get_string('savetheresponses', 'quizaccess_wifiresilience') . '</a></div>
+                                 </div></div>
+                                </div> ','submitbtns mdl-align wifi_submit_erfile_area');
+
+
+
 
 /**
  * ***** END CONTROL OVERRIDE*****

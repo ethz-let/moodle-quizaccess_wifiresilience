@@ -28,20 +28,27 @@ $string['answerchanged'] = 'Antwort geändert';
 $string['attempt'] = 'Versuch';
 $string['backtothequiz'] = 'Zurück zum Test';
 $string['changesmadereallygoaway'] = 'Ihre Antworten wurden nicht auf dem Server gespeichert. Möchten Sie diesen Versuch wirklich abbrechen?';
-$string['countrealofflinetime'] = 'Offline-Zeit abziehen (falls vorhanden)';
-$string['countrealofflinetime_help'] = 'Offline-Zeit von der Versuchszeit abziehen basierend auf der "richtigen Offline-Zeit". Von der Versuchszeit wird die Offline-Zeit abgezogen. Die Offline-Zeit ist die Zeit, in der der Benutzer eine spezifische Frage nicht bearbeiten konnte, weil keine Internetverbindung vorhanden war.<br><br>Wichtig: Dieser Wert wird bereits in der endgültigen Einreichungszeit berechnet. Diese Option funktioniert nur mit Versuchen, bei denen NICHT "beendet" ausgewählt worden ist.';
 $string['createasnewattempt'] = 'Als neuen Versuch anlegen';
 $string['createasnewattempt_help'] = '***Vorsicht*** Als neuen Versuch anlegen';
 $string['createnewattempt'] = 'Neuen Versuch anlegen';
 $string['currentissue'] = 'Aktuelles Problem';
-$string['dangeryes'] = 'Ja (<font color="red">!!Gefahr!!</font>)';
+$string['dangeryes'] = 'Ja';
 $string['dataprocessedsuccessfully'] = 'Daten wurden erfolgreich bearbeitet ({$a}).';
 $string['decryptingcomplete'] = 'Datei entschlüsseln abgeschlossen';
 $string['decryptingfile'] = 'Datei entschlüsseln {$a}';
 $string["delete"] = 'Löschen';
 $string["download"] = 'Herunterladen';
 $string["downloadfile"] = 'Als Datei herunterladen';
-$string['description'] = 'Dieser Test ist im <strong>Wifi Resilience</strong> Modus.';
+$string['description'] = 'Dieser Test ist im <strong>Wifi Resilience</strong> Modus.<br />
+<p style="text-align:left">
+Verwenden Sie den Wifi Resilience Modus nur, wenn
+<ul style="text-align:left">
+<li>alle Inhalte des Tests direkt in Moodle hochgeladen wurden, d.h. es gibt keine Links zu Dateien, Webseiten oder Bildern, die auf externe Server verweisen,
+<li>die im Test eingesetzten Fragetypen keinen externen Server benötigen, z. B. Stack, Code Expert, Code Runner,
+<li>der Test keine Videos enthält.
+</ul>
+<p style="text-align:left">Die Verwendung des Safe Exam Browsers wird dringend empfohlen.</p>
+</p>';
 $string['descriptionlink'] = 'Antwort-Dateien hochladen';
 $string['downloadedecryptedfile'] = 'Entschlüsselte Datei herunterladen';
 $string['excludelist'] = 'Dateien ausschliessen';
@@ -273,6 +280,7 @@ $string['ruleswnotregisteredstop'] = 'Service Worker ist nicht registriert (mög
 $string['ruleswnotregisteredupdate'] = 'Service Worker ist nicht registriert (möglicherweise fehlerhaft oder nicht im Page Scope enthalten oder bereits abgemeldet). Sie können ihn jetzt nicht aktualisieren.';
 $string['savefailed'] = 'Hinweis: Von Zeit zu Zeit sollten Sie:';
 $string['savetheresponses'] = 'Kopie der Antworten herunterladen';
+$string['emergencyfileoptions'] = 'Sie können auch eine Kopie der Antworten herunterladen';
 $string['savingdots'] = 'Auf dem Server speichern...';
 $string['savingtryagaindots'] = 'Erneuter Versuch auf dem Server zu speichern ...';
 $string['serviceworkermgmt'] = 'Service Worker Management';
@@ -299,7 +307,7 @@ $string['uploadinspection'] = 'Antworten überprüfen';
 $string['uploadinspectionfor'] = 'Antworten überprüfen für {$a}';
 $string['uploadmoreresponses'] = 'Weitere Antworten hochladen';
 $string['uploadresponses'] = 'Antwort-Dateien hochladen';
-$string['uploadresponsesadmin'] = 'Adminstratoren können: ';
+$string['uploadresponsesadmin'] = 'Adminstrator/innen können: ';
 $string['uploadresponsesfor'] = 'Antwort-Dateien hochladen für {$a}';
 $string['usefinalsubmissiontime'] = 'Endgültige Einreichungszeit aus der Antwort-Datei verwenden (falls vorhanden)';
 $string['usefinalsubmissiontime_help'] = 'Sobald ein Benutzer seinen Versuch beendet und abgibt (oder wenn der Versuch automtisch abgegeben wird), wird ein Parameter namens "final_submission_time" zur Datei hinzugefügt: Dieser Parameter enthält die Abgabe-Zeit. Falls keine endgültige Abgabezeit vorhanden ist, ist der Wert für "final_submission_time" 0. Falls 0, ignoriert das Skript diesen Paramater und eine der untenstehenden Optionen wird verwendet.';

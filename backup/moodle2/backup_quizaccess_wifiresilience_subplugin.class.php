@@ -48,13 +48,25 @@ class backup_quizaccess_wifiresilience_subplugin extends backup_mod_quiz_access_
         $subplugintablesettings = new backup_nested_element('quizaccess_wifiresilience', null,
                 array('enabled', 'prechecks', 'techerrors', 'navdetails'));
 
+        $emergencyfiles = new backup_nested_element('emergencyfiles');
+
+        $emergencyfile = new backup_nested_element('emergencyfile', array('id'),
+                                                    array('quizid', 'userid', 'attempt', 'answer_plain', 'answer_encrypted',
+                                                        'timecreated'));
+
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);
         $subpluginwrapper->add_child($subplugintablesettings);
+        $subpluginwrapper->add_child($emergencyfiles);
+        $emergencyfiles->add_child($emergencyfile);
 
         // Set source to populate the data.
         $subplugintablesettings->set_source_table('quizaccess_wifiresilience',
                 array('quizid' => backup::VAR_ACTIVITYID));
+        // Emergency files, per quizid.
+        $emergencyfile->set_source_table('quizaccess_wifiresilience_er',
+                array('quizid' => backup::VAR_PARENTID));
+        $emergencyfile->annotate_ids('user', 'userid');
 
         return $subplugin;
     }
