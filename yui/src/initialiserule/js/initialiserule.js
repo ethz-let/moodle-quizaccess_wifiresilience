@@ -89,75 +89,6 @@ M.quizaccess_wifiresilience.initialiserule = {
                     }
                 }
 
-                if (displayadminmsgs == 1) {
-                    document.querySelector("#quizaccess_wifiresilience_reset_sw").addEventListener("click",
-                    function() {
-                        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                            if (registrations) {
-                                for (let registration of registrations) {
-                                    registration.unregister().then(function(boolean) {
-                                        if (boolean) {
-                                            console.log("[Wifiresilience-SW] Service-Worker Reset successful: ", registration.scope);
-                                        }
-                                    });
-                                }
-                                window.location.reload();
-                            } else {
-                                alert(M.util.get_string('ruleswnotregisteredreset', 'quizaccess_wifiresilience'));
-                            }
-                        });
-                    });
-
-                    document.querySelector("#quizaccess_wifiresilience_update_sw").addEventListener("click",
-                    function() {
-                        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                            if (registrations) {
-                                for (let registration of registrations) {
-                                    registration.update().then(function(boolean) {
-                                        if (boolean) {
-                                            console.log("[Wifiresilience-SW] Service-Worker Update successful: ",registration.scope);
-                                        }
-                                    });
-                                }
-                            } else {
-                                alert(M.util.get_string('ruleswnotregisteredupdate', 'quizaccess_wifiresilience'));
-                            }
-                        });
-                    });
-
-                    document.querySelector("#quizaccess_wifiresilience_stop_sw").addEventListener("click",
-                    function() {
-                        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                            if (registrations)  {
-                                for (let registration of registrations) {
-                                    registration.unregister().then(function(boolean) {
-                                        if (boolean) {
-                                            console.log("[Wifiresilience-SW] Service-Worker STOP successful: ",registration.scope);
-                                        }
-                                    });
-                                }
-                            } else {
-                                alert(M.util.get_string('ruleswnotregisteredstop', 'quizaccess_wifiresilience'));
-                            }
-                        });
-                    });
-
-                    document.querySelector("#quizaccess_wifiresilience_sync_sw").addEventListener("click",
-                    function() {
-                        if (!registration.sync) {
-                            alert(M.util.get_string('rulebgsyncsupported', 'quizaccess_wifiresilience'));
-                            return;
-                        }
-                        registration.sync.register("upload-responses").then(function() {
-                            alert(M.util.get_string('rulebgsyncsuccess', 'quizaccess_wifiresilience'));
-                            console.log("[Wifiresilience-SW] Sync Test upload-responses registered. Firing upload-responses.");
-                        }).catch(function(error) {
-                            alert(M.util.get_string('rulebgsyncfail', 'quizaccess_wifiresilience'));
-                            console.log("[Wifiresilience-SW] Sync: Unable to register upload-responses.");
-                        });
-                    });
-                }
-
                 ExamServiceWorker.addEventListener("statechange", function(e) {
 
                     var swelement = document.querySelector('#sw_kind');
@@ -280,31 +211,14 @@ M.quizaccess_wifiresilience.initialiserule = {
             console.log('[Wifiresilience-SW] CacheAPI is not supported in this browser..');
         }
 
-        wifiresilience_tech_info_sync = M.util.get_string('rule7start', 'quizaccess_wifiresilience');
-
-        if ('SyncManager' in window) {
-            wifiresilience_tech_info_sync = M.util.get_string('rule7success', 'quizaccess_wifiresilience');
-            console.log('[Wifiresilience-SW] Background Sync is supported in this browser..');
-        } else {
-            wifiresilience_tech_info_sync = M.util.get_string('rule7error', 'quizaccess_wifiresilience');
-            console.log('[Wifiresilience-SW] Background Sync is not supported in this browser..');
-        }
 
         Y.on('domready', function() {
-            if (displayadminmsgs) {
-                Y.one(this.SELECTORS.RESETSW).show();
-                Y.one(this.SELECTORS.UPDATESW).show();
-                Y.one(this.SELECTORS.STOPSW).show();
-                Y.one(this.SELECTORS.SYNCSW).show();
-            }$console.log("xxx")
             Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info);
             Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info_db);
             Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info_presist_storage);
             Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info_avail_quota);
             Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info_req_quota);
             Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info_cacheAPI);
-            Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info_sync);
-            Y.one(this.SELECTORS.TECHINFO).append(wifiresilience_tech_info);
 
             if (showtechprechecks) {
                 Y.one(this.SELECTORS.TECHINFO).show();
