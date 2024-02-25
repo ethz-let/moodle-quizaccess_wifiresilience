@@ -324,4 +324,10 @@ textarea.inspectresponse {
     text-align: center !important;
     display: block;
 }
+#page-mod-quiz-attempt .wifi_submit_erfile_area {
+  display: none;
+}
+#page-mod-quiz-attempt #wifi_er_file_info_div{
+  margin-top: 10px;
+}
 /* stylelint-enable declaration-no-important  */

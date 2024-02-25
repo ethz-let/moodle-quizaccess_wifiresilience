@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use \moodleform;
 
-
 /**
  * Form for uploading responses saved from the emergency download link.
  *
@@ -40,8 +39,11 @@ class upload_responses extends moodleform {
      * Define the form.
      */
     protected function definition() {
-        $mform = $this->_form;
+      global $CFG, $COURSE, $USER;
 
+        $mform =& $this->_form;
+
+        $mform->addElement('header', 'general', get_string('general', 'form'));
         $mform->addElement('filemanager', 'responsefiles',
                 get_string('responsefiles', 'quizaccess_wifiresilience'),
                 null, array('subdirs' => 0, 'return_types' => FILE_INTERNAL));
@@ -50,6 +52,10 @@ class upload_responses extends moodleform {
 
         $mform->addHelpButton('responsefiles', 'responsefiles', 'quizaccess_wifiresilience');
 
+        $mform->addElement('hidden', 'finishattempts', 1);
+        $mform->addElement('hidden', 'createasnewattempt', 1);
+        $mform->addElement('hidden', 'submissiontime', 1);
+/*
         $mform->addElement('selectyesno', 'finishattempts',
                 get_string('finishattemptsafterupload', 'quizaccess_wifiresilience'));
 
@@ -61,13 +67,6 @@ class upload_responses extends moodleform {
 
         $mform->addHelpButton('createasnewattempt', 'createasnewattempt', 'quizaccess_wifiresilience');
 
-        $mform->disabledIf('countrealofflinetime', 'finishattempts', 'eq', 1);
-
-        $mform->addElement('checkbox', 'countrealofflinetime',
-                get_string('countrealofflinetime', 'quizaccess_wifiresilience'), '');
-
-        $mform->addHelpButton('countrealofflinetime', 'countrealofflinetime', 'quizaccess_wifiresilience');
-
         $timeoptions = array(
                         1 => get_string('fromfile', 'quizaccess_wifiresilience'),
                         2 => get_string('now', 'quizaccess_wifiresilience'),
@@ -75,12 +74,13 @@ class upload_responses extends moodleform {
 
         $mform->addElement('select', 'submissiontime',
                 get_string('uploadfinishtime', 'quizaccess_wifiresilience'), $timeoptions);
-
+*/
         $mform->addElement('checkbox', 'takeattemptfromjson',
-                get_string('takeattemptfromjson', 'quizaccess_wifiresilience'),
-                get_string('dangeryes', 'quizaccess_wifiresilience'));
+                get_string('takeattemptfromjson', 'quizaccess_wifiresilience'));
 
         $mform->addHelpButton('takeattemptfromjson', 'takeattemptfromjson', 'quizaccess_wifiresilience');
+        $mform->setAdvanced('takeattemptfromjson');
+
 
         $this->add_action_buttons(true, get_string('uploadresponses', 'quizaccess_wifiresilience'));
     }

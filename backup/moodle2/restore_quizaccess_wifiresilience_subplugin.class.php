@@ -50,6 +50,8 @@ class restore_quizaccess_wifiresilience_subplugin extends restore_mod_quiz_acces
         $elename = $this->get_namefor('');
         $elepath = $this->get_pathfor('/quizaccess_wifiresilience');
         $paths[] = new restore_path_element($elename, $elepath);
+        $paths[] = new restore_path_element('emergencyfiles',
+                       $this->get_pathfor('/emergencyfiles/emergencyfile'));
 
         return $paths;
     }
@@ -64,5 +66,26 @@ class restore_quizaccess_wifiresilience_subplugin extends restore_mod_quiz_acces
         $data = (object)$data;
         $data->quizid = $this->get_new_parentid('quiz');
         $DB->insert_record('quizaccess_wifiresilience', $data);
+    }
+    /**
+     * Processes the quizaccess_wifiresilience_er element, if it is in the file.
+     * @param array $data the data read from the XML file.
+     */
+    public function process_emergencyfiles($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $data->quizid = $this->get_new_parentid('quiz');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $DB->insert_record('quizaccess_wifiresilience_er', $data);
+    }
+    /**
+     * Return the contents of this quizaccess_wifiresilience_er to be processed by the links decoder
+     */
+    public static function define_decode_contents() {
+        $fields = array('answer_plain', 'answer_encrypted');
+        $contents[] = new restore_decode_content('quizaccess_wifiresilience_er', $fields, 'quizaccess_wifiresilience_er');
+
+        return $contents;
     }
 }

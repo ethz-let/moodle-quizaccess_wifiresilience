@@ -28,20 +28,28 @@ $string['answerchanged'] = 'Answer changed';
 $string['attempt'] = 'Attempt';
 $string['backtothequiz'] = 'Back to the quiz';
 $string['changesmadereallygoaway'] = 'Your responses have not been saved to the server. Are you sure you want to leave this attempt.';
-$string['countrealofflinetime'] = 'Deduct offline time (if available)';
-$string['countrealofflinetime_help'] = 'Deduct offline time from attempt time based on "real_offline_time". The attempt time, and regradless of the option (in the form below) you choose, will be minus the total offline time (time the user was not able to commence work in specific questions due to lack of internet).<br><br>Important: This value is already calculated in final submission time. This option only works with attempts that have not been selected as "finished".';
 $string['createasnewattempt'] = 'Create as new attempt.';
 $string['createasnewattempt_help'] = '***Carefull*** Create as new attempt';
 $string['createnewattempt'] = 'Create new attempt';
 $string['currentissue'] = 'Current issue';
-$string['dangeryes'] = 'Yes (<font color="red">!!Danger!!</font>)';
+$string['dangeryes'] = 'Yes';
 $string['dataprocessedsuccessfully'] = 'Data processed successfully ({$a}).';
 $string['decryptingcomplete'] = 'Decrypting file complete';
 $string['decryptingfile'] = 'Decrypting file {$a}';
 $string["delete"] = 'Delete';
 $string["download"] = 'Download';
 $string["downloadfile"] = 'Download as a file';
-$string['description'] = 'This exam is in <strong>Wifi Resilience</strong> mode.';
+$string['description'] = 'This exam is in <strong>Wifi Resilience</strong> mode.<br />
+<p style="text-align:left">
+Only use Wifi Resilience Mode when:
+<ul style="text-align:left">
+<li>All content in the test is uploaded directly to Moodle, e.g. no links to files, websites or pictures that refer to external servers.
+<li>The question types that you use in the test do not require an external server, e.g. Stack, Code Expert, Code Runner.
+<li>There is no video in the test.
+</ul>
+<ul style="text-align:left">The use of Safe Exam Browser is strongly recommended.</p>
+</p>
+';
 $string['descriptionlink'] = 'Upload exported responses';
 $string['downloadedecryptedfile'] = 'Download decrypted File';
 $string['excludelist'] = 'Exclude files';
@@ -275,6 +283,7 @@ $string['ruleswnotregisteredstop'] = 'Service Worker is not registered (Might ha
 $string['ruleswnotregisteredupdate'] = 'Service Worker is not registered (Might have errors, or not included in this page scope, or already deregistered), you can not update it now.';
 $string['savefailed'] = 'Note: From time to time you should:';
 $string['savetheresponses'] = 'Download copy of answers';
+$string['emergencyfileoptions'] = 'You can also download a copy of the answers';
 $string['savingdots'] = 'Saving to server...';
 $string['savingtryagaindots'] = 'Trying again to save to the server ...';
 $string['serviceworkermgmt'] = 'Service worker management';

@@ -84,4 +84,4 @@ Quiz fault-tolerant mode from Tim Hunt: https://github.com/timhunt/moodle-quizac
 ##  Contributors:
 
 ETH Zürich (Lead maintainer)
-Thomas Korner (Service owner, thomas.korner@let.ethz.ch)
+Antonia Bonaccorso (Service owner, antonia.bonaccorso@id.ethz.ch)
