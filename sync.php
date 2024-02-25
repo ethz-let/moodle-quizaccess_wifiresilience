@@ -64,25 +64,25 @@ $options = $attemptobj->get_display_options(false);
 
 // If the attempt is already closed, send them to the review page.
 if ($attemptobj->is_finished()) {
-    throw new moodle_quiz_exception($attemptobj->get_quizobj(),
-            'attemptalreadyclosed', null, $attemptobj->review_url());
+  $result = array('result' => 'OK', 'reviewurl' => $attemptobj->review_url()->out(false));
+  echo json_encode($result);
+  exit;
 }
 
-$duedate = 0;
-$quiz = $attemptobj->get_quiz();
-if ($quiz->timelimit) {
-    $duedate = $attemptobj->get_attempt()->timestart + $quiz->timelimit;
+
+// Fix potenial out of sequence issues.
+foreach ($attemptobj->get_slots() as $slot) {
+  $qa = $attemptobj->get_question_attempt($slot);
+  $_POST[$qa->get_control_field_name('sequencecheck')] = (string)$qa->get_sequence_check_count();
 }
 
-// If exceeded, put the time to be the due date (if set).
-if ($duedate != 0 && $timenow > $duedate) {
-    $timenow = $duedate;
-}
+$duedate = $attemptobj->get_due_date();
 
 if ($finishattempt) {
-    // Submit and finish. If tried to submit on time by delays happen etc.
-    if ($finalsubmissiontime != 0 && $timenow > $finalsubmissiontime) {
-        $timenow = $finalsubmissiontime;
+    // Submit and finish. If tried to submit on time but delays happen etc.
+    // Give them exceptional 30 mins in case of connection issues.
+    if ($duedate && $timenow > $duedate && ($timenow - $duedate) <= 1800) {
+        $timenow = $duedate;
     }
     $attemptobj->process_finish($timenow, true);
     $result = array('result' => 'OK', 'reviewurl' => $attemptobj->review_url()->out(false));

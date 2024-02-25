@@ -98,67 +98,77 @@ if ($form->is_cancelled()) {
             }
 
             $data = json_decode($datares);
-
             if (!$data) {
                 if (function_exists('json_last_error_msg')) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('filejsondecode', 'quizaccess_wifiresilience', json_last_error_msg()));
                 } else {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('filejsondecodeerror', 'quizaccess_wifiresilience', json_last_error()));
+
                 }
+                exit;
             }
             if (!isset($data->responses)) {
-                throw new coding_exception(
+                throw new \moodle_exception(
                                 get_string('filenoresponses', 'quizaccess_wifiresilience'));
+                exit;
             }
 
             if (isset($data->iv) || isset($data->key)) {
                 if (!$privatekey) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('filenodecryptionkey', 'quizaccess_wifiresilience'));
+                    exit;
                 }
 
                 $encryptedaeskey = base64_decode($data->key);
                 if (!$encryptedaeskey) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('fileencryptedkeynobase64', 'quizaccess_wifiresilience'));
+                    exit;
                 }
 
                 $encryptediv = base64_decode($data->iv);
                 if (!$encryptediv) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('fileencryptedinitvaluenobase64', 'quizaccess_wifiresilience'));
+                    exit;
                 }
 
                 $aeskeystring = '';
                 if (!openssl_private_decrypt($encryptedaeskey, $aeskeystring, $privatekey)) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('fileunabledecryptkey', 'quizaccess_wifiresilience', openssl_error_string()));
+                    exit;
                 }
 
                 $ivstring = '';
                 if (!openssl_private_decrypt($encryptediv, $ivstring, $privatekey)) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('fileunabledecryptkey', 'quizaccess_wifiresilience', openssl_error_string()));
+                    exit;
                 }
 
                 $aeskey = base64_decode($aeskeystring);
                 if (!$aeskey) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('filekeynobase64', 'quizaccess_wifiresilience'));
+                    exit;
                 }
 
                 $iv = base64_decode($ivstring);
                 if (!$iv) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('fileinitvaluenobase64', 'quizaccess_wifiresilience'));
+                    exit;
                 }
 
                 $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
                 if (!$responses) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('fileunabledecrypt', 'quizaccess_wifiresilience', openssl_error_string()));
+                    exit;
                 }
             } else {
                 $responses = $data->responses;
@@ -170,24 +180,27 @@ if ($form->is_cancelled()) {
 
             if (isset($fromform->takeattemptfromjson)) {
                 if (!isset($data->attemptid)) {
-                    throw new coding_exception(
+                    throw new \moodle_exception(
                                     get_string('filenoattemptidupload', 'quizaccess_wifiresilience'));
+                    exit;
                 }
                 $postdata['attempt'] = $data->attemptid;
             }
 
             if (!isset($postdata['attempt'])) {
-                throw new coding_exception(
+                throw new \moodle_exception(
                                 get_string('filenoattemptid', 'quizaccess_wifiresilience'));
+                exit;
             }
 
-            echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
+          //  echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
             // Load the attempt.
           //  $attemptobj = quiz_attempt::create($postdata['attempt']);
             $attemptobj = quiz_create_attempt_handling_errors($postdata['attempt'], $cmid);
             if ($attemptobj->get_cmid() != $cmid) {
-                throw new coding_exception(
+                throw new \moodle_exception(
                                 get_string('filewrongquiz', 'quizaccess_wifiresilience'));
+                exit;
             }
 
             // Process the uploaded data. (We have to do weird fakery with $_POST && $_REQUEST).
@@ -350,11 +363,7 @@ if ($form->is_cancelled()) {
                                 }
                                 $attemptobj->process_finish($endtime, true);
                             } else {
-                                if (isset($fromform->countrealofflinetime) && isset($postdata['real_offline_time'])) {
-                                    $timenow = time() - $postdata['real_offline_time'];
-                                } else {
-                                    $timenow = time();
-                                }
+                                $timenow = time();
                                 $attemptobj->process_attempt($timenow, false, 0, 0); // In progress.
                             }
 
@@ -381,7 +390,9 @@ if ($form->is_cancelled()) {
             echo $OUTPUT->heading(get_string('uploadfailed', 'quizaccess_wifiresilience'), 4);
             echo $OUTPUT->notification($e->getMessage());
             echo format_backtrace($e->getTrace());
+            echo $OUTPUT->single_button('upload.php?id=' . $cmid, get_string('continue'), 'get', ['type' => single_button::BUTTON_PRIMARY]);
             echo $OUTPUT->box_end();
+          exit;
         }
     }
     if ($privatekey) {
@@ -401,8 +412,13 @@ if ($form->is_cancelled()) {
     $PAGE->set_pagelayout('admin');
     $PAGE->set_title($title);
     $PAGE->set_heading($course->fullname);
-
     echo $OUTPUT->header();
+    /*
+    echo html_writer::div(html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/inspect.php',
+                                    array('id' => $cmid)),
+                                    get_string('inspect', 'quizaccess_wifiresilience')), 'alert alert-info',
+                                array('style' => 'text-align:left'));
+    */
     echo $OUTPUT->heading($title);
     $form->display();
     echo $OUTPUT->footer();
