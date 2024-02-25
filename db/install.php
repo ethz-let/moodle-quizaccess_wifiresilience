@@ -36,7 +36,7 @@ function xmldb_quizaccess_wifiresilience_install() {
         if ($privatekey) {
             openssl_pkey_export($privatekey, $privatekeystring);
             $publickeydata = openssl_pkey_get_details($privatekey);
-            openssl_pkey_free($privatekey);
+            unset($privatekey);
             set_config('privatekey', $privatekeystring, 'quizaccess_wifiresilience');
             set_config('publickey', $publickeydata['key'], 'quizaccess_wifiresilience');
         } else {
