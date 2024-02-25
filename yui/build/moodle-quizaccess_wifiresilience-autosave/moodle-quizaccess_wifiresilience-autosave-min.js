@@ -109,7 +109,11 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              LAST_SAVED_MESSAGE:    '#quiz-last-saved-message',
              LAST_SAVED_TIME:       '#quiz-last-saved',
              SAVE_FAILED_NOTICE:    '#mod_quiz_navblock .quiz-save-failed',
-             LIVE_STATUS_AREA:      '#quiz-server-status'
+             LIVE_STATUS_AREA:      '#quiz-server-status',
+             SEND_ER_AREA: '.wifi_submit_erfile_area',
+             SEND_ER_BTN: '#wifi_submit_erfile_btn',
+             SEND_ER_INFO_DIV: '#wifi_er_file_info_div',
+             ATTEMPT_SESSKEY_INPUT:      'input[name=sesskey]',
          },
 
          /**
@@ -122,6 +126,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           */
          AUTOSAVE_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/sync.php',
          TIMER_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/time.php',
+         ER_HANDLER: M.cfg.wwwroot + '/mod/quiz/accessrule/wifiresilience/senderfile.php',
 
          /**
           * Prefix for the localStorage key.
@@ -361,9 +366,13 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              this.form.delegate('change',      this.value_changed, this.SELECTORS.CHANGE_ELEMENTS,       this);
 
              var submitAndFinishButton = Y.one(this.SELECTORS.SUBMIT_BUTTON);
-
              submitAndFinishButton.detach('click');
              submitAndFinishButton.on('click', this.submit_and_finish_clicked, this);
+
+             var submitERfile = Y.one(this.SELECTORS.SEND_ER_BTN);
+
+             submitERfile.detach('click');
+             submitERfile.on('click', this.submit_er_clicked, this);
 
              // Special Case for qtype ddmatch.
              Y.DD.DDM.on("drag:drophit", this.value_changed_drag,    this);
@@ -1115,6 +1124,75 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              confirmationDialogue.render().show();
          },
 
+
+         submit_er_clicked: function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              $(this.SELECTORS.SEND_ER_INFO_DIV).html('');
+              $(this.SELECTORS.SEND_ER_BTN).prop("disabled",true);
+
+              var answerplain = {responses: Y.IO.stringify(M.quizaccess_wifiresilience.download.form)};
+              if (M.quizaccess_wifiresilience.download.publicKey) {
+                  var answerencrypted = M.quizaccess_wifiresilience.download.encryptResponses(answerplain);
+              }
+              Y.io(this.ER_HANDLER, {
+                  method: 'POST',
+                  data: {
+                      cmid: this.cmid,
+                      attempt: this.attemptid,
+                      sesskey: Y.one(this.SELECTORS.ATTEMPT_SESSKEY_INPUT).get('value'),
+                      answerplain: [Y.JSON.stringify(answerplain)],
+                      answerencrypted: [Y.JSON.stringify(answerencrypted)]
+                  },
+                  on: {
+                      success: this.submit_er_done,
+                      failure: this.submit_er_failed
+                  },
+                  context: this,
+                  timeout: this.SAVE_TIMEOUT_FULL_SUBMISSION,
+                  sync: false
+              });
+           },
+           submit_er_done: function(transactionid, response) {
+               var result;
+               try {
+                   result = Y.JSON.parse(response.responseText);
+               } catch (e) {
+                   Y.log('Final Submission Failure Reason (Transaction: ' + transactionid + '): ' + response.responseText, 'debug',
+                       '[Wifiresilience-SW] Sync');
+                   this.submit_er_failed(transactionid, response);
+                   return;
+               }
+
+               if (result.result !== 'OK') {
+                   this.submit_er_failed(transactionid, response);
+                   return;
+               }
+               var nice_merror_message = 'Emergency file is saved to Server. You can take a local copy of the emergency file and leave the exam safely.';
+               $(this.SELECTORS.SEND_ER_INFO_DIV).html('<div class="alert alert-success" role="alert">' + nice_merror_message + '</div>');
+             },
+          submit_er_failed: function(transactionid = null, response = null) {
+            function response_is_json_string(str) {
+                try {
+                    JSON.parse(str);
+                } catch (e) {
+                    return false;
+                }
+                return true;
+            }
+             if (response) {
+                 if (response_is_json_string(response)) { // Moodle validation issues.
+                     error_results = Y.JSON.parse(response);
+                     var nice_merror_message = '[ERR: ' + error_results.result + ']';
+                     Y.log(nice_merror_message, 'debug', '[Wifiresilience-SW] Sync');
+                 } else { // Server issues.
+                     var nice_merror_message = "Could not save the emergency file to Sever. Please download the file and keep a copy of it.";
+                     Y.log(response, 'debug', '[Wifiresilience-SW] Sync');
+                 }
+                 $(this.SELECTORS.SEND_ER_INFO_DIV).html('<div class="alert alert-warning" role="alert">' + nice_merror_message + '</div>');
+             }
+             $(this.SELECTORS.SEND_ER_BTN).prop("disabled",false);
+           },
          /**
           * Handle the submit and finish button in the confirm dialogue being pressed.
           *
@@ -1260,6 +1338,8 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              $(".submit-failed-message").append(
                  '<iframe id="wifi_automatic_download_iframe" width="1" height="1" frameborder="0" src="' +
                  url + '"></iframe>');
+              $(this.SELECTORS.SEND_ER_AREA).show();
+
          },
 
          get_submit_progress: function(controlsDiv) {
@@ -1289,12 +1369,15 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              failedHeader.append('<h4>' + M.util.get_string('submitfailed', 'quizaccess_wifiresilience') + '</h4>');
              failedHeader.append('<p>' + M.util.get_string('submitfailedmessage', 'quizaccess_wifiresilience') + '</p>');
 
-             var downloadLink = '<a href="#" class="response-download-link btn button" style="margin-top:40px;">' +
+             var downloadLink = '<a href="#" class="response-download-link btn btn-secondary" style="margin-top:40px;">' +
                      M.util.get_string('savetheresponses', 'quizaccess_wifiresilience') + '</a>';
-             var failedMessage = controlsDiv.appendChild('<div class="submit-failed-message">');
-             failedMessage.append(
-                 '<p>' + M.util.get_string('submitfaileddownloadmessage', 'quizaccess_wifiresilience', downloadLink) + '</p>');
 
+             var failedMessage = controlsDiv.appendChild('<div class="submit-failed-message">');
+/*
+             failedMessage.append(
+                 '<p>' + M.util.get_string('submitfaileddownloadmessage', 'quizaccess_wifiresilience', downloadLink) + '</p>'
+              );
+*/
              return {header: failedHeader, message: failedMessage};
          },
 
