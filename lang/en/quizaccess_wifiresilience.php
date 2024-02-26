@@ -50,7 +50,7 @@ Only use Wifi Resilience Mode when:
 <ul style="text-align:left">The use of Safe Exam Browser is strongly recommended.</p>
 </p>
 ';
-$string['descriptionlink'] = 'Upload response responses';
+$string['descriptionlink'] = 'Upload response files';
 $string['downloadedecryptedfile'] = 'Download decrypted File';
 $string['excludelist'] = 'Exclude files';
 $string['excludelist_help'] = 'Link/file per line. Exclude specific files/links from caching with service worker. This is useful when you want some files or links to be in NetworkOnly (never get cached) mode.';
