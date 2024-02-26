@@ -188,7 +188,7 @@ $string['finishattemptsafterupload'] = 'Versuch automatisch beenden und abgeben,
 $string['fromfile'] = 'Abgabezeit der Antwort-Datei';
 $string['inspect'] = 'Antwort-Dateien prüfen';
 $string['inspectingfile'] = 'Datei prüfen {$a}';
-$string['inspectingfiledesc'] = 'Hier können Sie Notfall-Dateien entschlüsseln und wieder verschlüsseln. Benutzen Sie dieses Tool mit Vorsicht. Mit dem Inspektions-Tool können Prüfungsadministratoren Testversuche bearbeiten. Bearbeitet werden kann unter anderem die Kurs ID, die Test ID, die Abgabezeit etc. ';
+$string['inspectingfiledesc'] = 'Hier können Sie Antwort-Dateien entschlüsseln und prüfen. Mit diesem Inspektions-Tool können Administrator/innen Testversuche einsehen, unter anderem die Kurs-ID, die Test-ID, die Abgabezeit etc.';
 $string['inspectionprocessedsuccessfully'] = 'Daten wurden erfolgreich bearbeitet.';
 $string['lastsaved'] = 'Zuletzt gespeichert: {$a}';
 $string['lastsavedtotheserver'] = 'Zuletzt auf dem Server gespeichert: {$a}';
@@ -243,7 +243,8 @@ $string['reference'] = 'Referenz';
 $string['refreshserviceworker'] = 'Service Worker neu laden';
 $string['resetserviceworker'] = 'Service Worker zurücksetzen';
 $string['responsefiles'] = 'Antwort-Dateien';
-$string['responsefiles_help'] = 'Durch Klicken auf das blinkende Icon für den Wireless Network Verbindungsstatus wird während eines Testversuchs eine Antwortdatei herunter geladen. Durch mehrmaliges Anklicken des Icons können unterschiedliche Versionen der Antwortdatei herunter geladen werden. Der Dateiname ist zusammengesetzt aus dem Präfix Wifiresilience, Datums- und Zeitangabe und der Endung .eth (...). (Beispiel: Wifiresilience-crs229-cm643-id558-u8-a25197-d201803010842.eth). Wenn nicht anders konfiguriert, wird die Datei im "Downloads"-Ordner gespeichert.';
+$string['responsefiles_help'] = 'Hier können Sie Antwort-Dateien von Teilnehmer/innen hochladen, die bei der Abgabe des Tests offline waren. Die Antwort-Datei enthält die offline gespeicherten Antworten der betroffenen Teilnehmer/in. Die Antwort-Dateien sind im Computer der betroffenen Teilnehmer/in im Download-Verzeichnis gespeichert.
+Für jede hochgeladene Antwort-Datei wird ein <b>neuer Versuch</b> angelegt. Dieser neu angelegte Versuch ist immer der letzte. Wenn z.B. schon ein Versuch existiert, ist der angelegte Versuch der zweite. Bestehende Versuche werden <b>nie</b> überschrieben.';
 $string['reviewthisattempt'] = 'Versuch erneut ansehen';
 $string['rule1start'] = '1. <font color=grey>[Wifiresilience-SW] Wifiresilience-exams-sw.js startet Registrierung..</font>';
 $string['rule1success'] = '1. <font color=green>[Wifiresilience-SW] Service-Worker Registrierung war erfolgreich. <span id="sw_kind"></span>';
@@ -294,7 +295,8 @@ $string['submitallandfinishtryagain'] = 'Alles abgeben und (erneut) beenden';
 $string['syncedfiles'] = 'Antwort-Dateien im Hintergrund synchronisieren';
 $string['syncserviceworker'] = 'Background Sync auslösen';
 $string['takeattemptfromjson'] = 'Unverschlüsselte Versuch-ID verwenden';
-$string['takeattemptfromjson_help'] = '***Bitte sorgfältig lesen:*** Wenn ein Versuch bereits beschädigt ist oder Sie einen neuen Versuch erstellen möchten, um damit fortzufahren und Probleme mit der Integrität der Fragensequenz zu vermeiden, verwenden Sie diese Option mit absoluter Sorgfalt! Bitte beachten Sie, dass die Versuchs-ID immer mit einem tatsächlichen Versuch übereinstimmen muss. Unabhängig davon, ob dieser zuvor erstellt oder vom Administrator (als Schüler angemeldet) erstellt wurde, um  damit die ursprüngliche Antwortdatei eines Schülers (Notfalldatei) hochzuladen. Es wird immer ein gültiger Versuch benötigt.<br><font color="red">Bitte kreuzen Sie dieses Kästchen NICHT an, es sei denn, Sie verstehen vollständig, wie Versuche verwaltet werden!</font>';
+$string['takeattemptfromjson_help'] = 'Diese Option sollten Sie nur verwenden, wenn die Antwort-Datei von Moodle nicht akzeptiert wird, z.B. weil der Versuch der Teilnehmer/in korrupt ist oder nicht mehr existiert.
+Beachten Sie, dass die Versuchs-ID in der Antwort-Datei immer mit einem tatsächlichen Versuch übereinstimmen muss. Der Versuch muss zuvor durch die Teilnehmer/in oder von der Administrator/in (angemeldet als betroffene/r Teilnehmer/in) erstellt werden.';
 $string['techerrors'] = 'Technische Fehler anzeigen';
 $string['techerrors_help'] = 'Dieses Option hilft das Fehlschlagen einer Testabgabe zu verstehen. Fehler, falls vorhanden, werden am Ende der Abgabeseite angezeigt.';
 $string['technicalchecks'] = 'Speicher Überprüfungen für den aktuellen Browser';
