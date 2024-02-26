@@ -92,7 +92,6 @@ if ($form->is_cancelled()) {
 
         try {
             $data = json_decode($file->get_content());
-
             if (!$data) {
                 if (function_exists('json_last_error_msg')) {
                     throw new coding_exception(json_last_error_msg());
@@ -148,9 +147,23 @@ if ($form->is_cancelled()) {
                     }
 
                     $responses = openssl_decrypt($data->responses, 'AES-256-CBC', $aeskey, 0, $iv);
+
                     if (!$responses) {
                         echo $OUTPUT->notification(
                             get_string('fileunabledecrypt', 'quizaccess_wifiresilience', openssl_error_string()), 'notifyfail');
+                    } else {
+                      $postdata = array();
+                      parse_str($responses, $postdata);
+                      echo get_string('filewithoutkeyandiv', 'quizaccess_wifiresilience');
+                      echo html_writer::tag('textarea', $responses,
+                          array('id' => 'quizaccess_wifiresilience_dectypted_file_output_json', 'class' => 'inspectresponse'));
+
+
+                      echo get_string('filearraystyle', 'quizaccess_wifiresilience');
+                      echo html_writer::tag('textarea', s(var_export($postdata, true)),
+                          array('id' => 'quizaccess_wifiresilience_dectypted_file_output_array', 'class' => 'inspectresponse'));
+                    
+
                     }
                 } else {
                     $responses = $data->responses;
