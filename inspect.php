@@ -40,7 +40,7 @@ require_capability('quizaccess/wifiresilience:inspectresponses', $context);
 $form = new \quizaccess_wifiresilience\form\inspect_responses($PAGE->url);
 
 if ($form->is_cancelled()) {
-    redirect($quizurl);
+    echo '<script>setTimeout(function() {window.location="'.$quizurl.'";}, 0);</script>';
 } else if ($fromform = $form->get_data()) {
 
     // Process submission.
