@@ -399,9 +399,7 @@ if ($form->is_cancelled()) {
         openssl_pkey_free($privatekey);
     }
 
-    echo $OUTPUT->confirm(get_string('processingcomplete', 'quizaccess_wifiresilience', 3),
-                    new single_button($PAGE->url, get_string('uploadmoreresponses', 'quizaccess_wifiresilience'), 'get'),
-                    new single_button($quizurl, get_string('backtothequiz', 'quizaccess_wifiresilience'), 'get'));
+    echo \html_writer::div($OUTPUT->single_button($quizurl, get_string('continue'), 'get'));
     echo $OUTPUT->footer();
 
 } else {
@@ -413,12 +411,6 @@ if ($form->is_cancelled()) {
     $PAGE->set_title($title);
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
-    /*
-    echo html_writer::div(html_writer::link(new moodle_url('/mod/quiz/accessrule/wifiresilience/inspect.php',
-                                    array('id' => $cmid)),
-                                    get_string('inspect', 'quizaccess_wifiresilience')), 'alert alert-info',
-                                array('style' => 'text-align:left'));
-    */
     echo $OUTPUT->heading($title);
     $form->display();
     echo $OUTPUT->footer();
