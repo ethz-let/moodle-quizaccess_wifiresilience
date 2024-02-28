@@ -38,10 +38,6 @@ if ($ADMIN->fulltree) {
             get_string('publickey', 'quizaccess_wifiresilience'),
             get_string('publickey_desc', 'quizaccess_wifiresilience'), '', PARAM_RAW, 60, 6));
 
-    $settings->add(new admin_setting_configtext('quizaccess_wifiresilience/wifitoken',
-            get_string('wifitoken', 'quizaccess_wifiresilience'),
-            get_string('wifitoken_help', 'quizaccess_wifiresilience'), ''));
-
     $settings->add(new admin_setting_configcheckbox('quizaccess_wifiresilience/prechecks',
             get_string('prechecks', 'quizaccess_wifiresilience'),
             get_string('prechecks_help', 'quizaccess_wifiresilience'), 1));
