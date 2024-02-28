@@ -249,9 +249,7 @@ if ($form->is_cancelled()) {
         openssl_pkey_free($privatekey);
     }
 
-    echo $OUTPUT->confirm(get_string('decryptingcomplete', 'quizaccess_wifiresilience', 3),
-            new single_button($PAGE->url, get_string('uploadmoreresponses', 'quizaccess_wifiresilience'), 'get'),
-            new single_button($quizurl, get_string('backtothequiz', 'quizaccess_wifiresilience'), 'get'));
+    echo \html_writer::div($OUTPUT->single_button($quizurl, get_string('continue'), 'get'));
     echo $OUTPUT->footer();
 
 } else {
