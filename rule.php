@@ -22,8 +22,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- use mod_quiz\local\access_rule_base;
- use mod_quiz\quiz_settings;
+defined('MOODLE_INTERNAL') || die();
+require_once ($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
 
 /**
  * The access rule class implementation for the quizaccess_wifiresilience plugin.
@@ -35,7 +35,7 @@
  * @copyright 2014 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class quizaccess_wifiresilience extends access_rule_base {
+class quizaccess_wifiresilience extends quiz_access_rule_base {
 
     /** @var string the URL path to our replacement attempt script. */
     const ATTEMPT_URL = '/mod/quiz/accessrule/wifiresilience/attempt.php';
@@ -53,12 +53,12 @@ class quizaccess_wifiresilience extends access_rule_base {
      *        limits (has_capability('mod/quiz:ignoretimelimits', ...)).
      * @return object quiz_access_rule_base
      */
-    public static function make(quiz_settings $quizobj, $timenow, $canignoretimelimits) {
+    public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
         if (empty($quizobj->get_quiz()->wifiresilience_enabled) ||
              !self::is_compatible_behaviour($quizobj->get_quiz()->preferredbehaviour)) {
             return null;
         }
-
+        
         return new self($quizobj, $timenow);
     }
 
