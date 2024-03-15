@@ -28,6 +28,6 @@ $plugin->component = 'quizaccess_wifiresilience';
 $plugin->version = 2024022601;
 $plugin->requires = 2022112800; // Moodle 4.1.
 $plugin->supported = [400, 401];
-$plugin->incompatible = [402];
+$plugin->incompatible = 402;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '4.1';
