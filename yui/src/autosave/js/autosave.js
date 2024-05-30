@@ -345,7 +345,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              M.quizaccess_wifiresilience.autosave.offline_happened_on = 0;
              M.quizaccess_wifiresilience.autosave.real_offline_happened_on = 0;
 
-             M.core_question_engine.init_form(Y, this.SELECTORS.QUIZ_FORM);
+             //M.core_question_engine.init_form(Y, this.SELECTORS.QUIZ_FORM);
              Y.on('submit', M.mod_quiz.timer.stop, this.SELECTORS.QUIZ_FORM);
              // I don't know why it is window.onbeforeunload, not Y.on(...).
              // I copied this from formchangechecker and am not brave enough to change it.
