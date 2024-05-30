@@ -26,6 +26,16 @@
 M.mod_quiz = M.mod_quiz || {};
 
 M.mod_quiz.init_attempt_form = function(Y) {
+    require(['core_question/question_engine'], function(qEngine) {
+        qEngine.initForm('#responseform');
+    });
+    Y.on('submit', M.mod_quiz.timer.stop, '#responseform');
+    require(['core_form/changechecker'], function(FormChangeChecker) {
+        FormChangeChecker.watchFormById('responseform');
+    });
+};
+
+M.mod_quiz.init_attempt_form = function(Y) {
     M.core_question_engine.init_form(Y, '#responseform');
     Y.on('submit', M.mod_quiz.timer.stop, '#responseform');
     require(['core_form/changechecker'], function(FormChangeChecker) {
