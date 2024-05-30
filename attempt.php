@@ -22,6 +22,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ use mod_quiz\output\navigation_panel_attempt;
+ use mod_quiz\output\renderer;
+ use mod_quiz\quiz_attempt;
 // In case compression is not enabled on server, maybe try to compress it locally?
 @ini_set("zlib.output_compression", "On");
 @header('Service-Worker-Allowed: /');
@@ -224,7 +227,7 @@ if ($watchlistconfig == 1) {
 $attemptobj->fire_attempt_viewed_event();
 
 // Arrange for the navigation to be displayed in the first region on the page.
-$navbc = $attemptobj->get_navigation_panel($output, 'quiz_attempt_nav_panel', $page);
+$navbc = $attemptobj->get_navigation_panel($output, navigation_panel_attempt::class, $page);
 $regions = $PAGE->blocks->get_regions();
 
 $PAGE->blocks->add_fake_block($navbc, reset($regions));
@@ -382,7 +385,7 @@ $options = array('attempt' => $attemptobj->get_attemptid(), 'finishattempt' => 1
     'sesskey' => sesskey());
 
 $button = new single_button(new moodle_url($attemptobj->processattempt_url(), $options), get_string('submitallandfinish', 'quiz'));
-$button->id = 'quizaccess_wifiresilience_timer_autosubmit_form'; // Responseform.
+$button->set_attribute('id', 'quizaccess_wifiresilience_timer_autosubmit_form');
 
 if ($attemptobj->get_state() == quiz_attempt::IN_PROGRESS) {
     $button->add_action(
