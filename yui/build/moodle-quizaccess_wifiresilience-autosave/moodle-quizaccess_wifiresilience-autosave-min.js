@@ -591,7 +591,19 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
 
              Y.log('Found TinyMCE.', 'debug', '[Wifiresilience-SW] Sync');
              this.editor_change_handler = Y.bind(this.editor_changed, this);
-             tinyMCE.onAddEditor.add(Y.bind(this.init_tinymce_editor, this));
+             if (window.tinyMCE.onAddEditor) {
+                 window.tinyMCE.onAddEditor.add(Y.bind(this.init_tinymce_editor, this));
+             } else if (window.tinyMCE.on) {
+                 var startSaveTimer = this.start_save_timer_if_necessary.bind(this);
+                 window.tinyMCE.on('AddEditor', function(event) {
+                     event.editor.on('Change Undo Redo keydown', startSaveTimer);
+                 });
+                 // One or more editors might already have been added, so we have to attach
+                 // the event handlers to these as well.
+                 window.tinyMCE.get().forEach(function(editor) {
+                     editor.on('Change Undo Redo keydown', startSaveTimer);
+                 });
+              }
 
          },
 

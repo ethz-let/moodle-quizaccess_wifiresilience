@@ -53,8 +53,11 @@ class upload_responses extends moodleform {
         $mform->addHelpButton('responsefiles', 'responsefiles', 'quizaccess_wifiresilience');
 
         $mform->addElement('hidden', 'finishattempts', 1);
+        $mform->setType('finishattempts', PARAM_INT);
         $mform->addElement('hidden', 'createasnewattempt', 1);
+        $mform->setType('createasnewattempt', PARAM_INT);
         $mform->addElement('hidden', 'submissiontime', 1);
+        $mform->setType('submissiontime', PARAM_INT);
 /*
         $mform->addElement('selectyesno', 'finishattempts',
                 get_string('finishattemptsafterupload', 'quizaccess_wifiresilience'));

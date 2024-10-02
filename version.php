@@ -18,15 +18,15 @@
  * Version information for the quizaccess_wifiresilience plugin.
  *
  * @package quizaccess_wifiresilience
- * @copyright 2017 ETH Zurich (amr.hourani@let.ethz.ch)
+ * @copyright 2017 ETH Zurich (moodle@id.ethz.ch)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->cron = 0;
 $plugin->component = 'quizaccess_wifiresilience';
-$plugin->version = 2024053000;
+$plugin->version = 2024100100;
 $plugin->requires = 2023100900; // Moodle >= 4.3+.
 
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.4';
+$plugin->release = '4.5';

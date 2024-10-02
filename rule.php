@@ -105,7 +105,7 @@ class quizaccess_wifiresilience extends access_rule_base {
         $mform->addElement('hidden', 'wifiresilience_wifitoken');
 
         $mform->setType('wifiresilience_wifitoken', PARAM_RAW);
-        $mform->setDefault('wifiresilience_wifitoken', $config->wifitoken);
+        $mform->setDefault('wifiresilience_wifitoken', '');
 
         $mform->addElement('textarea', 'wifiresilience_watchxhr', get_string('watchxhr', 'quizaccess_wifiresilience'),
                         'cols="60" rows="25"');
