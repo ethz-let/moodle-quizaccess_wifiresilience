@@ -116,8 +116,48 @@ M.mod_quiz.timer = {
         require(['core_form/changechecker'], function(FormChangeChecker) {
             M.mod_quiz.timer.FormChangeChecker = FormChangeChecker;
         });
+        Y.one('#toggle-timer').on('click', function() {
+            M.mod_quiz.timer.toggleVisibility();
+        });
     },
 
+        /**
+     * Toggle the timer's visibility.
+     */
+        toggleVisibility: function() {
+            var Y = M.mod_quiz.timer.Y;
+            var timer = Y.one('#quiz-time-left');
+    
+            // If the timer is currently hidden, the visibility should be set to true and vice versa.
+            this.setVisibility(timer.getAttribute('hidden') === 'hidden');
+        },
+    
+        /**
+         * Set visibility of the timer.
+         * @param visible whether the timer should be visible
+         * @param updatePref whether the new status should be stored as a preference
+         */
+        setVisibility: function(visible, updatePref = true) {
+            var Y = M.mod_quiz.timer.Y;
+            var timer = Y.one('#quiz-time-left');
+            var button = Y.one('#toggle-timer');
+    
+            if (visible) {
+                button.setContent(M.util.get_string('hide', 'moodle'));
+                timer.show();
+            } else {
+                button.setContent(M.util.get_string('show', 'moodle'));
+                timer.hide();
+            }
+    
+            // Only update the user preference if this has been requested.
+            if (updatePref) {
+                require(['core_user/repository'], function(UserRepository) {
+                    UserRepository.setUserPreference('quiz_timerhidden', (visible ? '0' : '1'));
+                });
+            }
+    
+        },
     /**
      * Stop the timer, if it is running.
      */
