@@ -69,6 +69,11 @@ class quizaccess_wifiresilience extends access_rule_base {
      * @param MoodleQuickForm $mform
      */
     public static function add_settings_form_fields(mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
+        // Hide the form element if cap is not set.
+        if (!has_capability('quizaccess/wifiresilience:showinmodulesettings', $quizform->get_context())) {
+            return;
+        }
+
         $quizid = $quizform->get_current()->id;
 
         $config = get_config('quizaccess_wifiresilience');

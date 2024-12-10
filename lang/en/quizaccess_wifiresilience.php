@@ -327,6 +327,7 @@ $string['wifiresilience:adminmessages'] = 'View administration messages';
 $string['wifiresilience:browserchecks'] = 'View browser checks';
 $string['wifiresilience:inspectresponses'] = 'Inspect responses';
 $string['wifiresilience:localresponses'] = 'Inspect local responses (local storage)';
+$string['wifiresilience:showinmodulesettings'] = 'Show in form module settings';
 $string['wifiresilience:viewtechchecks'] = 'View technical checks (even when this option is disabled via quiz settings)';
 $string['wifiresilience:viewlivedevices'] = 'View live devices';
 $string['wifitoken'] = 'Background sync token';
