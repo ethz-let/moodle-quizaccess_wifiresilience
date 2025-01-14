@@ -841,11 +841,30 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              } catch (e) {
                  return;
              }
+             if (result.result === 'blockattempt') {
+                Y.log('Stale attempt, should be blocked', 'debug', '[Wifiresilience-SW] Sync');
+                this.save_transaction = null;
+                this.dirty = true;
+                this.stop_autosaving();
+                $("#quizaccess_wifiresilience_overlay").fadeIn();
+                $("#quizaccess_wifiresilience_text").text('');
+                $("quizaccess_wifiresilience_result").text('');
+                $("#quizaccess_wifiresilience_text").append('<img width="50%" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8c3ZnIGZpbGw9IiMwMDAwMDAiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgCgkgd2lkdGg9IjgwMHB4IiBoZWlnaHQ9IjgwMHB4IiB2aWV3Qm94PSIwIDAgODUuMTYgODUuMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiCgk+CjxnPgoJPHBhdGggZD0iTTcyLjY5NywxMi40NThjLTE2LjYxMS0xNi42MTEtNDMuNjMtMTYuNjExLTYwLjI0LDBjLTE2LjYwNCwxNi42MTEtMTYuNjA0LDQzLjYzNiwwLDYwLjI0MwoJCWMxNi42MSwxNi42MTEsNDMuNjM3LDE2LjYxMSw2MC4yNCwwQzg5LjMwOSw1Ni4wOTQsODkuMzA5LDI5LjA2Niw3Mi42OTcsMTIuNDU4eiBNMTkuMTI5LDE5LjEyOAoJCWMxMC45MTctMTAuOTIsMjcuNjE3LTEyLjYxOCw0MC4zMzUtNS4wOTZMMTQuMDM3LDU5LjQ2OEM2LjUwNiw0Ni43NDksOC4yMDUsMzAuMDQ4LDE5LjEyOSwxOS4xMjh6IE02Ni4wMjQsNjYuMDI5CgkJYy0xMC44NDIsMTAuODQyLTI3LjM4MSwxMi41ODctNDAuMDY1LDUuMjVsNDUuMzE0LTQ1LjMxNkM3OC42MjEsMzguNjQ4LDc2Ljg3Myw1NS4xODcsNjYuMDI0LDY2LjAyOXoiLz4KPC9nPgo8L3N2Zz4=">');
+                window.location.replace(M.cfg.wwwroot); 
+                return;
+             }
              if (result.result === 'lostsession') {
                  Y.log('Session loss detected. Re-Login required', 'debug', '[Wifiresilience-SW] Sync');
+                 this.save_transaction = null;
+                 this.dirty = true;
+                 this.stop_autosaving();
+                 $("#quizaccess_wifiresilience_overlay").fadeIn();
+                 $("#quizaccess_wifiresilience_text").text('');
+                 $("quizaccess_wifiresilience_result").text('');
+                 $("#quizaccess_wifiresilience_text").append('<img width="50%" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8c3ZnIGZpbGw9IiMwMDAwMDAiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgCgkgd2lkdGg9IjgwMHB4IiBoZWlnaHQ9IjgwMHB4IiB2aWV3Qm94PSIwIDAgODUuMTYgODUuMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiCgk+CjxnPgoJPHBhdGggZD0iTTcyLjY5NywxMi40NThjLTE2LjYxMS0xNi42MTEtNDMuNjMtMTYuNjExLTYwLjI0LDBjLTE2LjYwNCwxNi42MTEtMTYuNjA0LDQzLjYzNiwwLDYwLjI0MwoJCWMxNi42MSwxNi42MTEsNDMuNjM3LDE2LjYxMSw2MC4yNCwwQzg5LjMwOSw1Ni4wOTQsODkuMzA5LDI5LjA2Niw3Mi42OTcsMTIuNDU4eiBNMTkuMTI5LDE5LjEyOAoJCWMxMC45MTctMTAuOTIsMjcuNjE3LTEyLjYxOCw0MC4zMzUtNS4wOTZMMTQuMDM3LDU5LjQ2OEM2LjUwNiw0Ni43NDksOC4yMDUsMzAuMDQ4LDE5LjEyOSwxOS4xMjh6IE02Ni4wMjQsNjYuMDI5CgkJYy0xMC44NDIsMTAuODQyLTI3LjM4MSwxMi41ODctNDAuMDY1LDUuMjVsNDUuMzE0LTQ1LjMxNkM3OC42MjEsMzguNjQ4LDc2Ljg3Myw1NS4xODcsNjYuMDI0LDY2LjAyOXoiLz4KPC9nPgo8L3N2Zz4=">');
+                 window.location.replace(M.cfg.wwwroot);
                  return;
              }
-
              if (result.result !== 'OK') {
                  if (result.error) {
                      var sync_errors = result.error + ' (Code: ' + result.errorcode + ') Info: ' + result.debuginfo;
@@ -974,6 +993,18 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.save_failed(transactionid, response);
                  return;
              }
+             if (result.result === 'blockattempt') {
+                Y.log('Failed Device is trying to submit old stale data. Prevent it.', 'debug', '[Wifiresilience-SW] Sync');
+                this.save_transaction = null;
+                this.dirty = true;
+                this.stop_autosaving();
+                $("#quizaccess_wifiresilience_overlay").fadeIn();
+                $("#quizaccess_wifiresilience_text").text('');
+                $("quizaccess_wifiresilience_result").text('');
+                $("#quizaccess_wifiresilience_text").append('<img width="50%" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8c3ZnIGZpbGw9IiMwMDAwMDAiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgCgkgd2lkdGg9IjgwMHB4IiBoZWlnaHQ9IjgwMHB4IiB2aWV3Qm94PSIwIDAgODUuMTYgODUuMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiCgk+CjxnPgoJPHBhdGggZD0iTTcyLjY5NywxMi40NThjLTE2LjYxMS0xNi42MTEtNDMuNjMtMTYuNjExLTYwLjI0LDBjLTE2LjYwNCwxNi42MTEtMTYuNjA0LDQzLjYzNiwwLDYwLjI0MwoJCWMxNi42MSwxNi42MTEsNDMuNjM3LDE2LjYxMSw2MC4yNCwwQzg5LjMwOSw1Ni4wOTQsODkuMzA5LDI5LjA2Niw3Mi42OTcsMTIuNDU4eiBNMTkuMTI5LDE5LjEyOAoJCWMxMC45MTctMTAuOTIsMjcuNjE3LTEyLjYxOCw0MC4zMzUtNS4wOTZMMTQuMDM3LDU5LjQ2OEM2LjUwNiw0Ni43NDksOC4yMDUsMzAuMDQ4LDE5LjEyOSwxOS4xMjh6IE02Ni4wMjQsNjYuMDI5CgkJYy0xMC44NDIsMTAuODQyLTI3LjM4MSwxMi41ODctNDAuMDY1LDUuMjVsNDUuMzE0LTQ1LjMxNkM3OC42MjEsMzguNjQ4LDc2Ljg3Myw1NS4xODcsNjYuMDI0LDY2LjAyOXoiLz4KPC9nPgo8L3N2Zz4=">');
+                window.location.replace(M.cfg.wwwroot);
+                return;
+            }
              if (result.result === 'lostsession') {
                  Y.log('Session loss detected. Re-Login required', 'debug', '[Wifiresilience-SW] Sync');
                  this.save_transaction = null;
@@ -1488,7 +1519,26 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              // The dialogue was submitted with a positive value indication.
              this.loginDialogue.render().show();
          },
+         blockattempt: function() {
+            this.blockattemptDialogue = new M.core.notification.info({
+                id: 'quiz-blockattempt-dialogue',
+                width: '70%',
+                center: true,
+                modal: true,
+                visible: false,
+                draggable: false
+            });
 
+            this.blockattemptDialogue.setStdModContent(Y.WidgetStdMod.HEADER,
+                    '<h1 id="moodle-quiz-relogin-dialogue-header-text">' +
+                    M.util.get_string('blockattemptheading', 'quizaccess_wifiresilience') +
+                    '</h1>', Y.WidgetStdMod.REPLACE);
+            this.blockattemptDialogue.setStdModContent(Y.WidgetStdMod.BODY,
+                    '!!!BLOCKED ATTEMPT!!!', Y.WidgetStdMod.REPLACE);
+
+            // The dialogue was submitted with a positive value indication.
+            this.blockattemptDialogue.render().show();
+        },
          restore_session_complete: function(sesskey) {
              Y.all('input[name=sesskey]').set('value', sesskey);
              if (this.loginDialogue) {
