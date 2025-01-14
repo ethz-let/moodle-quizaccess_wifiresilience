@@ -39,8 +39,6 @@ $cmid = optional_param('cmid', null, PARAM_INT);
 
 $transaction = $DB->start_delegated_transaction();
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
-//$attemptobj = quiz_attempt::create($attemptid);
-//$attemptobj = quiz_create_attempt_handling_errors($attemptid, null);
 
 // Check login.
 if (!isloggedin() || !confirm_sesskey()) {
@@ -52,7 +50,7 @@ require_sesskey();
 
 // Check that this attempt belongs to this user.
 if ($attemptobj->get_userid() != $USER->id) {
-    throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+    throw new moodle_exception('notyourattempt');
 }
 
 // Check capabilities.
@@ -63,10 +61,19 @@ $options = $attemptobj->get_display_options(false);
 
 // If the attempt is already closed, send them to the review page.
 if ($attemptobj->is_finished()) {
-    throw new moodle_quiz_exception($attemptobj->get_quizobj(),
-            'attemptalreadyclosed', null, $attemptobj->review_url());
+    throw new moodle_exception('attemptalreadyclosed', 'quiz', $attemptobj->review_url());
 }
-
+/*** tobias */
+// Check if its latest active session.
+$ativesessobj = ['sesskey' => sesskey(), 'userid' => $USER->id, 'attemptid' => $attemptid];
+$latestactivesession = $DB->get_record('quizaccess_wifiresilience_sess', $ativesessobj);
+if(!$latestactivesession){
+  $result = array('result' => 'blockattempt');
+  echo json_encode($result);
+  require_logout();
+  die;
+}
+/*** end tobias */
 $endtime = $attemptobj->get_quizobj()->get_access_manager(time())->get_end_time($attemptobj->get_attempt());
 
 if ($endtime === false) {

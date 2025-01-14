@@ -35,8 +35,8 @@ $PAGE->set_title(get_string('logindialogueheader', 'quizaccess_wifiresilience'))
 require_login();
 
 if ($USER->id != $currentuserid) {
-    print_error('loggedinaswronguser', 'quizaccess_wifiresilience',
-            new moodle_url('/login/logout.php', array('sesskey' => sesskey(), 'loginpage' => 1)));
+    throw new moodle_exception('notyourattempt');
+
 }
 
 $PAGE->requires->js_init_code('

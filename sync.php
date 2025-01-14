@@ -53,13 +53,14 @@ require_sesskey();
 
 // Check that this attempt belongs to this user.
 if ($attemptobj->get_userid() != $USER->id) {
-    throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+    throw new moodle_exception('notyourattempt');
 }
 
 // Check capabilities.
 if (!$attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/quiz:attempt');
 }
+
 $options = $attemptobj->get_display_options(false);
 
 // If the attempt is already closed, send them to the review page.
@@ -68,7 +69,17 @@ if ($attemptobj->is_finished()) {
   echo json_encode($result);
   exit;
 }
-
+/*** tobias */
+// Check if its latest active session.
+$ativesessobj = ['sesskey' => sesskey(), 'userid' => $USER->id, 'attemptid' => $attemptid];
+$latestactivesession = $DB->get_record('quizaccess_wifiresilience_sess', $ativesessobj);
+if(!$latestactivesession){
+  $result = array('result' => 'blockattempt');
+  echo json_encode($result);
+  require_logout();
+  die;
+}
+/*** end tobias */
 
 // Fix potenial out of sequence issues.
 foreach ($attemptobj->get_slots() as $slot) {
@@ -86,6 +97,12 @@ if ($finishattempt) {
     }
     $attemptobj->process_finish($timenow, true);
     $result = array('result' => 'OK', 'reviewurl' => $attemptobj->review_url()->out(false));
+
+    /*** tobias */
+    // Delete latest active session.
+    $ativesessobj = ['id' => $latestactivesession->id];
+    $DB->delete_records('quizaccess_wifiresilience_sess', $ativesessobj);
+    /*** end tobias */
 
 } else {
     // Process the responses.

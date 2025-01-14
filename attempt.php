@@ -80,7 +80,7 @@ if ($attemptobj->get_userid() != $USER->id) {
     if ($attemptobj->has_capability('mod/quiz:viewreports')) {
         redirect($attemptobj->review_url(null, $page));
     } else {
-        throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+        throw new moodle_exception('notyourattempt', 'quiz', $attemptobj->view_url());
     }
 }
 $PAGE->activityheader->disable();
@@ -140,6 +140,24 @@ if (!$autosaveperiod) {
     // Offline mode only works with autosave, so if it is off for normal quizzes, use a sensible default.
     $autosaveperiod = 30;
 }
+
+/*** tobias */
+// Check if its latest active session.
+$ativesessobj = ['userid' => $USER->id, 'attemptid' => $attemptid];
+$activsesrec = new stdClass;
+$activsesrec->attemptid = $attemptid;
+$activsesrec->userid = $USER->id;
+$activsesrec->sesskey = sesskey();
+$latestactivesession = $DB->get_record('quizaccess_wifiresilience_sess', $ativesessobj);
+
+if(!$latestactivesession){
+    $DB->insert_record('quizaccess_wifiresilience_sess', $activsesrec);
+} else {
+    $activsesrec->id = $latestactivesession->id;
+    $DB->update_record('quizaccess_wifiresilience_sess', $activsesrec);
+}
+/*** end tobias */
+
 
 $userid = '-u' . $USER->id;
 
