@@ -104,6 +104,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
              ATTEMPT_ID_INPUT:      'input[name=attempt]',
              FINISH_ATTEMPT_INPUT:  'input[name=finishattempt]',
              SUBMIT_BUTTON:         '#wifi_exam_submission_finish',
+             SAVE_ATTEMPTDATA:      '#wifisaveattemptdata',
              FORM:                  'form',
              SAVING_NOTICE:         '#quiz-saving',
              LAST_SAVED_MESSAGE:    '#quiz-last-saved-message',
@@ -1022,6 +1023,10 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  this.save_failed(transactionid, response);
                  return;
              }
+            // Reset to autosave rather than process action in sync.php
+             var saveattemptdata = Y.one(this.SELECTORS.SAVE_ATTEMPTDATA);
+             saveattemptdata.set('value', 0);
+
              this.sync_string_errors = '';
              this.last_successful_server_save_timestamp = new Date();
              this.save_transaction = null;
@@ -1147,7 +1152,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           */
          submit_and_finish_clicked: function(e) {
              e.halt(true);
-
+/*
              var confirmationDialogue = new M.core.confirm({
                  id: 'submit-confirmation',
                  width: '300px',
@@ -1160,10 +1165,22 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
                  yesLabel: M.util.get_string('submitallandfinish', 'quiz'),
                  question: M.util.get_string('confirmclose', 'quiz')
              });
-
              // The dialogue was submitted with a positive value indication.
              confirmationDialogue.on('complete-yes', this.submit_and_finish, this);
              confirmationDialogue.render().show();
+             */
+             require(['core/notification', 'core/str'], function(Notification, Str) {
+                Notification.saveCancelPromise(
+                    Str.get_string('confirmation', 'admin'),
+                    Str.get_string('confirmclose', 'quiz'),
+                    Str.get_string('submitallandfinish', 'quiz')
+                ).then(function() {
+                    M.quizaccess_wifiresilience.autosave.submit_and_finish(e);
+                    return;
+                }).catch(function() {
+                    // User cancelled.
+                });
+            });
          },
 
 
@@ -1240,7 +1257,7 @@ YUI.add('moodle-quizaccess_wifiresilience-autosave', function (Y, NAME) {
           *
           * @param {EventFacade} e The triggering event, if there is one.
           */
-         submit_and_finish: function(e) {
+         submit_and_finish: function(e) { 
              e.preventDefault();
              e.stopPropagation();
 

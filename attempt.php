@@ -337,6 +337,8 @@ $form .= html_writer::empty_tag('input',
 
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+$form .= html_writer::empty_tag('input',
+                                array('type' => 'hidden', 'name' => 'wifisaveattemptdata', 'id' => 'wifisaveattemptdata', 'value' => 0));
 
 $form .= html_writer::empty_tag('input',
                                 array('type' => 'hidden', 'name' => 'scrollpos', 'value' => '', 'id' => 'scrollpos'));

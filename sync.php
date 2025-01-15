@@ -34,9 +34,11 @@ $timenow = time();
 // Get submitted parameters.
 $attemptid = required_param('attempt',  PARAM_INT);
 $thispage  = optional_param('thispage', 0, PARAM_INT);
+$timeup  = optional_param('timeup', 0, PARAM_INT);
 $finishattempt = optional_param('finishattempt', false, PARAM_BOOL);
 $finalsubmissiontime = optional_param('final_submission_time', 0, PARAM_INT);
 $cmid = optional_param('cmid', null, PARAM_INT);
+$wifisaveattemptdata = optional_param('wifisaveattemptdata', 0, PARAM_INT);
 
 $transaction = $DB->start_delegated_transaction();
 //$attemptobj = quiz_attempt::create($attemptid);
@@ -85,7 +87,10 @@ if(!$latestactivesession){
 foreach ($attemptobj->get_slots() as $slot) {
   $qa = $attemptobj->get_question_attempt($slot);
   $_POST[$qa->get_control_field_name('sequencecheck')] = (string)$qa->get_sequence_check_count();
+  //unset($_POST[$qa->get_control_field_name('sequencecheck')]);
 }
+
+//exit;
 
 $duedate = $attemptobj->get_due_date();
 
@@ -98,15 +103,17 @@ if ($finishattempt) {
     $attemptobj->process_finish($timenow, true);
     $result = array('result' => 'OK', 'reviewurl' => $attemptobj->review_url()->out(false));
 
-    /*** tobias */
     // Delete latest active session.
     $ativesessobj = ['id' => $latestactivesession->id];
     $DB->delete_records('quizaccess_wifiresilience_sess', $ativesessobj);
-    /*** end tobias */
 
 } else {
     // Process the responses.
-    $attemptobj->process_auto_save($timenow);
+    if($wifisaveattemptdata == 1) {
+        $attemptobj->process_attempt($timenow, $finishattempt, $timeup, $thispage);
+    } else {
+        $attemptobj->process_auto_save($timenow);
+    }   
 
     // Update current page number.
     if ($thispage >= 0 && $attemptobj->get_currentpage() != $thispage) {
@@ -114,12 +121,17 @@ if ($finishattempt) {
     }
 
     // Get the question states, and put them in a response.
-    $result = array('result' => 'OK', 'questionstates' => array(), 'questionstatestrs' => array(), 'timerstartvalue' => array());
+    $result = array('result' => 'OK', 'questionstates' => array(), 'questionstatestrs' => array(), 
+                    'timerstartvalue' => array(), 'sequencecheck' => array(), 'questionflagged' => array());
     foreach ($attemptobj->get_slots() as $slot) {
         $result['questionstates'][$slot] = $attemptobj->get_question_state_class(
                 $slot, $options->correctness);
         $result['questionstatestrs'][$slot] = $attemptobj->get_question_status(
                 $slot, $options->correctness);
+        $result['questionflagged'][$slot] = $attemptobj->is_question_flagged($slot);   
+        // get sequencecheck history.
+        $qa = $attemptobj->get_question_attempt($slot);
+        $result['sequencecheck'][$slot] = $qa->get_sequence_check_count();       
     }
 
 }

@@ -58,7 +58,8 @@ M.quizaccess_wifiresilience.navigation = {
         NEXT_PAGE_INPUT:      'input[name=nextpage]',
         PREVIOUS_PAGE_INPUT:  'input[name=previouspage]',
         FINISH_ATTEMPT_INPUT: 'input[name=finishattempt]',
-        ATTEMPT_ID_INPUT:     'input[name=attempt]'
+        ATTEMPT_ID_INPUT:     'input[name=attempt]',
+        SAVE_ATTEMPTDATA:      '#wifisaveattemptdata'
     },
 
     /**
@@ -338,7 +339,8 @@ M.quizaccess_wifiresilience.navigation = {
         if (pageno === this.currentpage) {
             return;
         }
-
+        var saveattemptdata = Y.one(this.SELECTORS.SAVE_ATTEMPTDATA);
+        saveattemptdata.set('value', 1);
         /*
         User moved on from livewatch question (question with livewatch in wifi-config/admin)
         Reset to "Live" because technicallly the user still working so we cant be stoping the timer,
