@@ -326,7 +326,6 @@ $string['wifiresilience:adminmessages'] = 'Administrationsmeldungen ansehen';
 $string['wifiresilience:browserchecks'] = 'Browserüberprüfung ansehen';
 $string['wifiresilience:inspectresponses'] = 'Antworten überprüfen';
 $string['wifiresilience:localresponses'] = 'Lokale Antworten überprüfen (Lokale Sicherung)';
-$string['wifiresilience:showinmodulesettings'] = 'In den Modul-Einstellungen anzeigen';
 $string['wifiresilience:viewtechchecks'] = 'Technische Überprüfung ansehen (auch wenn diese Option in den Testeinstellungen deaktiviert ist)';
 $string['wifiresilience:viewlivedevices'] = 'Live-Geräte anzeigen';
 $string['wifitoken'] = 'Background Sync Token';
