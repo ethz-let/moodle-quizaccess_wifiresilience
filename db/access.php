@@ -101,4 +101,11 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
+    'quizaccess/wifiresilience:showinmodulesettings' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW
+        ]
+    ],
 );
