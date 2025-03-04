@@ -15,7 +15,7 @@
     <licenseversion></licenseversion>
   </library>
   <library>
-    <location>js/workbox/js</location>
+    <location>js/workbox</location>
     <name>Workbox SW</name>
     <license>Apache</license>
     <version>1.0</version>
