@@ -256,7 +256,7 @@ if ($form->is_cancelled()) {
 
                             if (isset($fromform->createasnewattempt) && isset($data->userid) ) {
 
-                                $quizobj = quiz::create($quiz->id, $data->userid);
+                                $quizobj = quiz_settings::create($quiz->id, $data->userid);
 
                                 // Look for an existing attempt.
                                 $attempts = quiz_get_user_attempts($quizobj->get_quizid(), $data->userid, 'all', true);
