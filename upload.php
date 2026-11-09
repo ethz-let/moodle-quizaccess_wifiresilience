@@ -192,10 +192,7 @@ if ($form->is_cancelled()) {
                                 get_string('filenoattemptid', 'quizaccess_wifiresilience'));
                 exit;
             }
-
-          //  echo html_writer::tag('textarea', s(var_export($postdata, true)), array('readonly' => 'readonly'));
             // Load the attempt.
-          //  $attemptobj = quiz_attempt::create($postdata['attempt']);
             $attemptobj = quiz_create_attempt_handling_errors($postdata['attempt'], $cmid);
             if ($attemptobj->get_cmid() != $cmid) {
                 throw new \moodle_exception(
@@ -256,7 +253,7 @@ if ($form->is_cancelled()) {
 
                             if (isset($fromform->createasnewattempt) && isset($data->userid) ) {
 
-                                $quizobj = quiz_settings::create($quiz->id, $data->userid);
+                                $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $data->userid);
 
                                 // Look for an existing attempt.
                                 $attempts = quiz_get_user_attempts($quizobj->get_quizid(), $data->userid, 'all', true);
@@ -351,7 +348,6 @@ if ($form->is_cancelled()) {
                                 $_POST = $postdata;
                                 $_REQUEST = $postdata;
 
-                              //  $attemptobj = quiz_attempt::create($attempt->id);
                                 $attemptobj = quiz_create_attempt_handling_errors($attempt->id, $cmid);
 
 
